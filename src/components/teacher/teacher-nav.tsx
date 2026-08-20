@@ -5,7 +5,7 @@ import type { CurrentUser } from "@/lib/auth";
 
 interface TeacherNavProps {
   user: CurrentUser;
-  activeSection?: "dashboard" | "courses" | "new";
+  activeSection?: "dashboard" | "courses" | "exams" | "new";
 }
 
 export function TeacherNav({ user, activeSection = "courses" }: TeacherNavProps) {
@@ -60,6 +60,16 @@ export function TeacherNav({ user, activeSection = "courses" }: TeacherNavProps)
               }`}
             >
               Courses
+            </Link>
+            <Link
+              href="/teacher/exams"
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                activeSection === "exams"
+                  ? "bg-surface-container-low text-primary font-semibold"
+                  : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
+              }`}
+            >
+              Exams
             </Link>
           </nav>
         </div>

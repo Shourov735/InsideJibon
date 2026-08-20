@@ -28,3 +28,4 @@ export type Role = User["role"];
 export * from "./courses";
 export * from "./learning";
 export * from "./materials";
+export * from "./exams";

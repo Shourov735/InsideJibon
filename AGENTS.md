@@ -41,6 +41,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   handler must call `requireUser()`/`requireRole()` from `src/lib/permissions.ts`
   first. Layouts do not re-run on client-side navigation and are NOT an
   authorization boundary.
+- **Exams (Phase 3A):** the exam domain lives in `src/services/exams/`.
+  Ownership is always resolved in the database (exam → course → teacherId;
+  question/option → exam_questions → exam → course → teacherId) and
+  cross-teacher access behaves like Not Found (identical `"Exam not found."`).
+  Publishing preconditions are enforced authoritatively in
+  `validateExamForPublishing`/`publishExam`. Only draft exams are structurally
+  editable — published exams are frozen (questions/options/reorder/delete
+  blocked) and cannot be deleted until unpublished or archived.
 - **Lazy env/db access:** on Workers, `process.env` is populated per request.
   Always call `getEnv()`/`getDb()` inside handlers, never at module scope.
 - **Env is per-runtime:** `.env.local` holds secrets for local dev; deployed

@@ -29,6 +29,13 @@
       "when": 1787215437527,
       "tag": "0003_lucky_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1787223046793,
+      "tag": "0004_serious_leper_queen",
+      "breakpoints": true
     }
   ]
 }
