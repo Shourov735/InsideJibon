@@ -3,6 +3,8 @@ import { and, eq, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { courseModules, courses, lessons, type Lesson } from "@/db/schema";
+import { getDefaultStorage } from "@/lib/storage";
+import { cleanupLessonMaterials } from "@/services/materials";
 import type { CreateLessonInput, UpdateLessonInput } from "@/schemas/course";
 
 /**
@@ -115,10 +117,16 @@ export async function updateLesson(
  */
 export async function deleteLesson(
   teacherId: string,
-  lessonId: string
+  lessonId: string,
+  storage: import("@/lib/storage").Storage = getDefaultStorage()
 ): Promise<void> {
   const db = getDb();
   const { lesson: targetLesson } = await verifyLessonOwnership(teacherId, lessonId);
+
+  // Best-effort R2 cleanup before the row is removed (the FK cascade
+  // removes material rows; the bytes are deleted separately because R2
+  // cannot join the Postgres transaction).
+  await cleanupLessonMaterials(targetLesson.id, storage);
 
   // Delete the lesson
   await db.delete(lessons).where(eq(lessons.id, lessonId));

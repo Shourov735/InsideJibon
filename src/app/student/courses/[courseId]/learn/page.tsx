@@ -8,8 +8,10 @@ import {
   getLearningCourse,
   getLessonForStudent,
 } from "@/services/learning";
+import { getLessonMaterialsForStudent } from "@/services/materials";
 import { LearningSidebar } from "@/components/student/learning-sidebar";
 import { LessonCompleteButton } from "@/components/student/lesson-complete-button";
+import { LessonResources } from "@/components/student/lesson-resources";
 import { LessonVideo } from "@/components/student/lesson-video";
 import { ProgressBar } from "@/components/student/progress-bar";
 
@@ -77,6 +79,8 @@ export default async function LearnPage({
 
   const lesson = await getLessonForStudent(user.id, activeLessonId);
   if (!lesson) notFound();
+
+  const materials = await getLessonMaterialsForStudent(user.id, activeLessonId);
 
   const lessonHref = (lessonId: string) =>
     `/student/courses/${courseId}/learn?lesson=${lessonId}`;
@@ -215,6 +219,9 @@ export default async function LearnPage({
               </div>
             </article>
           )}
+
+          {/* Lesson Materials / Resources */}
+          <LessonResources materials={materials} className="mt-8" />
 
           <div className="mt-8 flex items-center justify-between gap-3 border-t border-outline-variant pt-6 pb-2">
             {lesson.prevLessonId ? (

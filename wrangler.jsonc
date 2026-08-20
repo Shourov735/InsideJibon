@@ -9,6 +9,12 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "r2_buckets": [
+    {
+      "binding": "MATERIALS_BUCKET",
+      "bucket_name": "insidejibon-materials"
+    }
+  ],
   "observability": {
     "enabled": true
   }

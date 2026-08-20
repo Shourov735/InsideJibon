@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherCourseWithCurriculum } from "@/services/courses";
+import { getTeacherCourseMaterials } from "@/services/materials";
 import { CurriculumBuilder } from "@/components/teacher/builder/curriculum-builder";
 
 interface BuilderPageProps {
@@ -30,5 +31,8 @@ export default async function CourseBuilderPage({ params }: BuilderPageProps) {
     notFound();
   }
 
-  return <CurriculumBuilder course={course} />;
+  const materials = await getTeacherCourseMaterials(teacher.id, course.id);
+
+  return <CurriculumBuilder course={course} initialMaterials={materials} />;
 }
+

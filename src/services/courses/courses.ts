@@ -9,6 +9,8 @@ import {
   type Course,
 } from "@/db/schema";
 import { slugify, type CreateCourseInput, type UpdateCourseInput } from "@/schemas/course";
+import { getDefaultStorage } from "@/lib/storage";
+import { cleanupCourseMaterials } from "@/services/materials";
 import type {
   CourseWithCounts,
   CourseWithCurriculum,
@@ -212,7 +214,8 @@ export async function updateCourse(
  */
 export async function deleteCourse(
   teacherId: string,
-  courseId: string
+  courseId: string,
+  storage: import("@/lib/storage").Storage = getDefaultStorage()
 ): Promise<void> {
   const db = getDb();
 
@@ -226,6 +229,10 @@ export async function deleteCourse(
       "Published courses cannot be permanently deleted. Please archive the course instead to preserve student access history."
     );
   }
+
+  // Best-effort R2 cleanup before the rows cascade away (R2 cannot join the
+  // Postgres transaction; cleanup failures are logged, not thrown).
+  await cleanupCourseMaterials(courseId, storage);
 
   await db
     .delete(courses)

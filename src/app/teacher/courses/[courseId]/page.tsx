@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherCourseWithCurriculum } from "@/services/courses";
+import { getTeacherCourseMaterials } from "@/services/materials";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { StatusBadge } from "@/components/teacher/status-badge";
 
@@ -33,6 +34,8 @@ export default async function CourseOverviewPage({
   if (!course) {
     notFound();
   }
+
+  const materials = await getTeacherCourseMaterials(teacher.id, course.id);
 
   const totalLessons = course.modules.reduce(
     (acc, m) => acc + m.lessons.length,
@@ -159,7 +162,7 @@ export default async function CourseOverviewPage({
         </div>
 
         {/* Metrics Grid */}
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
               Curriculum Modules
@@ -175,6 +178,15 @@ export default async function CourseOverviewPage({
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {totalLessons}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
+            <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              Lesson Resources
+            </span>
+            <p className="mt-1 text-2xl font-bold text-primary">
+              {materials.length}
             </p>
           </div>
 
@@ -263,6 +275,28 @@ export default async function CourseOverviewPage({
                           </div>
 
                           <div className="flex items-center gap-3 text-secondary">
+                            {materials.some((m) => m.lessonId === lesson.id) && (
+                              <span className="flex items-center gap-1 text-[11px] text-secondary">
+                                <svg
+                                  className="h-3.5 w-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                  />
+                                </svg>
+                                <span>
+                                  {materials.filter((m) => m.lessonId === lesson.id).length}{" "}
+                                  {materials.filter((m) => m.lessonId === lesson.id).length === 1 ? "file" : "files"}
+                                </span>
+                              </span>
+                            )}
+
                             {lesson.videoUrl && (
                               <span className="flex items-center gap-1 text-[11px] text-primary">
                                 <svg

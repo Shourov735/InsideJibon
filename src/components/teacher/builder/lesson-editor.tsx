@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { Lesson } from "@/db/schema";
+import type { MaterialSummary } from "@/types/material";
+import { TeacherLessonMaterials } from "@/components/teacher/materials/teacher-lesson-materials";
 import {
   deleteLessonAction,
   updateLessonAction,
@@ -13,14 +15,18 @@ interface LessonEditorProps {
   courseId: string;
   lesson: Lesson;
   moduleTitle: string;
+  materials?: MaterialSummary[];
   onDeleted?: () => void;
+  onMaterialsChange?: (materials: MaterialSummary[]) => void;
 }
 
 export function LessonEditor({
   courseId,
   lesson,
   moduleTitle,
+  materials = [],
   onDeleted,
+  onMaterialsChange,
 }: LessonEditorProps) {
   const router = useRouter();
 
@@ -277,8 +283,20 @@ export function LessonEditor({
             </div>
           </div>
 
+          {/* Lesson Materials / Resources Section */}
+          <TeacherLessonMaterials
+            key={lesson.id}
+            courseId={courseId}
+            lessonId={lesson.id}
+            materials={materials}
+            onMaterialsChange={onMaterialsChange}
+          />
+
           {/* Save Action Bar */}
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex items-center justify-between border-t border-outline-variant pt-4">
+            <p className="text-xs text-secondary">
+              Remember to save changes to update lesson metadata and reading notes.
+            </p>
             <button
               type="submit"
               disabled={isSaving}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import type { CourseWithCurriculum } from "@/types/course";
+import type { MaterialSummary } from "@/types/material";
 import { StatusBadge } from "../status-badge";
 import { ModuleItem } from "./module-item";
 import { LessonEditor } from "./lesson-editor";
@@ -16,9 +17,13 @@ import {
 
 interface CurriculumBuilderProps {
   course: CourseWithCurriculum;
+  initialMaterials?: MaterialSummary[];
 }
 
-export function CurriculumBuilder({ course }: CurriculumBuilderProps) {
+export function CurriculumBuilder({
+  course,
+  initialMaterials = [],
+}: CurriculumBuilderProps) {
   const router = useRouter();
 
   // Find first lesson to select by default if available
@@ -28,9 +33,13 @@ export function CurriculumBuilder({ course }: CurriculumBuilderProps) {
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(
     initialLessonId
   );
+  const [materials, setMaterials] = useState<MaterialSummary[]>(initialMaterials);
+  const [mobileTab, setMobileTab] = useState<"structure" | "editor">(
+    initialLessonId ? "editor" : "structure"
+  );
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
-  // New module state
+  // Sync materials if initialMaterials changes
   const [isAddingModule, setIsAddingModule] = useState(false);
   const [newModuleTitle, setNewModuleTitle] = useState("");
   const [newModuleDesc, setNewModuleDesc] = useState("");
@@ -164,10 +173,40 @@ export function CurriculumBuilder({ course }: CurriculumBuilderProps) {
         </div>
       </header>
 
-      {/* Main Workspace Area (2 Columns) */}
+      {/* Mobile Tab Switcher */}
+      <div className="flex border-b border-outline-variant bg-surface-container-lowest lg:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileTab("structure")}
+          className={`flex-1 py-2.5 text-xs font-semibold border-b-2 text-center transition-colors ${
+            mobileTab === "structure"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-secondary hover:text-on-surface"
+          }`}
+        >
+          Structure ({course.modules.length} {course.modules.length === 1 ? "module" : "modules"})
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab("editor")}
+          className={`flex-1 py-2.5 text-xs font-semibold border-b-2 text-center transition-colors ${
+            mobileTab === "editor"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-secondary hover:text-on-surface"
+          }`}
+        >
+          {selectedLesson ? `Lesson: ${selectedLesson.title}` : "Lesson Editor"}
+        </button>
+      </div>
+
+      {/* Main Workspace Area (2 Columns on desktop, toggled on mobile) */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar: Structure / Curriculum Pane */}
-        <aside className="flex h-full w-80 shrink-0 flex-col border-r border-outline-variant bg-surface">
+        <aside
+          className={`h-full w-full lg:w-80 shrink-0 flex-col border-r border-outline-variant bg-surface ${
+            mobileTab === "structure" ? "flex" : "hidden lg:flex"
+          }`}
+        >
           {/* Structure Header */}
           <div className="border-b border-outline-variant p-4">
             <div className="flex items-center justify-between">
@@ -257,7 +296,10 @@ export function CurriculumBuilder({ course }: CurriculumBuilderProps) {
                   isFirstModule={idx === 0}
                   isLastModule={idx === course.modules.length - 1}
                   selectedLessonId={selectedLessonId}
-                  onSelectLesson={(lessonId) => setSelectedLessonId(lessonId)}
+                  onSelectLesson={(lessonId) => {
+                    setSelectedLessonId(lessonId);
+                    setMobileTab("editor");
+                  }}
                   onMoveModuleUp={() => handleMoveModule(idx, "up")}
                   onMoveModuleDown={() => handleMoveModule(idx, "down")}
                 />
@@ -267,44 +309,65 @@ export function CurriculumBuilder({ course }: CurriculumBuilderProps) {
         </aside>
 
         {/* Right Main Editor Canvas */}
-        {selectedLesson && selectedModule ? (
-          <LessonEditor
-            key={selectedLesson.id}
-            courseId={course.id}
-            lesson={selectedLesson}
-            moduleTitle={`Module ${selectedModule.position}: ${selectedModule.title}`}
-            onDeleted={() => {
-              setSelectedLessonId(null);
-              router.refresh();
-            }}
-          />
-        ) : (
-          <div className="flex flex-1 items-center justify-center bg-surface p-8 text-center">
-            <div className="max-w-md space-y-3">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-surface-container-high text-secondary">
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+        <div
+          className={`flex-1 overflow-hidden ${
+            mobileTab === "editor" ? "flex" : "hidden lg:flex"
+          }`}
+        >
+          {selectedLesson && selectedModule ? (
+            <LessonEditor
+              key={selectedLesson.id}
+              courseId={course.id}
+              lesson={selectedLesson}
+              moduleTitle={`Module ${selectedModule.position}: ${selectedModule.title}`}
+              materials={materials.filter((m) => m.lessonId === selectedLesson.id)}
+              onMaterialsChange={(updatedLessonMaterials) => {
+                setMaterials((prev) => [
+                  ...prev.filter((m) => m.lessonId !== selectedLesson.id),
+                  ...updatedLessonMaterials,
+                ]);
+              }}
+              onDeleted={() => {
+                setSelectedLessonId(null);
+                setMobileTab("structure");
+                router.refresh();
+              }}
+            />
+          ) : (
+            <div className="flex flex-1 items-center justify-center bg-surface p-8 text-center">
+              <div className="max-w-md space-y-3">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-surface-container-high text-secondary">
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-base font-bold text-on-surface">
+                  No Lesson Selected
+                </h3>
+                <p className="text-xs text-secondary">
+                  Select a lesson from the curriculum sidebar to edit its details, reading notes, and supplementary materials, or click <strong>Add Lesson</strong> under a module.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setMobileTab("structure")}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs font-semibold text-primary lg:hidden"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+                  View Curriculum Structure →
+                </button>
               </div>
-              <h3 className="text-base font-bold text-on-surface">
-                No Lesson Selected
-              </h3>
-              <p className="text-xs text-secondary">
-                Select a lesson from the left curriculum sidebar to edit its title, reading notes, and video materials, or click <strong>Add Lesson</strong> under a module.
-              </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Publish Checklist Modal */}
