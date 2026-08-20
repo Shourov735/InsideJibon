@@ -16,6 +16,7 @@ interface ExamFormProps {
   courses?: (Course | CourseWithCounts)[];
   exam?: Exam;
   associatedCourse?: Course | CourseWithCounts | null;
+  initialCourseId?: string;
 }
 
 const DURATION_PRESETS = [
@@ -33,6 +34,7 @@ export function ExamForm({
   courses = [],
   exam,
   associatedCourse,
+  initialCourseId,
 }: ExamFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export function ExamForm({
     exam?.durationMinutes != null ? String(exam.durationMinutes) : ""
   );
   const [selectedCourseId, setSelectedCourseId] = useState<string>(
-    exam?.courseId ?? (courses.length === 1 ? courses[0].id : "")
+    exam?.courseId ?? initialCourseId ?? (courses.length === 1 ? courses[0].id : "")
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

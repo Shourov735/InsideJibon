@@ -10,7 +10,12 @@ export const metadata = {
   description: "Create a new examination for one of your courses.",
 };
 
-export default async function NewExamPage() {
+interface NewExamPageProps {
+  searchParams: Promise<{ courseId?: string }>;
+}
+
+export default async function NewExamPage({ searchParams }: NewExamPageProps) {
+  const { courseId } = await searchParams;
   const teacher = await requireTeacher();
   const coursesList = await getTeacherCourses(teacher.id);
 
@@ -74,7 +79,11 @@ export default async function NewExamPage() {
                 </div>
               </div>
             ) : (
-              <ExamForm mode="create" courses={coursesList} />
+              <ExamForm
+                mode="create"
+                courses={coursesList}
+                initialCourseId={courseId}
+              />
             )}
           </div>
         </div>
