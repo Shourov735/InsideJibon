@@ -1,7 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 
-import { getCurrentUser, type CurrentUser } from "@/lib/auth";
+import { resolveCurrentUser, type CurrentUser } from "@/lib/auth";
 import type { Role } from "@/db/schema";
 
 /**
@@ -11,9 +11,16 @@ import type { Role } from "@/db/schema";
  */
 
 export async function requireUser(): Promise<CurrentUser> {
-  const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
-  return user;
+  const { status, user } = await resolveCurrentUser();
+  if (user) return user;
+
+  // The session token is valid but the user has not been synced into the
+  // users table yet (webhook pending). Send them to the homepage instead
+  // of the sign-in page so signed-in users are not bounced into a
+  // sign-in loop while the webhook catches up.
+  if (status === "not-synced") redirect("/");
+
+  redirect("/sign-in");
 }
 
 export async function requireRole(...roles: Role[]): Promise<CurrentUser> {
