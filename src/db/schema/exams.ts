@@ -1,7 +1,9 @@
 import {
   boolean,
+  doublePrecision,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -10,7 +12,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { courses } from "./index";
+import { courses, users } from "./index";
 
 export const examStatusEnum = pgEnum("exam_status", [
   "draft",
@@ -43,6 +45,7 @@ export const exams = pgTable(
     title: text("title").notNull(),
     description: text("description"),
     durationMinutes: integer("duration_minutes"),
+    maxAttempts: integer("max_attempts"),
     status: examStatusEnum("status").notNull().default("draft"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -165,3 +168,108 @@ export type NewQuestionOption = typeof questionOptions.$inferInsert;
 
 export type ExamQuestion = typeof examQuestions.$inferSelect;
 export type NewExamQuestion = typeof examQuestions.$inferInsert;
+
+export const examAttemptStatusEnum = pgEnum("exam_attempt_status", [
+  "in_progress",
+  "submitted",
+]);
+
+/**
+ * A single student attempt at taking an exam.
+ *
+ * Historical correctness: the exact question/option set (including correct
+ * answers) the student saw is snapshotted into contentSnapshot when the
+ * attempt STARTS. Grading and result rendering always read the snapshot, so
+ * teacher-side edits (unpublish → edit → republish) can never silently change
+ * historical results. The snapshot is server-side only — it is never returned
+ * to the client before submission.
+ *
+ * attemptNumber is per (exam, student) and unique; the "max attempts" limit
+ * counts SUBMITTED attempts (started-but-abandoned attempts do not consume
+ * the limit). Deleting an exam cascades its attempts — a teacher explicitly
+ * deleting an exam removes its history.
+ */
+export const examAttempts = pgTable(
+  "exam_attempts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    examId: uuid("exam_id")
+      .notNull()
+      .references(() => exams.id, { onDelete: "cascade" }),
+    studentId: text("student_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    attemptNumber: integer("attempt_number").notNull(),
+    status: examAttemptStatusEnum("status").notNull().default("in_progress"),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    score: integer("score"),
+    totalPoints: integer("total_points"),
+    percentage: doublePrecision("percentage"),
+    contentSnapshot: jsonb("content_snapshot").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("exam_attempts_exam_student_number_unique").on(
+      table.examId,
+      table.studentId,
+      table.attemptNumber
+    ),
+    index("exam_attempts_exam_id_idx").on(table.examId),
+    index("exam_attempts_student_id_idx").on(table.studentId),
+    index("exam_attempts_exam_student_status_idx").on(
+      table.examId,
+      table.studentId,
+      table.status
+    ),
+  ]
+);
+
+/**
+ * One graded answer row per question of a submitted attempt.
+ *
+ * questionId and selectedOptionId are intentionally PLAIN UUIDs without
+ * foreign keys: grading data must survive teacher-side cleanup of bank
+ * questions/options (e.g. deleting a question from a draft exam that was
+ * previously published and attempted). The contentSnapshot on the attempt
+ * preserves the presentation (texts, correct answers); these rows preserve
+ * the awarded marks and correctness for the score breakdown. submitted
+ * attempts are immutable — no mutation endpoint ever touches these rows.
+ */
+export const examAnswers = pgTable(
+  "exam_answers",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    attemptId: uuid("attempt_id")
+      .notNull()
+      .references(() => examAttempts.id, { onDelete: "cascade" }),
+    questionId: uuid("question_id").notNull(),
+    selectedOptionId: uuid("selected_option_id"),
+    awardedPoints: integer("awarded_points").notNull().default(0),
+    isCorrect: boolean("is_correct").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("exam_answers_attempt_question_unique").on(
+      table.attemptId,
+      table.questionId
+    ),
+    index("exam_answers_attempt_id_idx").on(table.attemptId),
+  ]
+);
+
+export type ExamAttempt = typeof examAttempts.$inferSelect;
+export type NewExamAttempt = typeof examAttempts.$inferInsert;
+export type ExamAttemptStatus = ExamAttempt["status"];
+
+export type ExamAnswer = typeof examAnswers.$inferSelect;
+export type NewExamAnswer = typeof examAnswers.$inferInsert;

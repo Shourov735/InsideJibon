@@ -30,6 +30,13 @@ export const createExamSchema = z.object({
     .max(600, "Duration cannot exceed 600 minutes")
     .optional()
     .nullable(),
+  maxAttempts: z.coerce
+    .number("Attempt limit must be a number")
+    .int("Attempt limit must be a whole number")
+    .min(1, "Attempt limit must be at least 1")
+    .max(50, "Attempt limit cannot exceed 50")
+    .optional()
+    .nullable(),
 });
 
 export const updateExamSchema = createExamSchema.extend({

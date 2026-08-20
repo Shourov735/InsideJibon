@@ -49,6 +49,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   `validateExamForPublishing`/`publishExam`. Only draft exams are structurally
   editable — published exams are frozen (questions/options/reorder/delete
   blocked) and cannot be deleted until unpublished or archived.
+- **Exams (Phase 4 — student attempts):** attempts live in
+  `src/services/exams/attempts.ts`, grading in `src/services/exams/grading.ts`.
+  Immutability is snapshot-based: at attempt start the exact question/option
+  set incl. correct answers is captured into `exam_attempts.content_snapshot`;
+  grading and results read ONLY the snapshot, and `exam_answers` references
+  questions/options by plain UUIDs (no FKs). `drizzle-orm/neon-http` has NO
+  transactions — race safety relies on atomic conditional UPDATEs, unique
+  constraints, and 23505 retry loops (never assume transactional semantics).
+  `max_attempts` counts submitted attempts only, hard-guarded inside the
+  atomic submit UPDATE.
 - **Lazy env/db access:** on Workers, `process.env` is populated per request.
   Always call `getEnv()`/`getDb()` inside handlers, never at module scope.
 - **Env is per-runtime:** `.env.local` holds secrets for local dev; deployed

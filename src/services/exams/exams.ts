@@ -57,6 +57,8 @@ export async function createExam(
         input.durationMinutes == null
           ? null
           : Number(input.durationMinutes),
+      maxAttempts:
+        input.maxAttempts == null ? null : Number(input.maxAttempts),
       status: "draft",
     })
     .returning();
@@ -186,6 +188,8 @@ export async function updateExam(
         input.durationMinutes == null
           ? null
           : Number(input.durationMinutes),
+      maxAttempts:
+        input.maxAttempts == null ? null : Number(input.maxAttempts),
       updatedAt: new Date(),
     })
     .where(eq(exams.id, examId))
