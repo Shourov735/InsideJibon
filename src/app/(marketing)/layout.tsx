@@ -13,9 +13,17 @@ export default function MarketingLayout({
           >
             InsideJibon
           </Link>
-          <p className="hidden text-sm text-on-surface-variant sm:block">
-            শেখা, অনুশীলন, সাফল্য
-          </p>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/courses"
+              className="text-sm font-medium text-on-surface-variant transition-colors hover:text-primary"
+            >
+              Courses
+            </Link>
+            <p className="hidden text-sm text-on-surface-variant sm:block">
+              শেখা, অনুশীলন, সাফল্য
+            </p>
+          </div>
         </div>
       </header>
 
