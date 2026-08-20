@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shiksha - Exam Result</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#41474e",
+                        "secondary": "#4f6072",
+                        "on-secondary-container": "#556678",
+                        "outline": "#72787f",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f9f9fd",
+                        "on-primary-fixed-variant": "#0b4a73",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e2e2e6",
+                        "inverse-surface": "#2e3134",
+                        "surface-container-high": "#e7e8ec",
+                        "secondary-container": "#d2e4fa",
+                        "surface-tint": "#2e628c",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0a1d2c",
+                        "surface": "#f9f9fd",
+                        "inverse-on-surface": "#f0f0f4",
+                        "primary": "#003555",
+                        "secondary-fixed": "#d2e4fa",
+                        "surface-container": "#edeef1",
+                        "outline-variant": "#c1c7cf",
+                        "tertiary-fixed-dim": "#fbba74",
+                        "surface-container-low": "#f3f3f7",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#0f4c75",
+                        "on-tertiary-container": "#eaab66",
+                        "inverse-primary": "#9acbfb",
+                        "on-primary-container": "#8bbceb",
+                        "surface-container-highest": "#e2e2e6",
+                        "tertiary-fixed": "#ffdcbc",
+                        "primary-fixed-dim": "#9acbfb",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f9f9fd",
+                        "secondary-fixed-dim": "#b6c8dd",
+                        "tertiary": "#4b2a00",
+                        "on-primary-fixed": "#001d32",
+                        "on-background": "#191c1f",
+                        "tertiary-container": "#6a3e00",
+                        "on-tertiary-fixed": "#2c1700",
+                        "primary-fixed": "#cee5ff",
+                        "on-secondary-fixed-variant": "#37485a",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1f",
+                        "surface-dim": "#d9dade",
+                        "on-tertiary-fixed-variant": "#683d00",
+                        "success": "#059669",
+                        "on-success": "#ffffff",
+                        "success-container": "#d1fae5",
+                        "on-success-container": "#064e3b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        };
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased md:hidden pb-24">
+<!-- TopNavBar -->
+<header class="bg-surface text-primary font-Inter text-body-md fixed top-0 w-full z-40 border-b border-outline-variant flat no shadows">
+<div class="flex justify-between items-center px-lg py-sm max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<button class="text-secondary cursor-pointer active:opacity-80 hover:bg-surface-container-low transition-colors rounded-full p-2 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<img alt="Shiksha Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida/AP1WRLtpo9BD2kQ8eeCHOFlBTDP-Cr2OmZ4gsLeEhhP1cWew1usgRKVpNiWkMxXjJhPhwfJwGx71Bc0cBENyKoHwyCGTQE2nLVihvPMZTUxsaFDmOQl_j2mWJSune-bMmMdLt2JbeInxTvgO1hoTL_gfhLkBsr9uEetcBIy1kcMBDbqdCgSIXF0G1Sv7DiYE5_O_C31WGrU__NNicvM83uEffEeHuou-JX1P1NMdVH40PHVLFGdahQlP3AOxdnk"/>
+</div>
+<div class="flex items-center gap-xs">
+<button class="text-secondary hover:bg-surface-container-low transition-colors p-2 rounded-full cursor-pointer active:opacity-80 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-secondary hover:bg-surface-container-low transition-colors p-2 rounded-full cursor-pointer active:opacity-80 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<img alt="Student profile avatar" class="h-8 w-8 rounded-full border border-outline-variant ml-2 object-cover" data-alt="A professional headshot of a diverse student in a modern, well-lit academic setting. The lighting is soft and natural, emphasizing a clean, contemporary aesthetic. The background is slightly blurred to focus on the individual, fitting a premium educational platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5EM59A40VgBmEWxBz-CUpGlmJasOyjCvX9usX4Ae75NtBf7obR3020e_ufv48TOKBhSM2sUTyjJMg0NFFY-6SpXtScZ673bZ-CCJ4LF-FOKyEoVvoMNnpzVhYWXt1Qq8CQblyfFFw9eiS1QOZVIBp8aQgANf1lF6Ehx0oWcaGr0AHtVuuTwgb-lk0XNiR31VO1fs_gn7qUN2sweBHCmQSjhRtvEXLlA6T_5HsTa-BrCqRad8_zcOc"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-margin-mobile flex flex-col gap-lg">
+<!-- Header Section -->
+<section class="flex flex-col gap-base">
+<div class="flex items-center gap-sm text-secondary font-label-md text-label-md">
+<span class="material-symbols-outlined text-body-lg" data-icon="quiz">quiz</span>
+<span>Advanced Calculus Final</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Exam Results</h1>
+<p class="font-body-md text-body-md text-secondary">Completed on October 24, 2023</p>
+</section>
+<!-- Score Summary Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col items-center text-center gap-md">
+<div class="inline-flex items-center justify-center bg-success-container text-on-success-container px-sm py-xs rounded-full font-label-sm text-label-sm uppercase tracking-wider mb-sm">
+<span class="material-symbols-outlined mr-1 text-[16px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+                Passed
+            </div>
+<div class="relative w-32 h-32 flex items-center justify-center">
+<!-- Decorative Progress Ring -->
+<svg class="absolute inset-0 w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="#edeef1" stroke-width="8"></circle>
+<circle class="transition-all duration-1000 ease-out" cx="50" cy="50" fill="none" r="45" stroke="#003555" stroke-dasharray="282.7" stroke-dashoffset="39.5" stroke-width="8"></circle>
+</svg>
+<div class="flex flex-col items-center z-10">
+<span class="font-headline-lg text-headline-lg text-primary">86%</span>
+</div>
+</div>
+<div class="flex justify-around w-full mt-sm pt-sm border-t border-surface-container-high">
+<div class="flex flex-col items-center">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Score</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">86/100</span>
+</div>
+<div class="w-px bg-surface-container-high"></div>
+<div class="flex flex-col items-center">
+<span class="font-label-sm text-label-sm text-secondary uppercase">Percentile</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">92nd</span>
+</div>
+</div>
+</section>
+<!-- Topic Performance Stack -->
+<section class="flex flex-col gap-sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Topic Performance</h2>
+<!-- Topic Item -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-md text-label-md text-on-surface">Limits and Continuity</span>
+<span class="font-body-sm text-body-sm text-secondary">90%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[90%]"></div>
+</div>
+</div>
+<!-- Topic Item -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-md text-label-md text-on-surface">Derivatives</span>
+<span class="font-body-sm text-body-sm text-secondary">85%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[85%]"></div>
+</div>
+</div>
+<!-- Topic Item -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-md text-label-md text-on-surface">Integrals</span>
+<span class="font-body-sm text-body-sm text-secondary">75%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-fixed-dim rounded-full w-[75%]"></div>
+</div>
+</div>
+</section>
+<!-- Weak Areas Warning -->
+<section class="bg-error-container text-on-error-container rounded-lg p-md border border-error/20 flex gap-md items-start">
+<span class="material-symbols-outlined text-error" data-icon="warning">warning</span>
+<div class="flex flex-col gap-xs">
+<h3 class="font-label-md text-label-md">Focus Area Identified</h3>
+<p class="font-body-sm text-body-sm opacity-90">Review Integration by Parts. You scored below average compared to your cohort on these specific question types.</p>
+<button class="text-error font-label-sm text-label-sm uppercase tracking-wider self-start mt-sm flex items-center gap-xs hover:opacity-80 transition-opacity">
+                    View Study Materials
+                    <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Action Buttons -->
+<section class="flex flex-col gap-sm mt-sm">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-sm px-md rounded-lg flex justify-center items-center gap-xs hover:bg-primary-container transition-colors shadow-sm active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+                Review Answers
+            </button>
+<button class="w-full bg-transparent text-primary border border-primary font-label-md text-label-md py-sm px-md rounded-lg flex justify-center items-center gap-xs hover:bg-primary-container/5 transition-colors active:scale-[0.98]">
+                Back to Dashboard
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface text-primary font-Inter text-label-sm-mobile fixed bottom-0 w-full z-50 md:hidden border-t border-outline-variant shadow-lg flex justify-around items-center h-16 px-2">
+<a class="flex flex-col items-center justify-center text-secondary active:bg-surface-container-high transition-transform active:scale-95 w-full h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span>Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary active:bg-surface-container-high transition-transform active:scale-95 w-full h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="library_books">library_books</span>
+<span>My Courses</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/20 px-4 py-1 rounded-xl transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="history_edu" data-weight="fill">history_edu</span>
+<span class="font-semibold">Exams</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary active:bg-surface-container-high transition-transform active:scale-95 w-full h-full rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Dashboard - Shiksha</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container": "#ffe9e9",
+                "on-surface": "#271719",
+                "inverse-on-surface": "#ffeced",
+                "surface-container-highest": "#f8dcdd",
+                "on-tertiary-fixed-variant": "#00522b",
+                "on-primary-container": "#fffbff",
+                "gradient-start": "#ff4b6b",
+                "tertiary": "#006a39",
+                "surface-variant": "#f8dcdd",
+                "surface-bright": "#fff8f7",
+                "on-background": "#271719",
+                "tertiary-container": "#008649",
+                "tertiary-fixed-dim": "#5cde8e",
+                "secondary-fixed": "#e0e0ff",
+                "on-primary-fixed": "#40000f",
+                "on-tertiary-fixed": "#00210e",
+                "on-primary-fixed-variant": "#91002d",
+                "inverse-surface": "#3d2c2d",
+                "on-surface-variant": "#5a4042",
+                "primary": "#b70b3c",
+                "soft-blue-bg": "#f0f4ff",
+                "on-secondary": "#ffffff",
+                "on-secondary-container": "#fffbff",
+                "secondary": "#3f49d5",
+                "on-tertiary-container": "#f6fff4",
+                "outline-variant": "#e3bebf",
+                "soft-pink-bg": "#fff5f6",
+                "secondary-container": "#5964ef",
+                "secondary-fixed-dim": "#bec2ff",
+                "primary-fixed-dim": "#ffb2b8",
+                "surface-dark": "#1a1a1a",
+                "outline": "#8e6f71",
+                "on-tertiary": "#ffffff",
+                "background": "#fff8f7",
+                "on-error": "#ffffff",
+                "surface-container-low": "#fff0f0",
+                "on-secondary-fixed": "#00036b",
+                "on-primary": "#ffffff",
+                "primary-container": "#da2f53",
+                "surface-container-high": "#fee1e2",
+                "on-error-container": "#93000a",
+                "tertiary-fixed": "#7afca8",
+                "surface-dim": "#f0d3d4",
+                "error": "#ba1a1a",
+                "surface": "#fff8f7",
+                "gradient-end": "#ff8e6e",
+                "error-container": "#ffdad6",
+                "primary-fixed": "#ffdadb",
+                "on-secondary-fixed-variant": "#252fc0",
+                "inverse-primary": "#ffb2b8",
+                "surface-container-lowest": "#ffffff",
+                "surface-tint": "#bb103e"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "gutter": "24px",
+                "container-max": "1200px",
+                "base": "8px",
+                "section-gap": "80px",
+                "card-padding": "24px",
+                "xs": "4px",
+                "xl": "32px",
+                "xxl": "48px",
+                "md": "16px",
+                "lg": "24px",
+                "sm": "12px",
+                "margin-mobile": "16px"
+        },
+        "fontFamily": {
+                "body-sm": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-sm": [
+                        "Plus Jakarta Sans"
+                ],
+                "display-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "label-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "label-sm": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "display-lg-mobile": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-lg": [
+                        "Plus Jakarta Sans"
+                ]
+        },
+        "fontSize": {
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-sm": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "headline-lg": [
+                        "30px",
+                        {
+                                "lineHeight": "38px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.03em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body { background-color: #fff8f7; }
+        .card-shadow { box-shadow: 0px 4px 12px rgba(183, 11, 60, 0.05); }
+        .progress-ring__circle { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        /* Hide scrollbar for carousel but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="text-on-surface pb-[80px] md:pb-0 md:pl-72 md:pt-20 bg-background">
+<!-- TopAppBar (Web) -->
+<header class="hidden md:flex fixed top-0 w-full z-50 justify-between items-center px-lg md:px-xxl h-20 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline flat no shadows">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer">menu</span>
+<span class="text-headline-md font-display-lg text-primary dark:text-primary-fixed">Shiksha</span>
+</div>
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A small, circular avatar portrait of a modern university student, shot in soft natural light against a neutral background. The student looks approachable and professional, consistent with an academic tech platform aesthetic. High quality, clear focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA58pqRV2eGQfNHaeZwzD-63Trej6PJZ6kaPSfBDkHQ4trLmBQEtg4MFCp8akt1kAOvSc-zugoumnCratt2nJLtfXPQrTphheHOnF13YynU7R1AP0UJnenZKFJtjXYrA7yMuBhItcHWlwHAFFSyiEgcdK_1pjjEAO6LoyBORbLqkF6_CO-w6ZNNIdHlGFxqcF8qnPOJ3kfCho9jKNVUrHrTMUhUoeJEeFQlTCFFMjl3yLWx4y-xYt5R"/>
+</div>
+</header>
+<!-- NavigationDrawer (Web Sidebar) -->
+<nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md bg-surface dark:bg-surface-dim border-r border-outline-variant dark:border-outline flat no shadows h-full w-72 z-40 pt-24">
+<!-- Sidebar Header (Profile) -->
+<div class="flex items-center gap-md mb-lg p-md">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A circular profile picture of an academic student, neutral expression, soft lighting, professional and calm mood, consistent with a clean educational platform design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA58pqRV2eGQfNHaeZwzD-63Trej6PJZ6kaPSfBDkHQ4trLmBQEtg4MFCp8akt1kAOvSc-zugoumnCratt2nJLtfXPQrTphheHOnF13YynU7R1AP0UJnenZKFJtjXYrA7yMuBhItcHWlwHAFFSyiEgcdK_1pjjEAO6LoyBORbLqkF6_CO-w6ZNNIdHlGFxqcF8qnPOJ3kfCho9jKNVUrHrTMUhUoeJEeFQlTCFFMjl3yLWx4y-xYt5R"/>
+<div>
+<p class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed">Alex Morgan</p>
+<p class="font-label-sm text-label-sm text-secondary">Student</p>
+</div>
+</div>
+<ul class="space-y-xs flex-1">
+<li>
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm border-l-4 border-primary transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg transition-all duration-200 ease-in-out font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-highest" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+                    Courses
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg transition-all duration-200 ease-in-out font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-highest" href="#">
+<span class="material-symbols-outlined">assignment</span>
+                    Tasks
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg transition-all duration-200 ease-in-out font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-highest" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                    Analytics
+                </a>
+</li>
+</ul>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg transition-all duration-200 ease-in-out font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-highest" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="w-full max-w-container-max mx-auto p-margin-mobile md:p-lg lg:p-xxl">
+<!-- Header -->
+<header class="mb-lg md:mb-xxl pt-6 md:pt-0">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Welcome back, Alex</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Here's a look at your academic progress today.</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Daily Progress Ring (Col 1-4) -->
+<div class="md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center card-shadow">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-md w-full text-left">Daily Goal</h2>
+<div class="relative w-40 h-40 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 120 120">
+<circle cx="60" cy="60" fill="none" r="54" stroke="#f8dcdd" stroke-width="8"></circle>
+<circle class="progress-ring__circle" cx="60" cy="60" fill="none" r="54" stroke="#ff4b6b" stroke-dasharray="339.292" stroke-dashoffset="84.823" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="font-headline-lg text-headline-lg text-[#ff4b6b]">75%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Completed</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-center text-on-surface-variant mt-md">3 of 4 daily study blocks finished. Keep it up!</p>
+</div>
+<!-- Current Courses (Col 5-12) -->
+<div class="md:col-span-8 flex flex-col gap-md">
+<div class="flex justify-between items-center mb-xs">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Current Courses</h2>
+<a class="font-label-md text-label-md text-[#ff4b6b] hover:underline" href="#">View All</a>
+</div>
+<!-- Course Carousel/List container -->
+<div class="flex overflow-x-auto gap-md no-scrollbar pb-sm snap-x">
+<!-- Course Card 1 -->
+<div class="min-w-[280px] md:min-w-0 md:flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden card-shadow snap-start">
+<div class="h-32 bg-surface-container w-full relative">
+<img class="w-full h-full object-cover absolute inset-0" data-alt="A clean, abstract geometric pattern representing mathematics and logic, using soft blue and grey tones. Suitable for an academic course header image. Modern, sharp, professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq3z7OiratkJGgb5gjfqBNTQi64dAGhSoJN3G7eTrzDHVdJTQtH6-QKQeXZ_eGHZq-Ltog_kUfKkAYHlbWrUSSELhaCL3hLzk46cdaN3pTmnPGrozfcckxW4MJ_lgEyV4uuv0sPAYmzZTQKqLaMsupZNbxif2tm31SqfAPLGMWvPQYLIT3rGQS51kvdyHJpWFj8Ost5-aUF2tFXbIuG9TtpymTp-YqjBQAYZOHBmodu59VDdVq1ui-"/>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Advanced Mathematics</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Prof. Harding • Mon, Wed, Fri</p>
+<div class="mt-lg">
+<div class="flex justify-between font-label-sm text-label-sm mb-xs">
+<span class="text-on-surface-variant">Progress</span>
+<span class="text-[#ff4b6b] font-bold">60%</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#ff4b6b] h-full rounded-full" style="width: 60%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-secondary mt-xs text-right">Last accessed 2 hrs ago</p>
+</div>
+</div>
+</div>
+<!-- Course Card 2 -->
+<div class="min-w-[280px] md:min-w-0 md:flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden card-shadow snap-start">
+<div class="h-32 bg-surface-container w-full relative">
+<img class="w-full h-full object-cover absolute inset-0" data-alt="A soft, abstract composition representing human psychology, with overlapping gentle curves and warm muted tones of beige and soft blue. Clean academic aesthetic, modern digital art." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWudrbxVK8AtB4CaLQP2IepQmQpiNahWNDdbL_UVUFXnp30M40SAUG3H4no5jkFuihBa1k-QuDI0qHCvE7LdhP6PyStGe0Mu-9KnS4EgW6A2GJ5TnCH-9skkT0cApgCdCx-IPlNVVxc5vt8BXQEFAKPWQrKZur-mD0RyBRI8zyBV3kvlrMBfSjQxX-9Y43qROB5Q2ob_rX3yrGtMQ-gCGPfliQ_bd74oFdIArAnJqEMwV_n5Isw4nl"/>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Intro to Psychology</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Dr. Chen • Tue, Thu</p>
+<div class="mt-lg">
+<div class="flex justify-between font-label-sm text-label-sm mb-xs">
+<span class="text-on-surface-variant">Progress</span>
+<span class="text-[#ff4b6b] font-bold">35%</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#ff4b6b] h-full rounded-full" style="width: 35%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-secondary mt-xs text-right">Last accessed yesterday</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Upcoming Tasks (Full width bottom row) -->
+<div class="md:col-span-12 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg card-shadow mt-md">
+<div class="flex justify-between items-center mb-lg">
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#ff4b6b]">event_upcoming</span>
+                        Upcoming Tasks
+                    </h2>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Task Item 1 -->
+<div class="flex items-start md:items-center gap-md p-md rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant group">
+<div class="bg-error-container text-on-error-container p-sm rounded-lg flex-shrink-0">
+<span class="material-symbols-outlined">quiz</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-label-md text-label-md text-on-surface truncate">Midterm Examination</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Advanced Mathematics</p>
+</div>
+<div class="text-right flex-shrink-0">
+<span class="inline-block bg-[#ffdad6] text-[#93000a] font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider">Tomorrow</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-outline-variant/30"></div>
+<!-- Task Item 2 -->
+<div class="flex items-start md:items-center gap-md p-md rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant group">
+<div class="bg-secondary-container text-on-secondary-container p-sm rounded-lg flex-shrink-0">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-label-md text-label-md text-on-surface truncate">Research Essay Draft</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Intro to Psychology</p>
+</div>
+<div class="text-right flex-shrink-0">
+<span class="inline-block bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider">In 2 Days</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-outline-variant/30"></div>
+<!-- Task Item 3 -->
+<div class="flex items-start md:items-center gap-md p-md rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant group">
+<div class="bg-primary-container text-on-primary-container p-sm rounded-lg flex-shrink-0">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-label-md text-label-md text-on-surface truncate">Weekly Discussion Post</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Ethics 101</p>
+</div>
+<div class="text-right flex-shrink-0">
+<span class="inline-block bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider">Friday</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center h-16 md:hidden bg-surface dark:bg-surface-dim docked full-width bottom-0 rounded-t-xl border-t border-outline-variant dark:border-outline bg-surface dark:bg-surface-dim shadow-sm">
+<!-- Active Tab: Home -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-full px-4 py-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-xs">Home</span>
+</a>
+<!-- Inactive Tab: My Courses -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-4 py-1 hover:text-[#ff4b6b] active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-sm text-label-sm mt-xs">My Courses</span>
+</a>
+<!-- Inactive Tab: Tasks -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-4 py-1 hover:text-[#ff4b6b] active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-sm text-label-sm mt-xs">Tasks</span>
+</a>
+<!-- Inactive Tab: Profile -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-4 py-1 hover:text-[#ff4b6b] active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-xs">Profile</span>
+</a>
+</nav>
+</body></html>

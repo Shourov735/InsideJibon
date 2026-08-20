@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shiksha - Mobile Student Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#6a3e00",
+                        "on-background": "#191c1f",
+                        "surface-variant": "#e2e2e6",
+                        "surface-container-high": "#e7e8ec",
+                        "tertiary-fixed": "#ffdcbc",
+                        "primary-container": "#0f4c75",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e2e2e6",
+                        "on-surface-variant": "#41474e",
+                        "surface-bright": "#f9f9fd",
+                        "secondary-fixed-dim": "#b6c8dd",
+                        "on-surface": "#191c1f",
+                        "on-tertiary-container": "#eaab66",
+                        "inverse-surface": "#2e3134",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f3f3f7",
+                        "surface-container": "#edeef1",
+                        "surface-tint": "#2e628c",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#556678",
+                        "secondary": "#4f6072",
+                        "on-tertiary-fixed-variant": "#683d00",
+                        "primary-fixed-dim": "#9acbfb",
+                        "primary-fixed": "#cee5ff",
+                        "tertiary": "#4b2a00",
+                        "on-primary-fixed-variant": "#0b4a73",
+                        "on-secondary-fixed": "#0a1d2c",
+                        "secondary-fixed": "#d2e4fa",
+                        "surface-dim": "#d9dade",
+                        "outline-variant": "#c1c7cf",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#2c1700",
+                        "secondary-container": "#d2e4fa",
+                        "outline": "#72787f",
+                        "primary": "#003555",
+                        "on-secondary-fixed-variant": "#37485a",
+                        "on-primary-fixed": "#001d32",
+                        "tertiary-fixed-dim": "#fbba74",
+                        "surface": "#f9f9fd",
+                        "on-error": "#ffffff",
+                        "background": "#f9f9fd",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#8bbceb",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f0f0f4",
+                        "inverse-primary": "#9acbfb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "base": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xxl": "48px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Hide scrollbar for carousel but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen pb-20">
+<!-- TopAppBar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-40 max-w-container-max mx-auto shadow-sm">
+<div class="flex items-center gap-sm">
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors focus:outline-none">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-sm-mobile text-headline-sm-mobile md:font-headline-sm md:text-headline-sm font-bold text-primary">Shiksha</span>
+</div>
+<div class="hidden md:flex gap-lg items-center">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">My Library</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Community</a>
+</div>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-80 active:opacity-100 p-1">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-80 active:opacity-100 p-1">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden ml-xs">
+<img alt="Student Avatar" class="w-full h-full object-cover" data-alt="A small, professional headshot of a young student with a neutral, pleasant expression, lit with soft daylight against a clean, out-of-focus academic background. The image is circular and optimized as a tiny avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaJUZV9XhNMJEtZw3Q16z30ywFVECbwWfsh6mr1EjYN7JMfNy97p7iOCzUSEaDbTQ09R91cxN3x6FfaJROJOLFYnBOZb7hVhCk8M9i5rstsgceaTYX_qOfyjZN-M9FU8y0CDK2ezwN7cp96lfVlNToMDqwrmrAJm1rSWe8sN2Hno1u_D5WYlwOLRJaGFczV7pXUsUO25dngiv9P7PyynVhGLS30nTuXv8oI0iLbqL9j5C0rdrom92F"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="w-full max-w-container-max mx-auto px-margin-mobile py-lg md:px-gutter flex flex-col gap-xl">
+<!-- Section 1: Hero / Continue Learning -->
+<section class="flex flex-col gap-md">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-on-background">Good morning, Alex</h1>
+<p class="font-body-md text-body-md text-secondary mt-xs">Here's where you left off.</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm flex flex-col hover:shadow-md transition-shadow">
+<div class="w-full h-32 md:h-48 relative">
+<img alt="Mastering Classical Mechanics &amp; Calculus" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XcdWpdJ6dNyn6joAR-oiiDh5AMpRCQqodiAgwzC9OODfDZNhMXxwCscv_lwycjUPRhs3za7fNNtzj0_V1vyTRuwqlraAsHxFohKK0VnjRDopjxaAUZ0av_6TvrdPlA8M4eTAn5dYe51RN_N045xeMhIJ9oDa2HZy8dpNghru9CfmK4s9EsCCeODATF1bvZUxBD516QwQKD87SKiBT-2MUDrUeU8vqZiMFWKDObwCar6iEjxxwSKO4Wsro"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/60 to-transparent"></div>
+<div class="absolute bottom-md left-md right-md flex justify-between items-end">
+<span class="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2 py-1 rounded">PHYS 301</span>
+</div>
+</div>
+<div class="p-md flex flex-col gap-sm">
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface line-clamp-1">Mastering Classical Mechanics &amp; Calculus</h2>
+<div class="flex flex-col gap-xs w-full">
+<div class="flex justify-between items-center w-full">
+<span class="font-label-sm text-label-sm text-secondary">Course Progress</span>
+<span class="font-label-sm text-label-sm text-primary font-bold">65%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[65%]"></div>
+</div>
+</div>
+<div class="flex justify-between items-center mt-sm">
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">schedule</span> Last accessed 2h ago
+                        </p>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg flex items-center gap-xs hover:bg-surface-tint transition-colors">
+                            Continue <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Enrolled Courses Carousel -->
+<section class="flex flex-col gap-md">
+<div class="flex justify-between items-end">
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-background">My Enrolled Courses</h2>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">View All</a>
+</div>
+<!-- Horizontal Scroll Container -->
+<div class="flex gap-md overflow-x-auto hide-scrollbar pb-xs -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
+<!-- Course Card 1 -->
+<div class="min-w-[240px] w-[240px] bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex flex-col gap-sm shadow-sm flex-shrink-0">
+<div class="w-full h-24 rounded bg-secondary-container mb-xs overflow-hidden">
+<img alt="Data Structures" class="w-full h-full object-cover" data-alt="A clean, minimalist illustration representing computer science, featuring abstract geometric nodes and lines connecting against a soft blue background. Academic Modernism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNZoiJH_V44B3wqAE5HCmY7LJPvXYsOu0GCBvvhTdxDQ7miOu5Rb9UnfF0abtsNll4XWyBUlEjYAwOEDUFlCwqZFKdjFb-C7Ugm6bW7V-_da_kR02dOg_wh2rdLYGY-l8b7adiiqMgrCt7ozCb2h6ehBz4IdRTII4yHuPxCrVi49MSZMEX-IsO9jRRMBux2OAXHoIB890opNZZ_UcIEtyWe9DyUskoHcVkcoqF4Pox-DmkhIO7ZYda"/>
+</div>
+<h3 class="font-label-md text-label-md font-semibold text-on-surface line-clamp-1">Data Structures &amp; Algorithms</h3>
+<div class="flex flex-col gap-xs mt-auto">
+<div class="flex justify-between items-center w-full">
+<span class="font-label-sm text-label-sm text-secondary">Progress</span>
+<span class="font-label-sm text-label-sm text-on-surface">32%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[32%]"></div>
+</div>
+</div>
+</div>
+<!-- Course Card 2 -->
+<div class="min-w-[240px] w-[240px] bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex flex-col gap-sm shadow-sm flex-shrink-0">
+<div class="w-full h-24 rounded bg-tertiary-container mb-xs overflow-hidden">
+<img alt="Cellular Biology" class="w-full h-full object-cover" data-alt="A polished, modern illustration of a microscope and stylized chemical bonds over a subtle grid pattern, utilizing deep maroon and warm neutral tones to convey advanced biology. Academic Modernism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJYliX9jeAWKswqWsnJdZALWPOjsTMhJso9ckS6ydEYocsRQtuMa77SXEqEAFyOdV9lH5ezm2VqR2F5-FSlU3K2Rq2XZcjj-6GmLdpRZPW30GnOxvuWyy07-B5pXJM4u9NRRgSPw0oSDH3DRUbk-OIzoadaCqbM39iNGTEord3sK45oA4K6DKvGwLARiyxrjv3XXuceqnfSHKuQR-XBIpi0a4Gs_ZOpEXWqOpJ5GZqCGhT0JAWYUT2"/>
+</div>
+<h3 class="font-label-md text-label-md font-semibold text-on-surface line-clamp-1">Advanced Cellular Biology</h3>
+<div class="flex flex-col gap-xs mt-auto">
+<div class="flex justify-between items-center w-full">
+<span class="font-label-sm text-label-sm text-secondary">Progress</span>
+<span class="font-label-sm text-label-sm text-on-surface">89%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[89%]"></div>
+</div>
+</div>
+</div>
+<!-- Course Card 3 -->
+<div class="min-w-[240px] w-[240px] bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex flex-col gap-sm shadow-sm flex-shrink-0">
+<div class="w-full h-24 rounded bg-surface-variant mb-xs flex items-center justify-center">
+<span class="material-symbols-outlined text-display-lg text-outline">add_circle</span>
+</div>
+<h3 class="font-label-md text-label-md font-semibold text-on-surface text-center">Browse Catalog</h3>
+<p class="font-body-sm text-body-sm text-secondary text-center mt-auto">Find new subjects</p>
+</div>
+</div>
+</section>
+<!-- Section 3 & 4: Bento Layout for Tasks & Performance -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Upcoming Tasks -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm shadow-sm">
+<div class="flex justify-between items-center mb-xs">
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-background flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary">assignment</span> Upcoming Tasks
+                    </h2>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Task Item -->
+<div class="flex items-start gap-sm p-sm rounded-lg hover:bg-surface-container-low transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined icon-fill text-sm">warning</span>
+</div>
+<div class="flex flex-col flex-grow">
+<h4 class="font-label-md text-label-md font-semibold text-on-surface group-hover:text-primary transition-colors">Midterm: Data Structures</h4>
+<p class="font-body-sm text-body-sm text-secondary">Tomorrow, 10:00 AM</p>
+</div>
+</div>
+<hr class="border-outline-variant/50"/>
+<!-- Task Item -->
+<div class="flex items-start gap-sm p-sm rounded-lg hover:bg-surface-container-low transition-colors group cursor-pointer border border-transparent hover:border-outline-variant">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm">edit_document</span>
+</div>
+<div class="flex flex-col flex-grow">
+<h4 class="font-label-md text-label-md font-semibold text-on-surface group-hover:text-primary transition-colors">Lab Report: Kinematics</h4>
+<p class="font-body-sm text-body-sm text-secondary">Friday, 11:59 PM</p>
+</div>
+</div>
+</div>
+<button class="mt-auto pt-sm w-full font-label-md text-label-md text-primary border-t border-outline-variant hover:bg-surface-container-low py-2 rounded-b-lg transition-colors">
+                    View Calendar
+                </button>
+</div>
+<!-- Weekly Performance -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm shadow-sm">
+<div class="flex justify-between items-center mb-xs">
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-background flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary">trending_up</span> Weekly Performance
+                    </h2>
+</div>
+<div class="flex flex-col gap-md flex-grow justify-center">
+<div class="flex items-center gap-md">
+<div class="flex flex-col w-24 flex-shrink-0">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Avg Score</span>
+<span class="font-headline-md text-headline-md text-on-surface">88%</span>
+</div>
+<div class="flex-grow flex items-end gap-1 h-12">
+<!-- Simple Bar Chart Mockup -->
+<div class="w-full bg-primary-container h-[60%] rounded-t-sm opacity-50"></div>
+<div class="w-full bg-primary-container h-[80%] rounded-t-sm opacity-50"></div>
+<div class="w-full bg-primary-container h-[70%] rounded-t-sm opacity-50"></div>
+<div class="w-full bg-primary-container h-[90%] rounded-t-sm opacity-75"></div>
+<div class="w-full bg-primary h-[100%] rounded-t-sm"></div>
+</div>
+</div>
+<div class="flex gap-sm">
+<div class="bg-surface-container-low rounded p-sm flex-grow flex flex-col items-center justify-center border border-outline-variant/30">
+<span class="font-label-sm text-label-sm text-secondary text-center">Study Hours</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">14.5h</span>
+</div>
+<div class="bg-surface-container-low rounded p-sm flex-grow flex flex-col items-center justify-center border border-outline-variant/30">
+<span class="font-label-sm text-label-sm text-secondary text-center">Tasks Done</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">8/10</span>
+</div>
+</div>
+</div>
+<button class="mt-auto pt-sm w-full font-label-md text-label-md text-primary border-t border-outline-variant hover:bg-surface-container-low py-2 rounded-b-lg transition-colors">
+                    Detailed Analytics
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-sm border-t border-outline-variant rounded-t-xl">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1 scale-95 transition-all duration-150" href="#">
+<span class="material-symbols-outlined icon-fill">home</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-high scale-95 transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">book</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Courses</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-high scale-95 transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Exams</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-high scale-95 transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-sm-mobile text-label-sm-mobile mt-1">Stats</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Course Learning Page - Shiksha</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Guidelines -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container": "#ffe9e9",
+                "on-surface": "#271719",
+                "inverse-on-surface": "#ffeced",
+                "surface-container-highest": "#f8dcdd",
+                "on-tertiary-fixed-variant": "#00522b",
+                "on-primary-container": "#fffbff",
+                "gradient-start": "#ff4b6b",
+                "tertiary": "#006a39",
+                "surface-variant": "#f8dcdd",
+                "surface-bright": "#fff8f7",
+                "on-background": "#271719",
+                "tertiary-container": "#008649",
+                "tertiary-fixed-dim": "#5cde8e",
+                "secondary-fixed": "#e0e0ff",
+                "on-primary-fixed": "#40000f",
+                "on-tertiary-fixed": "#00210e",
+                "on-primary-fixed-variant": "#91002d",
+                "inverse-surface": "#3d2c2d",
+                "on-surface-variant": "#5a4042",
+                "primary": "#b70b3c",
+                "soft-blue-bg": "#f0f4ff",
+                "on-secondary": "#ffffff",
+                "on-secondary-container": "#fffbff",
+                "secondary": "#3f49d5",
+                "on-tertiary-container": "#f6fff4",
+                "outline-variant": "#e3bebf",
+                "soft-pink-bg": "#fff5f6",
+                "secondary-container": "#5964ef",
+                "secondary-fixed-dim": "#bec2ff",
+                "primary-fixed-dim": "#ffb2b8",
+                "surface-dark": "#1a1a1a",
+                "outline": "#8e6f71",
+                "on-tertiary": "#ffffff",
+                "background": "#fff8f7",
+                "on-error": "#ffffff",
+                "surface-container-low": "#fff0f0",
+                "on-secondary-fixed": "#00036b",
+                "on-primary": "#ffffff",
+                "primary-container": "#da2f53",
+                "surface-container-high": "#fee1e2",
+                "on-error-container": "#93000a",
+                "tertiary-fixed": "#7afca8",
+                "surface-dim": "#f0d3d4",
+                "error": "#ba1a1a",
+                "surface": "#fff8f7",
+                "gradient-end": "#ff8e6e",
+                "error-container": "#ffdad6",
+                "primary-fixed": "#ffdadb",
+                "on-secondary-fixed-variant": "#252fc0",
+                "inverse-primary": "#ffb2b8",
+                "surface-container-lowest": "#ffffff",
+                "surface-tint": "#bb103e"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "gutter": "24px",
+                "container-max": "1200px",
+                "base": "8px",
+                "section-gap": "80px",
+                "card-padding": "24px"
+        },
+        "fontFamily": {
+                "body-sm": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-sm": [
+                        "Plus Jakarta Sans"
+                ],
+                "display-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "label-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "label-sm": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "display-lg-mobile": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-lg": [
+                        "Plus Jakarta Sans"
+                ]
+        },
+        "fontSize": {
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-sm": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "headline-lg": [
+                        "30px",
+                        {
+                                "lineHeight": "38px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.03em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen">
+<!-- TopAppBar (Shared Component) -->
+<header class="bg-surface fixed top-0 w-full z-50 flex justify-between items-center px-4 md:px-8 h-20 border-b border-outline-variant flat no shadows">
+<div class="flex items-center gap-4">
+<button class="text-primary hover:bg-surface-container-low transition-colors rounded-full p-2 active:scale-95 duration-150 flex items-center justify-center">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-headline-md font-headline-md text-primary tracking-tight">Shiksha</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-secondary hover:bg-surface-container-low transition-colors rounded-full p-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="text-secondary hover:bg-surface-container-low transition-colors rounded-full p-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant ml-2 cursor-pointer">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A highly detailed portrait of an academic professional in a modern, well-lit office setting. The lighting is soft and bright, emphasizing a calm and trustworthy mood. The color palette leans on natural skin tones against a clean, light grey and white background, perfectly matching a professional light-mode aesthetic. High resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4p91IZvnNy0su_R9Wi5dRwembtAXVWrXgft_SL1GzJ878rVyvMZVY0utaNmRAJlM5DZWY_4PZScZZ8-XtnS3Y4kqXvaNmkbXF8UWQBbDzQrbP7I87HYMlykgDsi6tF4fsDxs2VfAA0Wf5-RjyuHPQ0bRR_OBaYEiZkAl6n4-rCV9QKGcSz-9-bW3FhFh-bZ-DERaH3H5sKfXQQIYAag8E_b9fXy2X6SqeyxgaNQF7WZiaK8Nb3qBO"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="pt-[104px] pb-section-gap px-4 md:px-8 max-w-container-max mx-auto">
+<!-- Breadcrumbs & Local Nav -->
+<div class="flex items-center justify-between mb-8">
+<nav class="flex items-center gap-2 text-label-sm font-label-sm text-secondary">
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined" style="font-size: 16px;">home</span> Home
+                </a>
+<span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Mathematics</a>
+<span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+<span class="text-primary font-bold">Algebra Basics</span>
+</nav>
+<a class="hidden md:flex items-center gap-2 text-label-sm font-label-sm text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+                Back to Syllabus
+            </a>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Video & Lesson Content -->
+<div class="lg:col-span-8 flex flex-col gap-8">
+<!-- Video Player Placeholder -->
+<div class="w-full aspect-video bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant relative group">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A clean, modern classroom environment captured with shallow depth of field. Soft, diffused daylight streams in from large windows, illuminating a sleek whiteboard with faint, elegant mathematical equations. The aesthetic is bright, academic, and calm, utilizing a palette of pristine whites, light greys, and subtle hints of primary blue. High resolution, editorial style photography suitable for an educational platform." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCrCLoBWyrJSOyr8Fuq9o4LEKnntkyhXVWZR6fViZCCzoRTbhU0qNHPCk06JAO9C61f_CP_sxQRnc0qP8SSxfmBEsBZD9jNrG47K7GasoTvDw3cFvG1Niu-tGgXUOoCcGqUYdc0w-mINQpIKghRTKn5ZexcH5z3P8_pnCBsocs7lS-LO6cNWlGIdVKIS4DtQRl28p61p77raHzkIfaYRMR0A3R1q34p1dA6yI6xrT1ouSZ3QtozE4Xp')"></div>
+<!-- Gradient overlay for better control visibility -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+<!-- Play Button -->
+<button class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-secondary/90 text-on-secondary rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-secondary transition-all duration-300 backdrop-blur-sm">
+<span class="material-symbols-outlined" data-weight="fill" style="font-size: 32px;">play_arrow</span>
+</button>
+<!-- Fake Controls -->
+<div class="absolute bottom-0 left-0 w-full p-4 flex flex-col gap-2">
+<!-- Scrub Bar -->
+<div class="w-full h-1 bg-white/30 rounded-full overflow-hidden cursor-pointer">
+<div class="w-1/3 h-full bg-primary rounded-full"></div>
+</div>
+<div class="flex items-center justify-between text-white text-label-sm font-label-sm">
+<div class="flex items-center gap-4">
+<button class="hover:text-primary-fixed transition-colors"><span class="material-symbols-outlined">pause</span></button>
+<button class="hover:text-primary-fixed transition-colors"><span class="material-symbols-outlined">volume_up</span></button>
+<span>12:45 / 35:20</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:text-primary-fixed transition-colors"><span class="material-symbols-outlined">closed_caption</span></button>
+<button class="hover:text-primary-fixed transition-colors"><span class="material-symbols-outlined">settings</span></button>
+<button class="hover:text-primary-fixed transition-colors"><span class="material-symbols-outlined">fullscreen</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Lesson Content -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 md:p-8">
+<span class="text-label-md font-label-md text-secondary tracking-widest uppercase mb-2 block">Lesson 4.1</span>
+<h2 class="text-display-lg-mobile md:text-display-lg font-display-lg-mobile md:font-display-lg text-secondary mb-6">Chapter 4: Quadratic Equations</h2>
+<div class="prose max-w-none text-body-md font-body-md text-on-surface-variant leading-relaxed space-y-6">
+<p>
+                            Welcome to Chapter 4. In this lesson, we will explore the fundamental properties of quadratic equations. Building upon your understanding of linear equations, quadratics introduce a new layer of complexity by involving variables raised to the second power.
+                        </p>
+<p>
+                            A standard quadratic equation is written in the form <strong class="text-on-surface">ax² + bx + c = 0</strong>, where <em>a</em>, <em>b</em>, and <em>c</em> are known numbers, where <em>a ≠ 0</em>, and <em>x</em> is the unknown variable. The highest exponent of the variable is two, distinguishing it from linear forms.
+                        </p>
+<div class="bg-soft-blue-bg border-l-4 border-secondary p-4 rounded-r-lg my-8">
+<h4 class="text-headline-sm font-headline-sm text-secondary mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">lightbulb</span> Key Concept
+                            </h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+                                The graph of a univariate quadratic function is a parabola whose axis of symmetry is parallel to the y-axis. The roots of the quadratic equation represent the x-intercepts of the parabola.
+                            </p>
+</div>
+<p>
+                            By the end of this module, you will be proficient in solving these equations using multiple methods: factoring, completing the square, and applying the quadratic formula. We will start with visual representations to ground the abstract concepts in geometric reality.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Right Column: Contextual Tools & Resources -->
+<div class="lg:col-span-4 flex flex-col gap-8">
+<!-- Progress Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Your Progress</h3>
+<span class="text-label-md font-label-md text-primary">34%</span>
+</div>
+<!-- Linear Progress -->
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden mb-2">
+<div class="h-full bg-primary rounded-full transition-all duration-1000 ease-out" style="width: 34%;"></div>
+</div>
+<p class="text-label-sm font-label-sm text-secondary">4 of 12 lessons completed</p>
+</div>
+<!-- Resources Card (Bento-style layout within) -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm flex flex-col">
+<div class="p-6 border-b border-outline-variant bg-surface-container-low">
+<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">folder_open</span> Lesson Resources
+                        </h3>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<!-- PDF Download Link -->
+<a class="flex items-center p-3 rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant group" href="#">
+<div class="w-10 h-10 rounded-md bg-soft-pink-bg text-primary flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex-1">
+<h4 class="text-label-md font-label-md text-on-surface group-hover:text-primary transition-colors">Lesson Slides</h4>
+<p class="text-label-sm font-label-sm text-secondary">PDF Document • 2.4 MB</p>
+</div>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">download</span>
+</a>
+<!-- Formula Sheet Link -->
+<a class="flex items-center p-3 rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant group" href="#">
+<div class="w-10 h-10 rounded-md bg-soft-blue-bg text-secondary flex items-center justify-center mr-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1">
+<h4 class="text-label-md font-label-md text-on-surface group-hover:text-primary transition-colors">Formula Cheat Sheet</h4>
+<p class="text-label-sm font-label-sm text-secondary">PDF Document • 1.1 MB</p>
+</div>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">download</span>
+</a>
+</div>
+</div>
+<!-- Action Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-secondary text-on-secondary flex items-center justify-center mb-4">
+<span class="material-symbols-outlined" style="font-size: 32px;">quiz</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-2">Check Your Understanding</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-6">
+                        Complete this brief practice quiz to unlock the next lesson.
+                    </p>
+<button class="w-full bg-secondary hover:bg-secondary-container text-on-secondary font-label-md text-label-md py-3 px-6 rounded-lg transition-colors active:scale-95 duration-150 flex justify-center items-center gap-2 shadow-sm">
+                        Start Practice Quiz
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

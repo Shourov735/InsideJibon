@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  /* Academic Modernism — design system from .stitch/designs/academic_modernism */
+  --color-surface: #f9f9fd;
+  --color-surface-dim: #d9dade;
+  --color-surface-bright: #f9f9fd;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f3f7;
+  --color-surface-container: #edeef1;
+  --color-surface-container-high: #e7e8ec;
+  --color-surface-container-highest: #e2e2e6;
+  --color-on-surface: #191c1f;
+  --color-on-surface-variant: #41474e;
+  --color-outline: #72787f;
+  --color-outline-variant: #c1c7cf;
+  --color-primary: #003555;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #0f4c75;
+  --color-on-primary-container: #8bbceb;
+  --color-secondary: #4f6072;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d2e4fa;
+  --color-on-secondary-container: #556678;
+  --color-tertiary: #4b2a00;
+  --color-on-tertiary: #ffffff;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+}

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Professional Certification Exam - Mobile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#683d00",
+                        "inverse-surface": "#2e3134",
+                        "primary": "#003555",
+                        "secondary": "#4f6072",
+                        "surface-variant": "#e2e2e6",
+                        "surface-container-low": "#f3f3f7",
+                        "inverse-on-surface": "#f0f0f4",
+                        "error-container": "#ffdad6",
+                        "surface": "#f9f9fd",
+                        "secondary-fixed": "#d2e4fa",
+                        "inverse-primary": "#9acbfb",
+                        "primary-fixed-dim": "#9acbfb",
+                        "on-tertiary-fixed": "#2c1700",
+                        "on-secondary-fixed-variant": "#37485a",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e7e8ec",
+                        "on-primary-fixed-variant": "#0b4a73",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#fbba74",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#6a3e00",
+                        "surface-container-highest": "#e2e2e6",
+                        "on-surface": "#191c1f",
+                        "on-secondary-container": "#556678",
+                        "on-background": "#191c1f",
+                        "on-secondary-fixed": "#0a1d2c",
+                        "secondary-container": "#d2e4fa",
+                        "surface-container": "#edeef1",
+                        "on-surface-variant": "#41474e",
+                        "outline": "#72787f",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f9f9fd",
+                        "background": "#f9f9fd",
+                        "secondary-fixed-dim": "#b6c8dd",
+                        "primary-fixed": "#cee5ff",
+                        "tertiary-fixed": "#ffdcbc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#2e628c",
+                        "surface-dim": "#d9dade",
+                        "on-primary-fixed": "#001d32",
+                        "error": "#ba1a1a",
+                        "primary-container": "#0f4c75",
+                        "on-tertiary-container": "#eaab66",
+                        "tertiary": "#4b2a00",
+                        "outline-variant": "#c1c7cf",
+                        "on-primary-container": "#8bbceb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "gutter": "24px",
+                        "xxl": "48px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "xs": "4px",
+                        "container-max": "1280px",
+                        "sm": "12px",
+                        "margin-mobile": "16px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom styles for radio buttons */
+        .option-radio:checked + div {
+            border-color: #003555; /* primary */
+            background-color: #f3f3f7; /* surface-container-low */
+        }
+        .option-radio:checked + div .radio-inner {
+            background-color: #003555;
+            border-color: #003555;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:hidden">
+<!-- TopAppBar (Mobile Adaptation) -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-50">
+<div class="flex items-center gap-sm">
+<button class="text-secondary hover:bg-surface-container-low p-xs rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary truncate">Physics Final</h1>
+</div>
+<div class="flex items-center gap-sm">
+<div class="flex items-center gap-xs bg-surface-container py-xs px-sm rounded-full">
+<span class="material-symbols-outlined text-secondary" style="font-size: 18px;">timer</span>
+<span class="font-label-md text-label-md text-on-surface">00:42:15</span>
+</div>
+<button class="text-secondary hover:bg-surface-container-low p-xs rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">flag</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col px-margin-mobile py-lg overflow-y-auto pb-24">
+<!-- Question Meta -->
+<div class="flex justify-between items-end mb-md">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Question 12 of 60</span>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-xs">Kinematics &amp; Dynamics</h2>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-high text-on-surface-variant px-sm py-xs rounded-full">1 Point</span>
+</div>
+<!-- Question Prompt -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md mb-lg">
+<p class="font-body-lg text-body-lg text-on-surface">Which law explains the relationship between force, mass, and acceleration?</p>
+</div>
+<!-- Options Stack -->
+<div class="flex flex-col gap-sm" role="radiogroup">
+<label class="relative cursor-pointer group">
+<input class="option-radio sr-only" name="physics_q12" type="radio" value="A"/>
+<div class="flex items-center p-md border border-outline-variant rounded-lg bg-surface-container-lowest transition-colors hover:bg-surface-container-low">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center mr-sm radio-inner transition-colors">
+<span class="w-2.5 h-2.5 rounded-full bg-on-primary opacity-0 transition-opacity"></span>
+</div>
+<span class="font-label-md text-label-md text-secondary mr-sm w-6">A.</span>
+<span class="font-body-md text-body-md text-on-surface">Newton's First Law of Motion</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="option-radio sr-only" name="physics_q12" type="radio" value="B"/>
+<div class="flex items-center p-md border border-outline-variant rounded-lg bg-surface-container-lowest transition-colors hover:bg-surface-container-low">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center mr-sm radio-inner transition-colors">
+<span class="w-2.5 h-2.5 rounded-full bg-on-primary opacity-0 transition-opacity"></span>
+</div>
+<span class="font-label-md text-label-md text-secondary mr-sm w-6">B.</span>
+<span class="font-body-md text-body-md text-on-surface">Newton's Second Law of Motion</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="option-radio sr-only" name="physics_q12" type="radio" value="C"/>
+<div class="flex items-center p-md border border-outline-variant rounded-lg bg-surface-container-lowest transition-colors hover:bg-surface-container-low">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center mr-sm radio-inner transition-colors">
+<span class="w-2.5 h-2.5 rounded-full bg-on-primary opacity-0 transition-opacity"></span>
+</div>
+<span class="font-label-md text-label-md text-secondary mr-sm w-6">C.</span>
+<span class="font-body-md text-body-md text-on-surface">Newton's Third Law of Motion</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="option-radio sr-only" name="physics_q12" type="radio" value="D"/>
+<div class="flex items-center p-md border border-outline-variant rounded-lg bg-surface-container-lowest transition-colors hover:bg-surface-container-low">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center mr-sm radio-inner transition-colors">
+<span class="w-2.5 h-2.5 rounded-full bg-on-primary opacity-0 transition-opacity"></span>
+</div>
+<span class="font-label-md text-label-md text-secondary mr-sm w-6">D.</span>
+<span class="font-body-md text-body-md text-on-surface">Law of Universal Gravitation</span>
+</div>
+</label>
+</div>
+</main>
+<!-- Bottom Navigation Footer (Mobile specific) -->
+<footer class="fixed bottom-0 w-full bg-surface border-t border-outline-variant flex justify-between items-center px-margin-mobile py-sm z-50">
+<button class="flex items-center justify-center py-sm px-md border border-outline-variant rounded text-secondary hover:bg-surface-container-low font-label-md text-label-md transition-colors gap-xs">
+<span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
+            Previous
+        </button>
+<button aria-label="Question Navigator" class="flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-label-sm text-label-sm mt-xs">Navigator</span>
+</button>
+<button class="flex items-center justify-center py-sm px-md bg-primary text-on-primary rounded hover:opacity-90 font-label-md text-label-md transition-opacity gap-xs">
+            Next
+            <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+</button>
+</footer>
+<script>
+        // Simple script to handle radio button visual state within the custom styling
+        document.querySelectorAll('.option-radio').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                // Reset all inner circles
+                document.querySelectorAll('.radio-inner span').forEach(span => {
+                    span.classList.remove('opacity-100');
+                    span.classList.add('opacity-0');
+                });
+                
+                // Show inner circle for checked radio
+                if(e.target.checked) {
+                   const innerDot = e.target.nextElementSibling.querySelector('.radio-inner span');
+                   if(innerDot) {
+                       innerDot.classList.remove('opacity-0');
+                       innerDot.classList.add('opacity-100');
+                   }
+                }
+            });
+        });
+    </script>
+</body></html>

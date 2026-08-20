@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shiksha - Student Exam Result</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#41474e",
+                        "secondary": "#4f6072",
+                        "on-secondary-container": "#556678",
+                        "outline": "#72787f",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f9f9fd",
+                        "on-primary-fixed-variant": "#0b4a73",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e2e2e6",
+                        "inverse-surface": "#2e3134",
+                        "surface-container-high": "#e7e8ec",
+                        "secondary-container": "#d2e4fa",
+                        "surface-tint": "#2e628c",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0a1d2c",
+                        "surface": "#f9f9fd",
+                        "inverse-on-surface": "#f0f0f4",
+                        "primary": "#003555",
+                        "secondary-fixed": "#d2e4fa",
+                        "surface-container": "#edeef1",
+                        "outline-variant": "#c1c7cf",
+                        "tertiary-fixed-dim": "#fbba74",
+                        "surface-container-low": "#f3f3f7",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#0f4c75",
+                        "on-tertiary-container": "#eaab66",
+                        "inverse-primary": "#9acbfb",
+                        "on-primary-container": "#8bbceb",
+                        "surface-container-highest": "#e2e2e6",
+                        "tertiary-fixed": "#ffdcbc",
+                        "primary-fixed-dim": "#9acbfb",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f9f9fd",
+                        "secondary-fixed-dim": "#b6c8dd",
+                        "tertiary": "#4b2a00",
+                        "on-primary-fixed": "#001d32",
+                        "on-background": "#191c1f",
+                        "tertiary-container": "#6a3e00",
+                        "on-tertiary-fixed": "#2c1700",
+                        "primary-fixed": "#cee5ff",
+                        "on-secondary-fixed-variant": "#37485a",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1f",
+                        "surface-dim": "#d9dade",
+                        "on-tertiary-fixed-variant": "#683d00",
+                        "success": "#059669",
+                        "success-container": "#d1fae5",
+                        "on-success-container": "#064e3b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F8FAFC; }
+        .gauge-circle { stroke-dasharray: 283; stroke-dashoffset: 56.6; /* 80% */ transition: stroke-dashoffset 1s ease-out; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface flex h-screen overflow-hidden">
+<!-- TopAppBar JSON Component Mapping -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline fixed top-0 w-full z-50">
+<div class="flex justify-between items-center w-full px-gutter h-16 max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<img alt="Shiksha Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtpo9BD2kQ8eeCHOFlBTDP-Cr2OmZ4gsLeEhhP1cWew1usgRKVpNiWkMxXjJhPhwfJwGx71Bc0cBENyKoHwyCGTQE2nLVihvPMZTUxsaFDmOQl_j2mWJSune-bMmMdLt2JbeInxTvgO1hoTL_gfhLkBsr9uEetcBIy1kcMBDbqdCgSIXF0G1Sv7DiYE5_O_C31WGrU__NNicvM83uEffEeHuou-JX1P1NMdVH40PHVLFGdahQlP3AOxdnk"/>
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary hidden md:block ml-sm">Professional Certification Exam</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs text-secondary hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">timer</span>
+</button>
+<button class="p-xs text-secondary hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">flag</span>
+</button>
+<button class="p-xs text-secondary hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+</button>
+<button class="bg-primary text-on-primary px-md py-sm rounded font-label-md text-label-md hover:bg-primary-container transition-colors hidden md:block">
+                    Submit Exam
+                </button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Candidate Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a student in a bright, modern learning environment. Soft, even lighting creates a clean and focused mood. The student wears neutral, smart-casual clothing against a minimal, out-of-focus background with subtle cool tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAObRGPMZbp2TxDJyiQ-1g9PcUzMtF9mQ6RXz0-yLiuCS3-Q4WmKb81hq6wnyafoNAoDQK2kPC3Km_pahPxmn8dQQbZWWsDzRkN0DMAyv5eehrzPBd0_3G2mJXSjYcdPxx-Yw-CJenZ52KrIVsNdm5Tsf1ndpi6Ku-E4tNJkY1nlLYolx2pErYGs1O9Sj0hWinjuRidbkk1_QNDbafzsoqbicy3T5bdjUkGRIZrdH4nyLW0JVvuDw5N"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar JSON Component Mapping -->
+<nav class="hidden md:flex flex-col h-full w-80 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline fixed left-0 top-16 z-40 transition-all duration-200 ease-in-out">
+<div class="p-gutter border-b border-outline-variant">
+<h2 class="font-headline-sm text-headline-sm text-primary dark:text-inverse-primary">Exam Progress</h2>
+<p class="font-body-sm text-body-sm text-secondary mt-xs">45 of 60 Completed</p>
+</div>
+<div class="flex-1 overflow-y-auto py-sm">
+<a class="flex items-center px-gutter py-sm text-secondary hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined mr-sm" style="font-variation-settings: 'FILL' 0;">grid_view</span>
+<span class="font-label-md text-label-md">Question Navigator</span>
+</a>
+<a class="flex items-center px-gutter py-sm text-primary dark:text-inverse-primary font-bold border-l-4 border-primary bg-surface-container-high dark:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined mr-sm" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-md text-label-md">Exam Overview</span>
+</a>
+<a class="flex items-center px-gutter py-sm text-secondary hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined mr-sm" style="font-variation-settings: 'FILL' 0;">menu_book</span>
+<span class="font-label-md text-label-md">Resources</span>
+</a>
+<a class="flex items-center px-gutter py-sm text-secondary hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined mr-sm" style="font-variation-settings: 'FILL' 0;">calculate</span>
+<span class="font-label-md text-label-md">Calculator</span>
+</a>
+<a class="flex items-center px-gutter py-sm text-secondary hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined mr-sm" style="font-variation-settings: 'FILL' 0;">sticky_note_2</span>
+<span class="font-label-md text-label-md">Notes</span>
+</a>
+</div>
+<div class="p-gutter border-t border-outline-variant">
+<button class="w-full border border-primary text-primary px-md py-sm rounded font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-sm">flag</span>
+                Flag for Review
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-80 mt-16 overflow-y-auto p-gutter lg:p-xl">
+<div class="max-w-container-max mx-auto space-y-lg">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-sm mb-xl">
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="bg-success-container text-on-success-container font-label-sm text-label-sm px-2 py-1 rounded uppercase tracking-wider">Pass</span>
+<span class="font-body-sm text-body-sm text-secondary">October 24, 2024</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface">Advanced Physics: Classical Mechanics</h1>
+<p class="font-headline-sm text-headline-sm text-secondary mt-xs">Final Exam Result</p>
+</div>
+<div class="flex gap-sm w-full md:w-auto">
+<button class="flex-1 md:flex-none border border-primary text-primary px-lg py-sm rounded font-label-md text-label-md hover:bg-surface-container-low transition-colors whitespace-nowrap">
+                        Back to Dashboard
+                    </button>
+<button class="flex-1 md:flex-none bg-primary text-on-primary px-lg py-sm rounded font-label-md text-label-md hover:bg-primary-container transition-colors whitespace-nowrap shadow-[0px_4px_12px_rgba(15,76,117,0.05)]">
+                        Review Answers
+                    </button>
+</div>
+</div>
+<!-- Summary Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Circular Gauge Card -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-lg flex flex-col items-center justify-center col-span-1 shadow-[0px_4px_12px_rgba(15,76,117,0.05)]">
+<h3 class="font-label-md text-label-md text-secondary w-full text-left mb-auto">Overall Score</h3>
+<div class="relative w-40 h-40 flex items-center justify-center my-md">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle class="text-surface-variant stroke-current" cx="50" cy="50" fill="transparent" r="45" stroke-width="8"></circle>
+<circle class="text-primary stroke-current gauge-circle" cx="50" cy="50" fill="transparent" r="45" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-display-lg text-display-lg text-primary">80<span class="text-headline-md">%</span></span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mt-auto">48 / 60 Points</p>
+</div>
+<!-- Stats Grid -->
+<div class="col-span-1 md:col-span-2 grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-md flex flex-col justify-between">
+<div class="flex items-center gap-xs text-success">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Correct</span>
+</div>
+<div class="mt-sm">
+<span class="font-display-lg text-display-lg">48</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-md flex flex-col justify-between">
+<div class="flex items-center gap-xs text-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">cancel</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Incorrect</span>
+</div>
+<div class="mt-sm">
+<span class="font-headline-lg text-headline-lg">9</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-md flex flex-col justify-between">
+<div class="flex items-center gap-xs text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">do_not_disturb_on</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Skipped</span>
+</div>
+<div class="mt-sm">
+<span class="font-headline-lg text-headline-lg">3</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-md flex flex-col justify-between">
+<div class="flex items-center gap-xs text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">schedule</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Time Taken</span>
+</div>
+<div class="mt-sm">
+<span class="font-headline-lg text-headline-lg">52:14</span>
+<span class="font-body-sm text-body-sm text-secondary">/ 60:00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Weak Area Alert -->
+<div class="bg-error-container border border-error/20 rounded-xl p-md flex items-start gap-md">
+<span class="material-symbols-outlined text-error mt-xs" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-error-container">Attention: Newton's Laws</h4>
+<p class="font-body-md text-body-md text-on-error-container/80 mt-xs">Performance below 60% threshold. Immediate review recommended to solidify foundational concepts.</p>
+</div>
+</div>
+<!-- Topic Performance & Next Steps -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<!-- Topic Breakdown -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-lg">Topic Performance</h3>
+<div class="space-y-md">
+<!-- Topic 1 -->
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-body-md text-body-md font-medium">Dynamics</span>
+<span class="font-label-md text-label-md text-primary">92%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 92%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-secondary mt-xs text-right">Excellent</p>
+</div>
+<!-- Topic 2 -->
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-body-md text-body-md font-medium">Kinematics</span>
+<span class="font-label-md text-label-md text-success">84%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-success h-full rounded-full" style="width: 84%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-secondary mt-xs text-right">Strong</p>
+</div>
+<!-- Topic 3 -->
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-body-md text-body-md font-medium">Work &amp; Energy</span>
+<span class="font-label-md text-label-md text-primary">76%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 76%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-secondary mt-xs text-right">Good</p>
+</div>
+<!-- Topic 4 (Weak) -->
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-body-md text-body-md font-medium text-error">Newton's Laws</span>
+<span class="font-label-md text-label-md text-error">55%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-error h-full rounded-full" style="width: 55%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-error mt-xs text-right">Needs Review</p>
+</div>
+</div>
+</div>
+<!-- Recommended Actions -->
+<div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-lg flex flex-col">
+<h3 class="font-headline-sm text-headline-sm mb-lg">Recommended Next Steps</h3>
+<div class="space-y-sm flex-1">
+<a class="group block border border-outline-variant rounded-lg p-md hover:border-primary hover:shadow-[0px_4px_12px_rgba(15,76,117,0.05)] transition-all bg-surface-bright" href="#">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="bg-primary-container/10 p-sm rounded text-primary">
+<span class="material-symbols-outlined">play_lesson</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Review Newton's Laws</h4>
+<p class="font-body-sm text-body-sm text-secondary mt-xs">Video lesson • 15 mins</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</a>
+<a class="group block border border-outline-variant rounded-lg p-md hover:border-primary hover:shadow-[0px_4px_12px_rgba(15,76,117,0.05)] transition-all bg-surface-bright" href="#">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="bg-primary-container/10 p-sm rounded text-primary">
+<span class="material-symbols-outlined">quiz</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Practice 10 Related Questions</h4>
+<p class="font-body-sm text-body-sm text-secondary mt-xs">Adaptive quiz • Est. 12 mins</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</a>
+<a class="group block border border-outline-variant rounded-lg p-md hover:border-primary hover:shadow-[0px_4px_12px_rgba(15,76,117,0.05)] transition-all bg-surface-bright" href="#">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="bg-primary-container/10 p-sm rounded text-primary">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Retake Topic Test</h4>
+<p class="font-body-sm text-body-sm text-secondary mt-xs">Focused assessment • 20 Questions</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</a>
+</div>
+<div class="mt-lg pt-md border-t border-surface-variant">
+<button class="w-full border-2 border-primary text-primary px-lg py-sm rounded font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors">
+                            Practice Weak Topics Now
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

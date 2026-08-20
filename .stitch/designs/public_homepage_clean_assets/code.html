@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shiksha - Professional Learning Platform</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#9acbfb",
+                        "tertiary-container": "#6a3e00",
+                        "on-secondary": "#ffffff",
+                        "primary": "#003555",
+                        "surface": "#f9f9fd",
+                        "tertiary-fixed-dim": "#fbba74",
+                        "on-tertiary-fixed": "#2c1700",
+                        "on-tertiary-fixed-variant": "#683d00",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ffdcbc",
+                        "inverse-surface": "#2e3134",
+                        "surface-container-high": "#e7e8ec",
+                        "secondary-container": "#d2e4fa",
+                        "on-surface": "#191c1f",
+                        "background": "#f9f9fd",
+                        "on-secondary-container": "#556678",
+                        "outline": "#72787f",
+                        "on-surface-variant": "#41474e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#2e628c",
+                        "on-primary-fixed-variant": "#0b4a73",
+                        "inverse-on-surface": "#f0f0f4",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001d32",
+                        "on-tertiary-container": "#eaab66",
+                        "secondary": "#4f6072",
+                        "surface-container-highest": "#e2e2e6",
+                        "secondary-fixed": "#d2e4fa",
+                        "on-secondary-fixed": "#0a1d2c",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#d9dade",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#edeef1",
+                        "surface-bright": "#f9f9fd",
+                        "on-secondary-fixed-variant": "#37485a",
+                        "outline-variant": "#c1c7cf",
+                        "tertiary": "#4b2a00",
+                        "surface-container-low": "#f3f3f7",
+                        "on-primary-container": "#8bbceb",
+                        "primary-fixed": "#cee5ff",
+                        "on-background": "#191c1f",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e2e2e6",
+                        "primary-fixed-dim": "#9acbfb",
+                        "secondary-fixed-dim": "#b6c8dd",
+                        "primary-container": "#0f4c75"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "xxl": "48px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .academic-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .bento-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .bento-card:hover {
+            box-shadow: 0px 4px 12px rgba(15, 76, 117, 0.05);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-lg md:px-xxl h-20 bg-surface border-b border-outline-variant transition-all duration-300" id="main-nav">
+<div class="flex items-center gap-md">
+<span aria-label="Menu" class="material-symbols-outlined text-primary text-headline-md md:hidden cursor-pointer" data-icon="menu">menu</span>
+<a aria-label="Shiksha Home" class="text-headline-md font-display-lg text-primary tracking-tight" href="#">Shiksha</a>
+</div>
+<nav class="hidden md:flex items-center gap-xl">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 text-label-md transition-colors hover:text-primary" href="#">Home</a>
+<a class="text-secondary text-label-md transition-colors hover:text-primary" href="#courses">Courses</a>
+<a class="text-secondary text-label-md transition-colors hover:text-primary" href="#exams">Exams</a>
+<a class="text-secondary text-label-md transition-colors hover:text-primary" href="#teachers">Teachers</a>
+<a class="text-secondary text-label-md transition-colors hover:text-primary" href="#about">About</a>
+</nav>
+<div class="flex items-center gap-md">
+<a class="hidden md:inline-flex text-primary text-label-md font-semibold hover:text-primary-container transition-colors px-md py-sm" href="#">Sign In</a>
+<a class="bg-primary text-on-primary text-label-md font-semibold px-lg py-sm rounded-lg hover:bg-primary-container transition-colors shadow-sm" href="#">Get Started</a>
+</div>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="max-w-container-max mx-auto px-lg md:px-xxl py-xxl md:py-[120px]">
+<div class="academic-grid items-center">
+<div class="col-span-12 md:col-span-6 space-y-xl pr-0 md:pr-xl">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary leading-tight">
+                        Learn with structure.<br/>
+<span class="text-secondary">Practice with purpose.</span><br/>
+                        Improve with confidence.
+                    </h1>
+<p class="text-body-lg text-on-surface-variant max-w-xl">
+                        A modern platform designed to bring clarity to education. Master complex subjects through structured curricula, intelligent practice, and actionable performance tracking.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-md pt-sm">
+<a class="inline-flex justify-center items-center bg-primary text-on-primary text-label-md font-semibold px-xl py-md rounded-lg hover:bg-primary-container transition-colors shadow-sm w-full sm:w-auto" href="#courses">
+                            Explore Courses
+                        </a>
+<a class="inline-flex justify-center items-center border border-outline text-primary text-label-md font-semibold px-xl py-md rounded-lg hover:bg-surface-container-low transition-colors w-full sm:w-auto" href="#exams">
+                            View Exams
+                        </a>
+</div>
+</div>
+<div class="col-span-12 md:col-span-6 mt-xl md:mt-0 relative">
+<div class="aspect-[4/3] rounded-2xl overflow-hidden shadow-sm relative z-10 border border-outline-variant">
+<img alt="Educational Hero Image" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA58pqRV2eGQfNHaeZwzD-63Trej6PJZ6kaPSfBDkHQ4trLmBQEtg4MFCp8akt1kAOvSc-zugoumnCratt2nJLtfXPQrTphheHOnF13YynU7R1AP0UJnenZKFJtjXYrA7yMuBhItcHWlwHAFFSyiEgcdK_1pjjEAO6LoyBORbLqkF6_CO-w6ZNNIdHlGFxqcF8qnPOJ3kfCho9jKNVUrHrTMUhUoeJEeFQlTCFFMjl3yLWx4y-xYt5R"/>
+</div>
+<!-- Decorative element backing -->
+<div class="absolute -bottom-8 -right-8 w-full h-full bg-surface-container-high rounded-2xl z-0 hidden md:block"></div>
+</div>
+</div>
+</section>
+<!-- Stats / Trust Banner -->
+<section class="border-y border-outline-variant bg-surface-container-low py-lg">
+<div class="max-w-container-max mx-auto px-lg md:px-xxl">
+<div class="flex flex-wrap justify-around items-center gap-xl text-center">
+<div>
+<div class="text-headline-md font-headline-md text-primary">50+</div>
+<div class="text-label-sm text-secondary uppercase tracking-wider mt-xs">Structured Courses</div>
+</div>
+<div class="w-px h-12 bg-outline-variant hidden md:block"></div>
+<div>
+<div class="text-headline-md font-headline-md text-primary">10k+</div>
+<div class="text-label-sm text-secondary uppercase tracking-wider mt-xs">Practice Exams</div>
+</div>
+<div class="w-px h-12 bg-outline-variant hidden md:block"></div>
+<div>
+<div class="text-headline-md font-headline-md text-primary">98%</div>
+<div class="text-label-sm text-secondary uppercase tracking-wider mt-xs">Success Rate</div>
+</div>
+<div class="w-px h-12 bg-outline-variant hidden md:block"></div>
+<div>
+<div class="text-headline-md font-headline-md text-primary">24/7</div>
+<div class="text-label-sm text-secondary uppercase tracking-wider mt-xs">Performance Insights</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Courses (Bento Grid Style) -->
+<section class="max-w-container-max mx-auto px-lg md:px-xxl py-xxl md:py-[100px]" id="courses">
+<div class="flex justify-between items-end mb-xl">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-primary mb-xs">Featured Curricula</h2>
+<p class="text-body-md text-on-surface-variant">Carefully structured paths for optimal learning.</p>
+</div>
+<a class="hidden md:flex items-center gap-xs text-primary text-label-md font-semibold hover:underline" href="#">
+                    View all courses <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="academic-grid">
+<!-- Large Featured Course -->
+<div class="col-span-12 lg:col-span-8 bento-card overflow-hidden flex flex-col md:flex-row group cursor-pointer">
+<div class="w-full md:w-1/2 aspect-video md:aspect-auto relative overflow-hidden">
+<img alt="Advanced Physics Thumbnail" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq3z7OiratkJGgb5gjfqBNTQi64dAGhSoJN3G7eTrzDHVdJTQtH6-QKQeXZ_eGHZq-Ltog_kUfKkAYHlbWrUSSELhaCL3hLzk46cdaN3pTmnPGrozfcckxW4MJ_lgEyV4uuv0sPAYmzZTQKqLaMsupZNbxif2tm31SqfAPLGMWvPQYLIT3rGQS51kvdyHJpWFj8Ost5-aUF2tFXbIuG9TtpymTp-YqjBQAYZOHBmodu59VDdVq1ui-"/>
+<div class="absolute top-md left-md bg-white/90 backdrop-blur-sm px-sm py-xs rounded text-label-sm font-semibold text-primary border border-outline-variant">
+                            Advanced
+                        </div>
+</div>
+<div class="p-lg md:p-xl flex flex-col justify-center w-full md:w-1/2">
+<span class="text-label-sm text-secondary uppercase tracking-wider mb-sm">Physics &amp; Mathematics</span>
+<h3 class="text-headline-md font-headline-md text-primary mb-md group-hover:text-surface-tint transition-colors">Mastering Classical Mechanics &amp; Calculus</h3>
+<p class="text-body-sm text-on-surface-variant mb-xl line-clamp-2">A comprehensive deep dive into the foundational principles of physics, integrated with advanced mathematical applications.</p>
+<div class="mt-auto border-t border-outline-variant pt-md flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-bold text-label-sm border border-outline-variant">
+                                    AP
+                                </div>
+<div class="text-label-sm text-on-surface">Dr. Aranya P.</div>
+</div>
+<div class="text-label-sm text-secondary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="library_books">library_books</span> 42 Lessons
+                            </div>
+</div>
+</div>
+</div>
+<!-- Secondary Featured Course -->
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bento-card overflow-hidden flex flex-col group cursor-pointer">
+<div class="aspect-[16/10] relative overflow-hidden border-b border-outline-variant">
+<img alt="Applied Chemistry Thumbnail" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWudrbxVK8AtB4CaLQP2IepQmQpiNahWNDdbL_UVUFXnp30M40SAUG3H4no5jkFuihBa1k-QuDI0qHCvE7LdhP6PyStGe0Mu-9KnS4EgW6A2GJ5TnCH-9skkT0cApgCdCx-IPlNVVxc5vt8BXQEFAKPWQrKZur-mD0RyBRI8zyBV3kvlrMBfSjQxX-9Y43qROB5Q2ob_rX3yrGtMQ-gCGPfliQ_bd74oFdIArAnJqEMwV_n5Isw4nl"/>
+<div class="absolute top-md left-md bg-white/90 backdrop-blur-sm px-sm py-xs rounded text-label-sm font-semibold text-primary border border-outline-variant">
+                            Intermediate
+                        </div>
+</div>
+<div class="p-md md:p-lg flex flex-col flex-grow">
+<span class="text-label-sm text-secondary uppercase tracking-wider mb-xs">Chemistry</span>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-sm group-hover:text-surface-tint transition-colors">Applied Organic Chemistry</h3>
+<div class="mt-auto pt-lg flex items-center justify-between">
+<div class="text-label-sm text-on-surface font-medium">Prof. S. Khan</div>
+<div class="text-label-sm text-secondary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="library_books">library_books</span> 28 Lessons
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-xl text-center md:hidden">
+<a class="inline-flex justify-center items-center border border-outline text-primary text-label-md font-semibold px-xl py-md rounded-lg hover:bg-surface-container-low transition-colors w-full" href="#">
+                    View all courses
+                </a>
+</div>
+</section>
+<!-- Academic Process / How it Works -->
+<section class="bg-surface-container-lowest border-y border-outline-variant py-xxl md:py-[100px]">
+<div class="max-w-container-max mx-auto px-lg md:px-xxl text-center">
+<span class="text-label-sm text-secondary uppercase tracking-wider mb-sm block">The Shiksha Method</span>
+<h2 class="text-headline-lg font-headline-lg text-primary mb-xl md:mb-[60px]">A rigorous approach to mastery</h2>
+<div class="academic-grid text-left">
+<div class="col-span-12 md:col-span-4 bento-card p-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px] text-primary" data-icon="menu_book">menu_book</span>
+</div>
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-lg border border-primary/20">
+<span class="font-headline-sm font-bold">1</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-sm">Learn with Structure</h3>
+<p class="text-body-sm text-on-surface-variant relative z-10">Engage with meticulously planned curricula that build foundational knowledge sequentially, avoiding cognitive overload.</p>
+</div>
+<div class="col-span-12 md:col-span-4 bento-card p-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px] text-primary" data-icon="quiz">quiz</span>
+</div>
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-lg border border-primary/20">
+<span class="font-headline-sm font-bold">2</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-sm">Practice with Purpose</h3>
+<p class="text-body-sm text-on-surface-variant relative z-10">Apply concepts immediately through targeted exercises and simulated exams designed to mimic real-world testing environments.</p>
+</div>
+<div class="col-span-12 md:col-span-4 bento-card p-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px] text-primary" data-icon="analytics">analytics</span>
+</div>
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-lg border border-primary/20">
+<span class="font-headline-sm font-bold">3</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-sm">Improve with Confidence</h3>
+<p class="text-body-sm text-on-surface-variant relative z-10">Utilize granular performance analytics to identify weaknesses, track progress over time, and focus revision efforts efficiently.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Teacher Section -->
+<section class="max-w-container-max mx-auto px-lg md:px-xxl py-xxl md:py-[100px]" id="teachers">
+<div class="flex justify-between items-end mb-xl">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-primary mb-xs">Expert Instructors</h2>
+<p class="text-body-md text-on-surface-variant">Learn directly from seasoned academic professionals.</p>
+</div>
+</div>
+<div class="academic-grid">
+<!-- Teacher Profile Card -->
+<div class="col-span-12 sm:col-span-6 lg:col-span-3 bento-card overflow-hidden">
+<div class="aspect-[4/5] relative bg-surface-container-high border-b border-outline-variant">
+<img alt="Portrait of Dr. Aranya P." class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPz2zFPX988kGgPAeXqzMpRdFbGRetsltublxZqEPDB-FkEPdNrrj0u1zGzxG5W7cc7YRbkrCqWR3ERzi6pwdpUgJc0KQAPs41CXHLN1DX1kk5zSAeWitqpi3O6bsUQhUC7g36dXgMZZe4tdYRJBZc9G9Wy69Ve8H7B9Vdseb5hE5RYuwmk5EBULsjjoSfGgE4505ycB9Tg9rIFtkNlkrqHVe-qYLjoI18XriUcJupqKYDmDF2h7yz"/>
+</div>
+<div class="p-md text-center">
+<h3 class="text-headline-sm font-headline-sm text-primary">Dr. Aranya P.</h3>
+<p class="text-label-sm text-secondary uppercase tracking-wider mt-xs">Head of Physics</p>
+<p class="text-body-sm text-on-surface-variant mt-sm line-clamp-3">15+ years experience in theoretical physics education. Focused on making complex mechanics accessible.</p>
+</div>
+</div>
+<!-- Placeholder Cards to maintain grid -->
+<div class="col-span-12 sm:col-span-6 lg:col-span-3 bento-card overflow-hidden">
+<div class="aspect-[4/5] relative bg-surface-container-high border-b border-outline-variant">
+<img alt="Portrait of Prof. S. Khan" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEjVDXFe5FhNty7NJExOKlEuwQdzek6Js42eTqgrWXTvtguPx7MaTCb0d01PJuHaDf0JxMYKaiy0fSTB4_bm2Kdb1qGFoinLnZdN1g9jfI64KUUQl4jsU9ccqyk4_WMqkrXWSTtXUKAzUEUa4lYKxJxSBTXhj5qQ0dYOfgLs-U1V4NpDZbs1q61uBNLICcajjV69pOziuwtULHQZ8eP16XoKsAqKNefcVX5xukUfNFsuCVM9omjD1p"/>
+</div>
+<div class="p-md text-center">
+<h3 class="text-headline-sm font-headline-sm text-primary">Prof. S. Khan</h3>
+<p class="text-label-sm text-secondary uppercase tracking-wider mt-xs">Chemistry Lead</p>
+</div>
+</div>
+<div class="col-span-12 sm:col-span-6 lg:col-span-3 bento-card overflow-hidden">
+<div class="aspect-[4/5] relative bg-surface-container-high border-b border-outline-variant">
+<img alt="Portrait of Dr. E. Miller" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAr3x-0iyEFuXtJq0I5CpZiOkOVKwv2-4biEn0__XuNFNF921cJzp1z6u26Xc6SH9ZA9I6tzg1NipfVx0J6KquuTUDPemknRkA7plxWMd9fBAKgqpRwNAHdKe-HS26mvPixBQt1a33gN1l_C4Gw8dYBuZTUJim-7jsUPqBdbCsEbg52qnMVS2KsNSycncyXGgxn5mowjsCwuzuLYqE6n8bZD03JPOQbcNaM8FuCKFaaxUOCIRflCbFB"/>
+</div>
+<div class="p-md text-center">
+<h3 class="text-headline-sm font-headline-sm text-primary">Dr. E. Miller</h3>
+<p class="text-label-sm text-secondary uppercase tracking-wider mt-xs">Mathematics Director</p>
+</div>
+</div>
+<div class="col-span-12 sm:col-span-6 lg:col-span-3 bento-card overflow-hidden flex flex-col justify-center items-center p-xl text-center hover:bg-surface-container-low cursor-pointer">
+<span class="material-symbols-outlined text-primary text-[48px] mb-md" data-icon="group">group</span>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-sm">View Faculty Directory</h3>
+<p class="text-body-sm text-secondary">Browse all 40+ expert instructors</p>
+</div>
+</div>
+</section>
+<!-- Minimal CTA -->
+<section class="bg-primary text-on-primary py-xxl md:py-[80px]">
+<div class="max-w-3xl mx-auto px-lg text-center">
+<h2 class="text-headline-lg font-headline-lg mb-md text-white">Begin your structured learning journey.</h2>
+<p class="text-body-lg text-primary-fixed mb-xl opacity-90">Join thousands of students who have elevated their academic performance through Shiksha.</p>
+<div class="flex flex-col sm:flex-row justify-center gap-md">
+<a class="inline-flex justify-center items-center bg-white text-primary text-label-md font-semibold px-xl py-md rounded-lg hover:bg-surface-container-lowest transition-colors shadow-sm w-full sm:w-auto" href="#">
+                        Create Free Account
+                    </a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface border-t border-outline-variant pt-xl pb-lg px-lg md:px-xxl">
+<div class="max-w-container-max mx-auto academic-grid mb-xl">
+<div class="col-span-12 md:col-span-4 pr-lg mb-xl md:mb-0">
+<a class="text-headline-md font-display-lg text-primary tracking-tight block mb-md" href="#">Shiksha</a>
+<p class="text-body-sm text-on-surface-variant max-w-sm">
+                    Academic Modernism applied to digital education. Rigorous, structured, and focused on outcomes.
+                </p>
+</div>
+<div class="col-span-6 md:col-span-2">
+<h4 class="text-label-md font-bold text-primary mb-md uppercase tracking-wider">Platform</h4>
+<ul class="space-y-sm">
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Courses</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Practice Exams</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Performance Tracking</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Pricing</a></li>
+</ul>
+</div>
+<div class="col-span-6 md:col-span-2">
+<h4 class="text-label-md font-bold text-primary mb-md uppercase tracking-wider">Subjects</h4>
+<ul class="space-y-sm">
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Mathematics</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Physics</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Chemistry</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Computer Science</a></li>
+</ul>
+</div>
+<div class="col-span-12 md:col-span-4 mt-xl md:mt-0">
+<h4 class="text-label-md font-bold text-primary mb-md uppercase tracking-wider">Support</h4>
+<ul class="space-y-sm">
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Help Center</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">Contact Us</a></li>
+<li><a class="text-body-sm text-secondary hover:text-primary transition-colors" href="#">System Status</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-container-max mx-auto border-t border-outline-variant pt-lg flex flex-col md:flex-row justify-between items-center gap-md">
+<p class="text-label-sm text-secondary">© 2024 Shiksha Educational Platform. All rights reserved.</p>
+<div class="flex gap-md">
+<a class="text-secondary hover:text-primary text-label-sm" href="#">Privacy Policy</a>
+<a class="text-secondary hover:text-primary text-label-sm" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple nav scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-sm');
+                nav.classList.replace('bg-surface', 'bg-surface/95');
+                nav.classList.add('backdrop-blur-md');
+            } else {
+                nav.classList.remove('shadow-sm');
+                nav.classList.replace('bg-surface/95', 'bg-surface');
+                nav.classList.remove('backdrop-blur-md');
+            }
+        });
+    </script>
+</body></html>

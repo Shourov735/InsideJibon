@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advanced Physics Exam</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#683d00",
+                        "inverse-surface": "#2e3134",
+                        "primary": "#003555",
+                        "secondary": "#4f6072",
+                        "surface-variant": "#e2e2e6",
+                        "surface-container-low": "#f3f3f7",
+                        "inverse-on-surface": "#f0f0f4",
+                        "error-container": "#ffdad6",
+                        "surface": "#f9f9fd",
+                        "secondary-fixed": "#d2e4fa",
+                        "inverse-primary": "#9acbfb",
+                        "primary-fixed-dim": "#9acbfb",
+                        "on-tertiary-fixed": "#2c1700",
+                        "on-secondary-fixed-variant": "#37485a",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e7e8ec",
+                        "on-primary-fixed-variant": "#0b4a73",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#fbba74",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#6a3e00",
+                        "surface-container-highest": "#e2e2e6",
+                        "on-surface": "#191c1f",
+                        "on-secondary-container": "#556678",
+                        "on-background": "#191c1f",
+                        "on-secondary-fixed": "#0a1d2c",
+                        "secondary-container": "#d2e4fa",
+                        "surface-container": "#edeef1",
+                        "on-surface-variant": "#41474e",
+                        "outline": "#72787f",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f9f9fd",
+                        "background": "#f9f9fd",
+                        "secondary-fixed-dim": "#b6c8dd",
+                        "primary-fixed": "#cee5ff",
+                        "tertiary-fixed": "#ffdcbc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#2e628c",
+                        "surface-dim": "#d9dade",
+                        "on-primary-fixed": "#001d32",
+                        "error": "#ba1a1a",
+                        "primary-container": "#0f4c75",
+                        "on-tertiary-container": "#eaab66",
+                        "tertiary": "#4b2a00",
+                        "outline-variant": "#c1c7cf",
+                        "on-primary-container": "#8bbceb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "gutter": "24px",
+                        "xxl": "48px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "xs": "4px",
+                        "container-max": "1280px",
+                        "sm": "12px",
+                        "margin-mobile": "16px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<!-- TopAppBar (From JSON) -->
+<header class="bg-surface border-b border-outline-variant w-full top-0 z-50 fixed">
+<div class="flex justify-between items-center w-full px-gutter h-16 max-w-container-max mx-auto">
+<!-- Brand -->
+<div class="flex items-center gap-sm">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">
+                    Professional Certification Exam
+                </span>
+</div>
+<!-- Central Content: Timer (User Request integrated into Header) -->
+<div class="hidden md:flex flex-col items-center justify-center">
+<div class="flex items-center gap-base text-on-surface font-label-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">timer</span>
+                    00:42:15 remaining
+                </div>
+<div class="flex items-center gap-xs text-error font-label-sm mt-xs">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                    15 minutes remaining
+                </div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:bg-surface-container-low transition-colors rounded-full" title="Flag">
+<span class="material-symbols-outlined" data-icon="flag">flag</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:bg-surface-container-low transition-colors rounded-full" title="Help">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-gutter py-sm rounded-full hover:opacity-80 transition-all duration-200 ml-sm">
+                    Submit Exam
+                </button>
+<img alt="Candidate Avatar" class="w-8 h-8 rounded-full border border-outline-variant object-cover ml-base" data-alt="A small, professional circular avatar portrait of an exam candidate, plain white background, sharp focus, modern academic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfiuXsqD3xLcVltifk9DtLuw2MUuAqcrGP3TyKUC0Z3ICcYOzsqil-yPnIwhzzOvUv9wTx2n6poGMspoVIJvOrK7zraS-L5lvfGv-J7ibpdIZlr9zvUKiu7PeFyvImE6XrG0QdOaMd_O-27P8CP32O7IKTThakXf14AZ_BC2JnvFeFn6fKOrZ9lB64q2m0fhaDfmr81gfge_6mGfbg8iLDu5xBVUuya4omZXawvSnR6auJ7rOkJ-eB"/>
+</div>
+</div>
+</header>
+<!-- Main Layout -->
+<div class="flex flex-1 pt-16 w-full max-w-[1440px] mx-auto">
+<!-- SideNavBar (From JSON - Rendered strictly on left per style_component_shape) -->
+<aside class="w-80 h-[calc(100vh-64px)] bg-surface-container-lowest border-r border-outline-variant hidden lg:flex flex-col fixed left-0 z-40 overflow-y-auto">
+<div class="p-lg border-b border-outline-variant">
+<h2 class="font-headline-sm text-headline-sm text-primary">Exam Progress</h2>
+<p class="font-body-sm text-body-sm text-secondary mt-xs">45 of 60 Completed</p>
+<div class="mt-md flex items-center gap-sm">
+<img alt="Progress Overview" class="w-12 h-12 rounded-full" data-alt="A clean, minimalist circular progress chart showing 75 percent completion, rendered in deep primary blue against a bright white background, crisp vector style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdL7rnyNoVkSbBC_in8bc_1bxDPiHgRHBUhk3NoNo0-0DSaexEDMGKIrGIXakdGckkD6PF5WcfrhCN7kACUBoN9AeJgHS_rY5MDN8Y9FZpZU_OtOcEnlPKjsYZkTk83oPgMMZmE9pemY785OnDAr8UdEdZofE8YmiGxKPrxI7X88EbpR9qhkMimJkiKf1xwu9GXeCr_R_G2asitPLqGN70ZY7-JkV4rDUaTxmprD9npxAMAyKqEdsX"/>
+<button class="text-primary font-label-sm text-label-sm border border-primary px-sm py-xs rounded hover:bg-surface-container transition-all">
+                        Flag for Review
+                    </button>
+</div>
+</div>
+<nav class="flex-1 py-sm flex flex-col gap-xs px-sm mt-sm">
+<!-- Active Tab -->
+<button class="w-full flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-l-4 border-primary bg-surface-container-high transition-all duration-200 ease-in-out text-left">
+<span class="material-symbols-outlined" data-icon="grid_view" data-weight="fill" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-label-md text-label-md">Question Navigator</span>
+</button>
+<!-- Inactive Tabs -->
+<button class="w-full flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container transition-all duration-200 ease-in-out text-left">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Exam Overview</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container transition-all duration-200 ease-in-out text-left">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-md text-label-md">Resources</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container transition-all duration-200 ease-in-out text-left">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="font-label-md text-label-md">Calculator</span>
+</button>
+<button class="w-full flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container transition-all duration-200 ease-in-out text-left">
+<span class="material-symbols-outlined" data-icon="sticky_note_2">sticky_note_2</span>
+<span class="font-label-md text-label-md">Notes</span>
+</button>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-80 p-gutter lg:p-xl flex flex-col xl:flex-row gap-gutter">
+<!-- Left: Question Canvas -->
+<div class="flex-1 flex flex-col gap-lg">
+<!-- Context Header -->
+<div class="mb-sm">
+<h1 class="font-headline-md text-headline-md text-on-surface">Advanced Physics: Classical Mechanics - Final Exam</h1>
+<p class="font-body-md text-body-md text-secondary mt-xs">Question 46 of 60</p>
+</div>
+<!-- Question Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg md:p-xl flex flex-col">
+<h3 class="font-body-lg text-body-lg text-on-surface mb-xl leading-relaxed">
+                        Which law explains the relationship between force, mass, and acceleration?
+                    </h3>
+<!-- Options -->
+<div class="flex flex-col gap-sm">
+<!-- Option A -->
+<label class="flex items-start gap-md p-md rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="mt-1 w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface-container-lowest" name="q46" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">A. Newton's First Law</span>
+</div>
+</label>
+<!-- Option B (Selected State) -->
+<label class="flex items-start gap-md p-md rounded-lg border-2 border-primary bg-primary-fixed text-on-primary-fixed cursor-pointer transition-colors shadow-[0px_4px_12px_rgba(15,76,117,0.05)]">
+<input checked="" class="mt-1 w-5 h-5 text-primary border-primary focus:ring-primary focus:ring-offset-0 bg-surface-container-lowest" name="q46" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-primary-fixed font-bold">B. Newton's Second Law</span>
+</div>
+</label>
+<!-- Option C -->
+<label class="flex items-start gap-md p-md rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="mt-1 w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface-container-lowest" name="q46" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">C. Newton's Third Law</span>
+</div>
+</label>
+<!-- Option D -->
+<label class="flex items-start gap-md p-md rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="mt-1 w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-0 bg-surface-container-lowest" name="q46" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">D. Law of Universal Gravitation</span>
+</div>
+</label>
+</div>
+<!-- Card Actions -->
+<div class="flex items-center justify-between mt-xl pt-lg border-t border-outline-variant">
+<div class="flex gap-md">
+<button class="flex items-center gap-xs text-tertiary font-label-md text-label-md hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">flag</span>
+                                Mark for Review
+                            </button>
+<button class="flex items-center gap-xs text-secondary font-label-md text-label-md hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">ink_eraser</span>
+                                Clear Selection
+                            </button>
+</div>
+</div>
+</div>
+<!-- Global Navigation Actions -->
+<div class="flex justify-between items-center mt-auto pt-lg">
+<button class="flex items-center gap-xs px-lg py-sm rounded-full border border-primary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<span class="material-symbols-outlined">arrow_back</span>
+                        Previous Question
+                    </button>
+<button class="flex items-center gap-xs px-lg py-sm rounded-full bg-primary text-on-primary font-label-md text-label-md hover:opacity-90 transition-opacity">
+                        Next Question
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Right: Question Navigator Panel (User requested right sidebar, implemented as panel in main content alongside JSON's left nav) -->
+<div class="w-full xl:w-80 flex flex-col gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col h-full shadow-[0px_4px_12px_rgba(15,76,117,0.02)]">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md">Question Navigator</h3>
+<!-- Legend -->
+<div class="flex flex-wrap gap-sm mb-lg pb-md border-b border-outline-variant">
+<div class="flex items-center gap-xs w-full sm:w-auto">
+<div class="w-4 h-4 rounded-sm bg-primary border border-primary"></div>
+<span class="font-label-sm text-label-sm text-secondary">Answered</span>
+</div>
+<div class="flex items-center gap-xs w-full sm:w-auto">
+<div class="w-4 h-4 rounded-sm bg-surface-container-lowest border border-outline-variant"></div>
+<span class="font-label-sm text-label-sm text-secondary">Unanswered</span>
+</div>
+<div class="flex items-center gap-xs w-full sm:w-auto">
+<div class="w-4 h-4 rounded-sm border border-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-tertiary">flag</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary">Marked</span>
+</div>
+<div class="flex items-center gap-xs w-full sm:w-auto">
+<div class="w-4 h-4 rounded-sm border-2 border-primary bg-primary-fixed"></div>
+<span class="font-label-sm text-label-sm text-secondary">Current</span>
+</div>
+</div>
+<!-- Grid -->
+<div class="grid grid-cols-5 gap-sm overflow-y-auto max-h-[600px] pr-xs" style="scrollbar-width: thin;">
+<!-- Using inline script to generate grid items for brevity and adherence to rules, simulating states -->
+<script>
+                            for(let i=1; i<=60; i++) {
+                                let classes = "w-full aspect-square rounded flex items-center justify-center font-label-md text-label-md transition-all cursor-pointer ";
+                                let content = i;
+                                
+                                if(i === 46) {
+                                    // Current
+                                    classes += "border-2 border-primary bg-primary-fixed text-on-primary-fixed font-bold shadow-[0px_4px_12px_rgba(15,76,117,0.1)]";
+                                } else if(i === 12 || i === 28 || i === 55) {
+                                    // Marked
+                                    classes += "border border-tertiary text-tertiary bg-surface-container-lowest hover:bg-surface-container-low relative";
+                                    content += `<span class="material-symbols-outlined absolute -top-1 -right-1 text-[12px] bg-surface-container-lowest rounded-full">flag</span>`;
+                                } else if(i < 45) {
+                                    // Answered
+                                    classes += "bg-primary text-on-primary border border-primary hover:opacity-90";
+                                } else {
+                                    // Unanswered
+                                    classes += "bg-surface-container-lowest border border-outline-variant text-secondary hover:bg-surface-container-low hover:text-on-surface";
+                                }
+                                
+                                document.write(`<button class="${classes}" title="Question ${i}">${content}</button>`);
+                            }
+                        </script>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

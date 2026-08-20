@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shiksha - Course Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#cee5ff",
+                      "inverse-on-surface": "#f0f0f4",
+                      "tertiary-container": "#6a3e00",
+                      "tertiary": "#4b2a00",
+                      "on-error-container": "#93000a",
+                      "surface-bright": "#f9f9fd",
+                      "secondary-container": "#d2e4fa",
+                      "surface-container-highest": "#e2e2e6",
+                      "tertiary-fixed": "#ffdcbc",
+                      "on-tertiary-container": "#eaab66",
+                      "on-primary-fixed": "#001d32",
+                      "primary-container": "#0f4c75",
+                      "surface-variant": "#e2e2e6",
+                      "surface-dim": "#d9dade",
+                      "secondary-fixed-dim": "#b6c8dd",
+                      "on-primary-fixed-variant": "#0b4a73",
+                      "inverse-surface": "#2e3134",
+                      "primary-fixed-dim": "#9acbfb",
+                      "on-secondary-fixed-variant": "#37485a",
+                      "outline": "#72787f",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-background": "#191c1f",
+                      "inverse-primary": "#9acbfb",
+                      "surface-tint": "#2e628c",
+                      "outline-variant": "#c1c7cf",
+                      "on-tertiary-fixed-variant": "#683d00",
+                      "surface-container-high": "#e7e8ec",
+                      "error": "#ba1a1a",
+                      "surface": "#f9f9fd",
+                      "on-primary-container": "#8bbceb",
+                      "surface-container-low": "#f3f3f7",
+                      "on-secondary-fixed": "#0a1d2c",
+                      "secondary-fixed": "#d2e4fa",
+                      "background": "#f9f9fd",
+                      "on-surface-variant": "#41474e",
+                      "tertiary-fixed-dim": "#fbba74",
+                      "surface-container": "#edeef1",
+                      "on-tertiary-fixed": "#2c1700",
+                      "secondary": "#4f6072",
+                      "on-error": "#ffffff",
+                      "primary": "#003555",
+                      "on-surface": "#191c1f",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#556678"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "xl": "32px",
+                      "xxl": "48px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "container-max": "1280px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "sm": "12px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "60px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "38px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pt-20 pb-16 md:pb-0 md:pl-72">
+<!-- NavigationDrawer (Desktop) -->
+<nav class="bg-surface dark:bg-surface-dim hidden md:flex flex-col h-screen fixed left-0 top-0 p-md h-full w-72 left-0 border-r border-outline-variant dark:border-outline">
+<div class="mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="school" style="font-size: 32px;">school</span>
+<span class="text-headline-md font-display-lg text-primary dark:text-primary-fixed">Shiksha</span>
+</div>
+<div class="flex items-center gap-md mb-lg">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a female teacher named Dr. Aranya in a modern academic setting. She is wearing professional attire, slightly smiling, in a bright, modern light-mode aesthetic with clean white and blue tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy3q8FwqdcVFHAKsIVDFuNesYDrkiCivD4tq76Q_LgT6_3DbvIcC2bMyc47BrQSMlR7aJJRTdP1gCnw2KtJ0I8H2lrumQE_QqEo4qy5ftGFXLbrwayiH6Udi9C21B-D5Uk1LUZVxmHyRdylLassUTY5Xe_4J9hMzN6RgJ2Xd1caqXudpF2jaCIFvdF17Tk-xUBV7np0HxGsEki-_WeHmAEIhhSVXgyS1vRW3lRdyGfIh78j_xRkJRR"/>
+<div>
+<p class="font-headline-sm text-headline-sm text-on-surface">Dr. Aranya</p>
+<p class="font-label-sm text-label-sm text-secondary">Senior Instructor</p>
+<p class="font-label-sm text-label-sm text-primary">Active Now</p>
+</div>
+</div>
+<div class="flex flex-col gap-sm mt-md">
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm border-l-4 border-primary transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book" data-weight="fill" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="font-label-md text-label-md font-bold">Courses</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+<span class="font-label-md text-label-md">Exams</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-md text-secondary hover:bg-surface-container-low px-md py-sm rounded-lg hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-200 ease-in-out mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline fixed top-0 w-full z-50 flex justify-between items-center px-lg md:px-xxl h-20 md:hidden docked full-width top-0">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 p-sm rounded-full" data-icon="menu">menu</span>
+<span class="text-headline-md font-display-lg text-primary dark:text-primary-fixed">Shiksha</span>
+</div>
+<img class="w-10 h-10 rounded-full object-cover cursor-pointer" data-alt="A professional headshot of a female teacher named Dr. Aranya in a modern academic setting. She is wearing professional attire, slightly smiling, in a bright, modern light-mode aesthetic with clean white and blue tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAG84aDE2pIX0_rMgrdMINsdjo7tSsu2NrsBFgSPwkc7JG58X2P9LYbktaQQEnXV3yAuvNo-Pc8BCJSdgUj4kN8tUEL04kQWWVWh7E12SXLs0aNcba-G48ep1TtYChDlN59aFIdGvIbJD0E9BS2M0r_fryxytaB9jQEC0woHj8kW1Vk-TZZel1w1lJSo9zVX-WJYCX0pIACa46s4HxreC-BsOC0R4wCITbDpT4MWCjxeAskV8HPvEF"/>
+</header>
+<!-- Main Content -->
+<main class="max-w-[1280px] mx-auto p-margin-mobile md:p-gutter">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-xl gap-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Manage Courses</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Overview and administration of your active classes.</p>
+</div>
+<div class="flex gap-sm w-full md:w-auto">
+<button class="flex-1 md:flex-none border border-primary text-primary font-label-md text-label-md px-lg py-sm rounded-full hover:bg-surface-container-low transition-colors">
+                    Publish Exam
+                </button>
+<button class="flex-1 md:flex-none bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-full hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors shadow-sm">
+                    Add New Lesson
+                </button>
+</div>
+</div>
+<!-- Metrics Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center justify-between shadow-sm">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Students Enrolled</p>
+<p class="font-headline-lg text-headline-lg text-on-surface mt-xs">245</p>
+</div>
+<div class="bg-primary-container text-on-primary-container p-sm rounded-full">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center justify-between shadow-sm">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Average Score</p>
+<p class="font-headline-lg text-headline-lg text-on-surface mt-xs">82%</p>
+</div>
+<div class="bg-secondary-container text-on-secondary-container p-sm rounded-full">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex items-center justify-between shadow-sm">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Content Uploaded</p>
+<p class="font-headline-lg text-headline-lg text-on-surface mt-xs">90%</p>
+</div>
+<div class="bg-tertiary-container text-on-tertiary-container p-sm rounded-full">
+<span class="material-symbols-outlined" data-icon="cloud_done">cloud_done</span>
+</div>
+</div>
+</div>
+<!-- Course List -->
+<h2 class="font-headline-md text-headline-md text-on-surface mb-lg">Active Courses</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Course Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden hover:shadow-[0px_4px_12px_rgba(15,76,117,0.05)] transition-shadow duration-300">
+<div class="bg-cover bg-center w-full h-48" data-alt="A high-quality educational image representing World History. An antique globe alongside old parchment maps and a feather quill resting on a wooden desk. Bright, soft natural lighting typical of a modern light-mode interface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB-pXQBuZU6eDAVXxbS-2ZctJYYKyNokbivnvRTHziONPb2TQm0aNVIxfg-CNCuTrrMO8uJgXCLhPf2-9TFIcTZxJ3BS0iWmI0SXKuQxm_S7P-I77VuAuYxTpUOlWfGS377QHrT7hr2MqkWH7plYf2wGh5Y-yjx_ZDvGFzozBTYwLV0jp7AgtYNqWngeWfAoPErlTjHImroOE50zndbQv7YnGLaGF3iEF8VNKQB93yfDAe1RcSvhpo7')"></div>
+<div class="p-lg">
+<div class="flex justify-between items-start mb-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">World History: 19th Century</h3>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-xs py-xs rounded uppercase tracking-wider">Active</span>
+</div>
+<div class="mb-md">
+<div class="flex justify-between mb-xs">
+<span class="font-label-sm text-label-sm text-secondary">Course Progress</span>
+<span class="font-label-sm text-label-sm text-primary">65%</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 65%"></div>
+</div>
+</div>
+<div class="flex items-center gap-md text-secondary">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="group">group</span>
+<span class="font-body-sm text-body-sm">120 Students</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span class="font-body-sm text-body-sm">Last accessed 2h ago</span>
+</div>
+</div>
+<div class="mt-lg pt-md border-t border-outline-variant flex justify-end gap-sm">
+<button class="text-primary font-label-md text-label-md px-md py-xs rounded hover:bg-surface-container-low transition-colors">Edit</button>
+<button class="bg-surface-container-high text-on-surface font-label-md text-label-md px-md py-xs rounded-full hover:bg-surface-variant transition-colors">Manage Lessons</button>
+</div>
+</div>
+</div>
+<!-- Course Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden hover:shadow-[0px_4px_12px_rgba(15,76,117,0.05)] transition-shadow duration-300">
+<div class="bg-cover bg-center w-full h-48" data-alt="A high-quality educational image representing Bio-Chemistry. A modern laboratory setup with glowing blue liquid in a beaker, flanked by clean glassware and a microscope. Bright, sterile light-mode aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCsFZwK4ztVTtQcvqHXkOD8mg-fRBm4NhKaX9m3uvE4O5kDNL-1oZqjDIAqyx49-abbMxbo8hN3el1iVHZTU2RIEFoTtYV19h_mJj5blgxE1NpCdit2Q3bO-rc9N--B0as4iHv9MtYbn4G6e4W04h5FXT7wd2iSIEAsWsNC5E9mTPXWGWE43kBGdL0l22CLSkLof-yBAaIb435PLrlq9qA1zIZTKHOJ8b_ZcYw7o7vgYYX7Q7eDkX-_')"></div>
+<div class="p-lg">
+<div class="flex justify-between items-start mb-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Advanced Bio-Chemistry</h3>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-xs py-xs rounded uppercase tracking-wider">Active</span>
+</div>
+<div class="mb-md">
+<div class="flex justify-between mb-xs">
+<span class="font-label-sm text-label-sm text-secondary">Course Progress</span>
+<span class="font-label-sm text-label-sm text-primary">85%</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="flex items-center gap-md text-secondary">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="group">group</span>
+<span class="font-body-sm text-body-sm">125 Students</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span class="font-body-sm text-body-sm">Last accessed 5h ago</span>
+</div>
+</div>
+<div class="mt-lg pt-md border-t border-outline-variant flex justify-end gap-sm">
+<button class="text-primary font-label-md text-label-md px-md py-xs rounded hover:bg-surface-container-low transition-colors">Edit</button>
+<button class="bg-surface-container-high text-on-surface font-label-md text-label-md px-md py-xs rounded-full hover:bg-surface-variant transition-colors">Manage Lessons</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="bg-surface dark:bg-surface-dim border-t border-outline-variant dark:border-outline fixed bottom-0 w-full z-50 flex justify-around items-center h-16 md:hidden shadow-sm rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-full px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="school" data-weight="fill" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-sm text-label-sm">My Courses</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-sm text-label-sm">Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

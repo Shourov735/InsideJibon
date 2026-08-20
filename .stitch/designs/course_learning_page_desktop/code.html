@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shiksha - Course Learning</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0f4c75",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#556678",
+                        "outline": "#72787f",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2e3134",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1f",
+                        "tertiary": "#4b2a00",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#683d00",
+                        "on-secondary-fixed-variant": "#37485a",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f0f0f4",
+                        "outline-variant": "#c1c7cf",
+                        "secondary-container": "#d2e4fa",
+                        "on-tertiary-fixed": "#2c1700",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdcbc",
+                        "surface": "#f9f9fd",
+                        "primary-fixed": "#cee5ff",
+                        "tertiary-fixed-dim": "#fbba74",
+                        "on-primary-fixed": "#001d32",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e2e2e6",
+                        "background": "#f9f9fd",
+                        "secondary": "#4f6072",
+                        "on-secondary-fixed": "#0a1d2c",
+                        "secondary-fixed-dim": "#b6c8dd",
+                        "surface-container": "#edeef1",
+                        "on-primary-container": "#8bbceb",
+                        "surface-container-low": "#f3f3f7",
+                        "primary": "#003555",
+                        "surface-tint": "#2e628c",
+                        "on-tertiary-container": "#eaab66",
+                        "tertiary-container": "#6a3e00",
+                        "surface-bright": "#f9f9fd",
+                        "surface-dim": "#d9dade",
+                        "surface-variant": "#e2e2e6",
+                        "on-surface-variant": "#41474e",
+                        "inverse-primary": "#9acbfb",
+                        "surface-container-high": "#e7e8ec",
+                        "secondary-fixed": "#d2e4fa",
+                        "primary-fixed-dim": "#9acbfb",
+                        "on-surface": "#191c1f",
+                        "on-primary-fixed-variant": "#0b4a73",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "48px",
+                        "sm": "12px",
+                        "lg": "24px",
+                        "container-max": "1280px",
+                        "xl": "32px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #c1c7cf;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #72787f;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline fixed top-0 w-full z-40 h-[64px]">
+<div class="flex justify-between items-center px-lg h-full max-w-container-max mx-auto">
+<div class="flex items-center gap-md">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+                    Shiksha
+                </div>
+<div class="hidden md:flex items-center text-secondary dark:text-secondary-fixed-dim font-label-md text-label-md ml-lg">
+<span class="cursor-pointer hover:text-primary transition-colors">Home</span>
+<span class="material-symbols-outlined mx-xs text-[16px]">chevron_right</span>
+<span class="cursor-pointer hover:text-primary transition-colors">Mathematics</span>
+<span class="material-symbols-outlined mx-xs text-[16px]">chevron_right</span>
+<span class="text-on-background font-semibold">Algebra Basics</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center gap-sm mr-lg">
+<div class="text-secondary font-label-sm text-label-sm">Overall Progress</div>
+<div class="w-32 h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 34%;"></div>
+</div>
+<div class="text-on-background font-label-sm text-label-sm font-semibold">34%</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 rounded-full text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden ml-sm cursor-pointer border border-outline-variant">
+<img alt="Student profile avatar" class="w-full h-full object-cover" data-alt="A clean, professional headshot of a diverse young university student. The lighting is soft and flattering, emphasizing a bright, optimistic mood suitable for a modern learning platform profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1aZ5dHpiQOd92WfdzEOx-rSguse-3BICkaN6NuTl-Z1UcZiokxVutpt8vAgtjZGj9ljlepm_nY5Nq4pvHB88Yp6e20nM222kU1mYdCoeTb7GED_C27JdpXK5RY_qjOGIwC35cpVxUuwAD1ntatVX5OKyi38iym4MNXKsvuEmZIl7XV3a-CTcO3Qke6qLcDEaSLzxn-tU3IvAzYb5ISCgaz9kmOyrSRoQ3QpnsKVkmone2AsDGweMi"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Layout Container -->
+<div class="flex flex-1 pt-[64px] overflow-hidden">
+<!-- Left Sidebar (Curriculum) -->
+<aside class="w-[320px] bg-surface border-r border-outline-variant flex-shrink-0 flex flex-col h-full hidden lg:flex">
+<div class="p-md border-b border-outline-variant">
+<h2 class="font-headline-sm text-headline-sm text-on-background mb-xs">Algebra Basics</h2>
+<p class="font-body-sm text-body-sm text-secondary">Mastering quadratic equations and functions.</p>
+</div>
+<div class="flex-1 overflow-y-auto py-sm">
+<!-- Module 1 -->
+<div class="mb-sm">
+<div class="px-md py-sm flex justify-between items-center cursor-pointer hover:bg-surface-container-low transition-colors">
+<h3 class="font-label-md text-label-md text-on-background font-semibold">Module 1: Foundations</h3>
+<span class="material-symbols-outlined text-secondary text-[20px]">expand_more</span>
+</div>
+<div class="flex flex-col">
+<!-- Lesson 1 (Completed) -->
+<div class="flex items-start px-lg py-sm hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<div class="mr-sm mt-[2px] text-primary">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</div>
+<div class="flex-1">
+<div class="font-body-sm text-body-sm text-secondary group-hover:text-on-background transition-colors">1. Introduction to Polynomials</div>
+<div class="font-label-sm text-label-sm text-outline mt-xs">12 mins</div>
+</div>
+</div>
+<!-- Lesson 2 (Completed) -->
+<div class="flex items-start px-lg py-sm hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<div class="mr-sm mt-[2px] text-primary">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</div>
+<div class="flex-1">
+<div class="font-body-sm text-body-sm text-secondary group-hover:text-on-background transition-colors">2. Factoring Techniques</div>
+<div class="font-label-sm text-label-sm text-outline mt-xs">18 mins</div>
+</div>
+</div>
+<!-- Lesson 3 (Active) -->
+<div class="flex items-start px-lg py-sm bg-secondary-container/30 border-l-4 border-primary cursor-pointer">
+<div class="mr-sm mt-[2px] text-primary">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+</div>
+<div class="flex-1">
+<div class="font-body-sm text-body-sm text-primary font-semibold">3. Quadratic Equations</div>
+<div class="font-label-sm text-label-sm text-primary/70 mt-xs">25 mins • Active</div>
+</div>
+</div>
+<!-- Lesson 4 (Locked) -->
+<div class="flex items-start px-lg py-sm cursor-not-allowed opacity-60">
+<div class="mr-sm mt-[2px] text-outline">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+</div>
+<div class="flex-1">
+<div class="font-body-sm text-body-sm text-secondary">4. Complex Roots</div>
+<div class="font-label-sm text-label-sm text-outline mt-xs">20 mins</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Module 2 -->
+<div class="mb-sm">
+<div class="px-md py-sm flex justify-between items-center cursor-pointer hover:bg-surface-container-low transition-colors">
+<h3 class="font-label-md text-label-md text-on-background font-semibold">Module 2: Advanced Functions</h3>
+<span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+</div>
+<div class="flex flex-col hidden"> <!-- Collapsed state example -->
+<!-- Content would go here -->
+</div>
+</div>
+</div>
+</aside>
+<!-- Center (Main Lesson) -->
+<main class="flex-1 bg-surface-container-lowest overflow-y-auto h-full flex flex-col items-center py-lg px-md md:px-xl">
+<div class="w-full max-w-[900px]">
+<!-- Video Player Area -->
+<div class="relative w-full aspect-video bg-surface-container-highest rounded-xl overflow-hidden mb-lg shadow-sm border border-outline-variant/50 group cursor-pointer">
+<img alt="Video Thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XcdWpdJ6dNyn6joAR-oiiDh5AMpRCQqodiAgwzC9OODfDZNhMXxwCscv_lwycjUPRhs3za7fNNtzj0_V1vyTRuwqlraAsHxFohKK0VnjRDopjxaAUZ0av_6TvrdPlA8M4eTAn5dYe51RN_N045xeMhIJ9oDa2HZy8dpNghru9CfmK4s9EsCCeODATF1bvZUxBD516QwQKD87SKiBT-2MUDrUeU8vqZiMFWKDObwCar6iEjxxwSKO4Wsro"/>
+<!-- Overlay Play Button -->
+<div class="absolute inset-0 bg-on-background/20 flex items-center justify-center group-hover:bg-on-background/30 transition-colors">
+<div class="w-16 h-16 bg-surface-container-lowest/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-display-lg-mobile ml-1">play_arrow</span>
+</div>
+</div>
+<!-- Video Controls Placeholder -->
+<div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-on-background/80 to-transparent flex items-end px-md pb-sm">
+<div class="w-full flex items-center gap-sm text-on-primary">
+<span class="material-symbols-outlined text-[20px]">pause</span>
+<div class="text-label-sm font-label-sm">04:12 / 25:00</div>
+<div class="flex-1 h-1 bg-surface/30 rounded-full overflow-hidden mx-sm">
+<div class="h-full bg-primary-fixed w-[15%]"></div>
+</div>
+<span class="material-symbols-outlined text-[20px]">volume_up</span>
+<span class="material-symbols-outlined text-[20px]">fullscreen</span>
+</div>
+</div>
+</div>
+<!-- Lesson Info & Actions -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background mb-xs">Chapter 4: Quadratic Equations</h1>
+<div class="font-body-sm text-body-sm text-secondary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">person</span> Dr. Alan Turing
+                            <span class="mx-xs">•</span>
+<span class="material-symbols-outlined text-[16px]">schedule</span> 25 mins
+                        </div>
+</div>
+<button class="bg-primary text-on-primary hover:bg-on-primary-fixed-variant px-lg py-sm rounded-lg font-label-md text-label-md flex items-center gap-sm transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">done</span>
+                        Mark as Complete
+                    </button>
+</div>
+<div class="h-[1px] w-full bg-outline-variant mb-lg"></div>
+<!-- Lesson Description -->
+<div class="prose max-w-none text-on-background font-body-md text-body-md mb-xl">
+<p class="mb-sm">In this lesson, we will explore the fundamental properties of quadratic equations. We will cover the standard form, understand how to identify a, b, and c coefficients, and learn the most effective methods for solving them.</p>
+<p class="mb-sm">Key concepts include:</p>
+<ul class="list-disc pl-lg mb-sm space-y-xs text-secondary">
+<li>The Standard Form: ax² + bx + c = 0</li>
+<li>The Quadratic Formula and its derivation</li>
+<li>Understanding the Discriminant (Δ)</li>
+</ul>
+</div>
+<!-- Navigation Buttons -->
+<div class="flex justify-between items-center border-t border-outline-variant pt-lg mt-auto pb-xl">
+<button class="flex items-center gap-sm px-md py-sm rounded-lg border border-outline text-secondary hover:text-primary hover:border-primary transition-colors font-label-md text-label-md bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                        Previous Lesson
+                    </button>
+<button class="flex items-center gap-sm px-md py-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors font-label-md text-label-md">
+                        Next Lesson
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Right Panel (Resources & Progress) -->
+<aside class="w-[280px] bg-surface border-l border-outline-variant flex-shrink-0 flex flex-col h-full hidden xl:flex">
+<div class="p-lg">
+<!-- Progress Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/50 shadow-sm mb-lg">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-label-md text-label-md text-on-background font-semibold">Course Progress</h3>
+<span class="font-label-sm text-label-sm text-primary font-bold">34%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden mb-sm">
+<div class="h-full bg-primary" style="width: 34%;"></div>
+</div>
+<p class="font-label-sm text-label-sm text-secondary">12 of 35 lessons completed</p>
+</div>
+<!-- Resources List -->
+<div>
+<h3 class="font-label-md text-label-md text-on-background font-semibold mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">folder</span> Lesson Resources
+                    </h3>
+<div class="flex flex-col gap-sm">
+<a class="flex items-center p-sm rounded-lg hover:bg-surface-container-low border border-transparent hover:border-outline-variant transition-colors group" href="#">
+<div class="w-10 h-10 rounded bg-error-container text-on-error-container flex items-center justify-center mr-sm flex-shrink-0">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="font-label-sm text-label-sm text-on-background truncate group-hover:text-primary transition-colors">Lesson Slides.pdf</div>
+<div class="font-label-sm text-label-sm text-outline text-[10px]">2.4 MB</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary text-[20px]">download</span>
+</a>
+<a class="flex items-center p-sm rounded-lg hover:bg-surface-container-low border border-transparent hover:border-outline-variant transition-colors group" href="#">
+<div class="w-10 h-10 rounded bg-secondary-container text-on-secondary-container flex items-center justify-center mr-sm flex-shrink-0">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="font-label-sm text-label-sm text-on-background truncate group-hover:text-primary transition-colors">Formula Sheet.pdf</div>
+<div class="font-label-sm text-label-sm text-outline text-[10px]">1.1 MB</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary text-[20px]">download</span>
+</a>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

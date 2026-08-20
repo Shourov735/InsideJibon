@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Course Builder: Applied Organic Chemistry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#f9f9fd",
+                      "inverse-surface": "#2e3134",
+                      "secondary-fixed": "#d2e4fa",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed": "#ffdcbc",
+                      "surface-container-high": "#e7e8ec",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c1c7cf",
+                      "inverse-primary": "#9acbfb",
+                      "tertiary-fixed-dim": "#fbba74",
+                      "primary": "#003555",
+                      "surface-container-low": "#f3f3f7",
+                      "on-secondary-fixed": "#0a1d2c",
+                      "surface-container-highest": "#e2e2e6",
+                      "on-tertiary-fixed": "#2c1700",
+                      "on-primary-fixed": "#001d32",
+                      "secondary": "#4f6072",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed-variant": "#0b4a73",
+                      "on-tertiary-fixed-variant": "#683d00",
+                      "surface-dim": "#d9dade",
+                      "secondary-fixed-dim": "#b6c8dd",
+                      "on-primary": "#ffffff",
+                      "primary-container": "#0f4c75",
+                      "on-surface": "#191c1f",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#d2e4fa",
+                      "tertiary-container": "#6a3e00",
+                      "primary-fixed": "#cee5ff",
+                      "surface-variant": "#e2e2e6",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#2e628c",
+                      "on-secondary-fixed-variant": "#37485a",
+                      "on-surface-variant": "#41474e",
+                      "on-secondary-container": "#556678",
+                      "on-tertiary-container": "#eaab66",
+                      "surface-container": "#edeef1",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-on-surface": "#f0f0f4",
+                      "primary-fixed-dim": "#9acbfb",
+                      "background": "#f9f9fd",
+                      "tertiary": "#4b2a00",
+                      "on-primary-container": "#8bbceb",
+                      "on-error": "#ffffff",
+                      "on-background": "#191c1f",
+                      "surface": "#f9f9fd",
+                      "outline": "#72787f"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xl": "32px",
+                      "gutter": "24px",
+                      "lg": "24px",
+                      "xxl": "48px",
+                      "sm": "12px",
+                      "container-max": "1280px",
+                      "base": "8px",
+                      "xs": "4px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "display-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "38px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "60px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen flex flex-col font-body-md antialiased overflow-hidden">
+<!-- TopNavBar JSON Applied -->
+<header class="bg-surface-container-lowest text-primary font-body-md flex justify-between items-center w-full px-gutter h-16 sticky top-0 z-50 border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">Shiksha</span>
+<div class="h-6 w-px bg-outline-variant mx-sm"></div>
+<h1 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+                Course Builder: Applied Organic Chemistry
+                <span class="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider">Draft</span>
+</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-secondary hover:text-primary transition-colors cursor-pointer active:opacity-80 px-4 py-2 font-label-md text-label-md">Save</button>
+<button class="text-secondary hover:text-primary transition-colors cursor-pointer active:opacity-80 px-4 py-2 font-label-md text-label-md">Preview</button>
+<button class="bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-colors cursor-pointer active:opacity-80 px-4 py-2 rounded-DEFAULT font-label-md text-label-md shadow-sm">Publish</button>
+<div class="flex gap-2 ml-sm">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors text-secondary" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors text-secondary" data-icon="help">help</span>
+</div>
+<img alt="Teacher Profile" class="w-8 h-8 rounded-full ml-sm object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPK9MC6vHMhLjYZeFjUMHQd5tlhnh57PM1O2xs1cEjki2ptaeMsAo-F_atuytFl56ds1qDX82XU5iD4NLMxOAq74e5pVFAqxixgJERRR3UyB8IsGD7hU8Ihn3FojYOSND7R7Vo8ifEytSLK2lk1r3MniE16_jArasqrf8PTlaTpB8fhCChtJkVBbTHo5Jrcknggxx80q5L5ce3n8l6AoB-cxH9DsImie_3PvqZi8PVRWv2Tb2YTA4q"/>
+</div>
+</header>
+<!-- Main Workspace -->
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar JSON Applied (Structure Pane) -->
+<aside class="bg-surface text-primary font-label-md text-label-md h-full w-80 flex-shrink-0 flex flex-col border-r border-outline-variant">
+<div class="p-4 border-b border-outline-variant">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline-sm text-headline-sm text-primary">Course Structure</h2>
+</div>
+<div class="flex flex-col gap-2">
+<button class="w-full flex items-center justify-center gap-2 border border-primary text-primary hover:bg-surface-container-low transition-colors rounded-DEFAULT py-2 font-label-md">
+<span class="material-symbols-outlined" data-icon="add">add</span> Add Module
+                    </button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-2">
+<!-- Course Root -->
+<div class="flex items-center gap-2 px-2 py-1 text-on-surface">
+<span class="material-symbols-outlined text-secondary" data-icon="school">school</span>
+<span class="font-label-md truncate">Applied Organic Chemistry</span>
+</div>
+<!-- Module 1 -->
+<div class="pl-2 space-y-1 mt-2">
+<div class="flex items-center justify-between px-2 py-1.5 hover:bg-surface-container-low rounded-DEFAULT cursor-pointer group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary transition-transform transform rotate-90" data-icon="chevron_right">chevron_right</span>
+<span class="font-label-md text-on-surface">Module 1: Foundations...</span>
+</div>
+<span class="material-symbols-outlined text-sm text-secondary opacity-0 group-hover:opacity-100" data-icon="more_vert">more_vert</span>
+</div>
+<!-- Lessons in Module 1 -->
+<div class="pl-6 space-y-1">
+<div class="flex items-center justify-between px-2 py-1.5 hover:bg-surface-container-low rounded-DEFAULT cursor-pointer text-secondary group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span>
+<span class="font-body-sm truncate">1.1 Introduction to Alkanes</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-2 py-1.5 hover:bg-surface-container-low rounded-DEFAULT cursor-pointer text-secondary group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span>
+<span class="font-body-sm truncate">1.2 Chemical Bonding...</span>
+</div>
+</div>
+<!-- Active Lesson -->
+<div class="flex items-center justify-between px-2 py-1.5 text-primary-fixed-dim font-bold border-l-4 border-primary bg-surface-container-low rounded-r-DEFAULT cursor-pointer group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span>
+<span class="font-label-md truncate">1.3 Stereochemistry...</span>
+</div>
+<span class="material-symbols-outlined text-sm" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+<button class="ml-6 mt-1 flex items-center gap-1 text-secondary hover:text-primary font-label-sm py-1 px-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Add Lesson
+                    </button>
+</div>
+<!-- Module 2 -->
+<div class="pl-2 space-y-1 mt-4">
+<div class="flex items-center justify-between px-2 py-1.5 hover:bg-surface-container-low rounded-DEFAULT cursor-pointer group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="chevron_right">chevron_right</span>
+<span class="font-label-md text-on-surface">Module 2: Reaction...</span>
+</div>
+<span class="material-symbols-outlined text-sm text-secondary opacity-0 group-hover:opacity-100" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-outline-variant text-secondary">
+<button class="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-all active:scale-95 duration-150 rounded-DEFAULT">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+                </button>
+<button class="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-all active:scale-95 duration-150 rounded-DEFAULT">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span> Support
+                </button>
+</div>
+</aside>
+<!-- Main Editor Pane -->
+<main class="flex-1 overflow-y-auto bg-surface-bright p-xl flex justify-center">
+<div class="w-full max-w-container-max space-y-lg pb-xxl">
+<div class="flex items-center gap-sm text-secondary font-label-sm">
+<span>Module 1</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-on-surface">Lesson Edit</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-sm">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">Lesson Edit: Stereochemistry Basics</h2>
+<!-- Title Input -->
+<div class="mb-lg">
+<label class="block font-label-md text-on-surface mb-xs">Lesson Title</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-DEFAULT px-4 py-2 font-body-md text-on-surface" type="text" value="Stereochemistry Basics"/>
+</div>
+<!-- Rich Text Description -->
+<div class="mb-lg">
+<label class="block font-label-md text-on-surface mb-xs">Lesson Description</label>
+<div class="border border-outline-variant rounded-DEFAULT overflow-hidden">
+<!-- Toolbar mock -->
+<div class="bg-surface-container-low border-b border-outline-variant px-3 py-2 flex gap-2 text-secondary">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary text-[20px]" data-icon="format_bold">format_bold</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary text-[20px]" data-icon="format_italic">format_italic</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary text-[20px]" data-icon="format_underlined">format_underlined</span>
+<div class="w-px h-5 bg-outline-variant mx-1"></div>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary text-[20px]" data-icon="format_list_bulleted">format_list_bulleted</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary text-[20px]" data-icon="format_list_numbered">format_list_numbered</span>
+</div>
+<textarea class="w-full border-none focus:ring-0 p-4 font-body-md text-on-surface resize-y" placeholder="Enter lesson description..." rows="4">In this lesson, we explore the spatial arrangement of atoms in molecules and how this affects their chemical properties and reactivity.</textarea>
+</div>
+</div>
+<!-- Video Section -->
+<div class="mb-lg">
+<label class="block font-label-md text-on-surface mb-xs flex items-center justify-between">
+<span>Lesson Video</span>
+<span class="text-error font-label-sm flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="warning">warning</span> Required</span>
+</label>
+<div class="border-2 border-dashed border-outline-variant bg-surface-container-low rounded-lg p-xl flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-4xl text-secondary mb-2" data-icon="video_file">video_file</span>
+<p class="font-label-md text-on-surface">Drag and drop video here or <span class="text-primary underline">browse</span></p>
+<p class="font-body-sm text-secondary mt-1">MP4, WebM (Max 2GB)</p>
+</div>
+</div>
+<!-- Materials Section -->
+<div>
+<div class="flex items-center justify-between mb-sm">
+<label class="block font-label-md text-on-surface">Supplementary Materials</label>
+<button class="text-primary font-label-sm hover:underline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="upload_file">upload_file</span> Upload File
+                            </button>
+</div>
+<ul class="space-y-2">
+<!-- File Item 1 -->
+<li class="flex items-center justify-between p-3 border border-outline-variant rounded-DEFAULT bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-error-container text-error rounded flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Lecture Notes.pdf</p>
+<p class="font-body-sm text-secondary">2.4 MB • PDF</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-secondary hover:text-primary font-label-sm px-2 py-1">View</button>
+<button class="text-error hover:text-on-error-container font-label-sm px-2 py-1">Remove</button>
+</div>
+</li>
+<!-- File Item 2 -->
+<li class="flex items-center justify-between p-3 border border-outline-variant rounded-DEFAULT bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-tertiary-fixed text-on-tertiary-fixed rounded flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="image">image</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Molecule Models Image.png</p>
+<p class="font-body-sm text-secondary">1.1 MB • IMAGE</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-secondary hover:text-primary font-label-sm px-2 py-1">View</button>
+<button class="text-error hover:text-on-error-container font-label-sm px-2 py-1">Remove</button>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex items-center justify-between pt-md">
+<button class="text-error hover:text-on-error-container font-label-md flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span> Delete Lesson
+                    </button>
+<div class="flex gap-md">
+<button class="border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors px-6 py-2 rounded-DEFAULT font-label-md">Duplicate</button>
+<button class="border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors px-6 py-2 rounded-DEFAULT font-label-md">Preview</button>
+<button class="bg-primary text-on-primary hover:bg-primary-container transition-colors px-6 py-2 rounded-DEFAULT font-label-md">Save Changes</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Side: Publishing Checklist Overlay/Panel -->
+<aside class="w-72 bg-surface-container-lowest border-l border-outline-variant flex-shrink-0 flex flex-col hidden lg:flex shadow-[-4px_0_12px_rgba(0,0,0,0.02)]">
+<div class="p-4 border-b border-outline-variant bg-surface-container-low">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="fact_check">fact_check</span> Ready to Publish?
+                </h3>
+</div>
+<div class="p-4 flex-1 overflow-y-auto">
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-surface-tint mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-on-surface">Course title</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-surface-tint mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-on-surface">Description</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-surface-tint mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-on-surface">Thumbnail</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-surface-tint mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-on-surface">At least one module</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-surface-tint mt-0.5" data-icon="check_circle">check_circle</span>
+<span class="font-body-md text-on-surface">At least one lesson</span>
+</li>
+<li class="flex items-start gap-3 bg-error-container/30 p-2 rounded-md -ml-2 -mr-2">
+<span class="material-symbols-outlined text-error mt-0.5" data-icon="error">error</span>
+<div>
+<span class="font-label-md text-error block">Required lesson content</span>
+<span class="font-body-sm text-on-error-container block mt-0.5">Missing video for Lesson 1.3</span>
+</div>
+</li>
+</ul>
+</div>
+<div class="p-4 border-t border-outline-variant bg-surface-container-low">
+<button class="w-full bg-surface-variant text-on-surface-variant cursor-not-allowed opacity-50 px-4 py-2 rounded-DEFAULT font-label-md shadow-sm" disabled="">Publish Course</button>
+<p class="font-body-sm text-secondary text-center mt-2">Complete checklist to publish</p>
+</div>
+</aside>
+</div>
+</body></html>
