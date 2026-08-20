@@ -123,26 +123,16 @@ export default async function PublicCourseDetailPage({
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <div className="flex items-center gap-2">
-                  {course.teacher.imageUrl ? (
-                    <img
-                      src={course.teacher.imageUrl}
-                      alt={course.teacher.name || "Teacher"}
-                      className="h-9 w-9 rounded-full border border-outline-variant object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-outline-variant bg-surface-container-high text-xs font-bold text-primary">
-                      {(course.teacher.name || "T")
-                        .split(/\s+/)
-                        .slice(0, 2)
-                        .map((part) => part.charAt(0).toUpperCase())
-                        .join("")}
-                    </span>
-                  )}
+                  <img
+                    src={course.teacher.imageUrl || "/jibon.jpg"}
+                    alt={course.teacher.name || "Tanvir Hasan Jibon"}
+                    className="h-9 w-9 rounded-full border border-outline-variant object-cover"
+                  />
                   <div className="leading-tight">
                     <p className="text-sm font-medium text-on-surface">
-                      {course.teacher.name || "InsideJibon Teacher"}
+                      {course.teacher.name || "Tanvir Hasan Jibon"}
                     </p>
-                    <p className="text-xs text-secondary">Instructor</p>
+                    <p className="text-xs text-secondary">Lead Educator · Botany</p>
                   </div>
                 </div>
 

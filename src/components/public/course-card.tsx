@@ -8,29 +8,14 @@ interface PublicCourseCardProps {
 
 function TeacherAvatar({ course }: PublicCourseCardProps) {
   const name = course.teacher.name?.trim();
-
-  if (course.teacher.imageUrl) {
-    return (
-      <img
-        src={course.teacher.imageUrl}
-        alt={name || "Teacher"}
-        className="h-8 w-8 rounded-full border border-outline-variant object-cover"
-      />
-    );
-  }
-
-  const initials = name
-    ? name
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part.charAt(0).toUpperCase())
-        .join("")
-    : "T";
+  const avatarSrc = course.teacher.imageUrl || "/jibon.jpg";
 
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-outline-variant bg-surface-container-high text-xs font-bold text-primary">
-      {initials}
-    </span>
+    <img
+      src={avatarSrc}
+      alt={name || "Tanvir Hasan Jibon"}
+      className="h-8 w-8 rounded-full border border-outline-variant object-cover"
+    />
   );
 }
 
