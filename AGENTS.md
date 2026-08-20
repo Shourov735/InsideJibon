@@ -1,3 +1,25 @@
+InsideJibon is a Next.js 16 App Router application deployed to Cloudflare Workers through OpenNext.
+
+Never assume Vercel APIs, Node-only runtime APIs, or Next.js middleware/proxy compatibility with Cloudflare Workers.
+
+Authentication uses Clerk with manual server-side JWT verification through @clerk/backend; do not introduce clerkMiddleware() unless Cloudflare/OpenNext compatibility has been explicitly verified.
+
+Authorization must be enforced at every Server Action and Route Handler that accesses protected data. Layouts are not security boundaries.
+
+Database: Neon PostgreSQL + Drizzle using the Workers-compatible HTTP driver.
+
+File storage: Cloudflare R2 through the application's storage abstraction.
+
+Identity: Clerk.
+
+Application roles: student, teacher, admin.
+
+UI language: Bangla + English.
+
+UI visual direction: Academic Modernism and the existing .stitch/ designs.
+
+Never expose secrets to the client.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
