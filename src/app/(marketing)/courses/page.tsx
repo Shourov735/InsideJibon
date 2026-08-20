@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { getPublishedCourses } from "@/services/courses";
 import { PublicCourseCard } from "@/components/public/course-card";
+import { getTranslator } from "@/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PublicCoursesPage() {
+  const t = await getTranslator();
   const coursesList = await getPublishedCourses();
 
   return (
@@ -24,18 +26,16 @@ export default async function PublicCoursesPage() {
       <section className="bg-surface-container-lowest border-b border-outline-variant">
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <p className="mb-4 inline-block rounded-full border border-outline-variant bg-surface-container-low px-3 py-1 text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-            Course Catalog
+            {t("marketing.coursesBadge")}
           </p>
           <h1 className="max-w-2xl text-3xl font-bold leading-tight tracking-tight text-on-surface sm:text-4xl">
-            কোর্সসমূহ —{" "}
-            <span className="text-primary">শেখার যাত্রা শুরু হোক</span>
+            {t("marketing.coursesTitleA")}{" "}
+            <span className="text-primary">{t("marketing.coursesTitleB")}</span>
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-on-surface-variant">
-            Explore structured courses published by InsideJibon teachers.
+            {t("marketing.coursesDescription")}
             {coursesList.length > 0 &&
-              ` Currently showing ${coursesList.length} ${
-                coursesList.length === 1 ? "course" : "courses"
-              }.`}
+              t.tn("marketing.showingCourses", coursesList.length)}
           </p>
         </div>
       </section>
@@ -59,11 +59,10 @@ export default async function PublicCoursesPage() {
               </svg>
             </div>
             <h2 className="mt-4 text-lg font-bold text-on-surface">
-              এখনো কোনো কোর্স প্রকাশিত হয়নি
+              {t("marketing.coursesEmptyTitle")}
             </h2>
             <p className="mt-1 text-sm text-secondary">
-              No published courses yet. Check back soon — teachers are preparing
-              new learning paths.
+              {t("marketing.coursesEmptyDesc")}
             </p>
           </div>
         ) : (

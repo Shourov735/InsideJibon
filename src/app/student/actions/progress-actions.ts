@@ -9,6 +9,8 @@ import {
 } from "@/schemas/learning";
 import * as learningService from "@/services/learning";
 import type { ActionResult } from "@/types/course";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 /**
  * Marks a lesson completed or un-completed for the authenticated student.
@@ -18,11 +20,12 @@ import type { ActionResult } from "@/types/course";
 export async function markLessonCompleteAction(
   formData: unknown
 ): Promise<ActionResult<{ completed: boolean }>> {
+  const t = await getTranslator();
   const student = await requireStudent();
   const parsed = lessonProgressActionSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid lesson identifier." };
+    return { success: false, error: localizeMessage("Invalid lesson identifier.", t) };
   }
 
   try {
@@ -58,11 +61,12 @@ export async function markLessonCompleteAction(
 export async function updateLessonPositionAction(
   formData: unknown
 ): Promise<ActionResult<{ position: number }>> {
+  const t = await getTranslator();
   const student = await requireStudent();
   const parsed = lessonPositionActionSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid lesson data." };
+    return { success: false, error: localizeMessage("Invalid lesson data.", t) };
   }
 
   try {

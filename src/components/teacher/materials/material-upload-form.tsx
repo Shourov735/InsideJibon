@@ -10,6 +10,7 @@ import {
 } from "@/lib/material-utils";
 import { MAX_MATERIAL_SIZE_BYTES, MAX_MATERIAL_NAME_LENGTH } from "@/schemas/material";
 import type { MaterialSummary } from "@/types/material";
+import { useTranslations } from "@/i18n/client";
 
 const ACCEPTED_EXTENSIONS = [
   ".pdf",
@@ -40,6 +41,7 @@ export function MaterialUploadForm({
   onSuccess,
   onCancel,
 }: MaterialUploadFormProps) {
+  const { t, locale } = useTranslations();
   const fileInputId = useId();
   const nameInputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ export function MaterialUploadForm({
 
     // Client-side quick checks for instant user feedback
     if (selectedFile.size > MAX_MATERIAL_SIZE_BYTES) {
-      setErrorMessage("This file is too large. The maximum upload size is 25 MB.");
+      setErrorMessage(t("teacher.materials.upload.fileTooLarge"));
       setFile(null);
       return;
     }
@@ -126,7 +128,7 @@ export function MaterialUploadForm({
       onSuccess(result.data);
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to upload material. Please try again."
+        err instanceof Error ? err.message : t("teacher.materials.upload.uploadFailed")
       );
     } finally {
       setIsUploading(false);
@@ -140,9 +142,9 @@ export function MaterialUploadForm({
     >
       <div className="flex items-center justify-between border-b border-outline-variant pb-3">
         <div>
-          <h4 className="text-sm font-bold text-on-surface">Upload Lesson Material</h4>
+          <h4 className="text-sm font-bold text-on-surface">{t("teacher.materials.upload.title")}</h4>
           <p className="text-xs text-secondary mt-0.5">
-            Attach study notes, slides, worksheets, or reference files for enrolled students.
+            {t("teacher.materials.upload.subtitle")}
           </p>
         </div>
         {onCancel && (
@@ -151,7 +153,7 @@ export function MaterialUploadForm({
             onClick={onCancel}
             disabled={isUploading}
             className="rounded-lg p-1 text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
-            aria-label="Close upload form"
+            aria-label={t("teacher.materials.upload.closeAria")}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -224,10 +226,10 @@ export function MaterialUploadForm({
             </svg>
           </div>
           <p className="mt-3 text-xs font-semibold text-on-surface">
-            <span className="text-primary underline underline-offset-2">Click to browse</span> or drag and drop your file here
+            <span className="text-primary underline underline-offset-2">{t("teacher.materials.upload.clickBrowse")}</span> {t("teacher.materials.upload.dropHint")}
           </p>
           <p className="mt-1 text-[11px] text-secondary">
-            PDF, Word (.doc, .docx), PowerPoint (.ppt, .pptx), Excel (.xls, .xlsx), Images, ZIP, or Text (Max 25 MB)
+            {t("teacher.materials.upload.acceptedFormats")}
           </p>
         </div>
       ) : (
@@ -244,7 +246,7 @@ export function MaterialUploadForm({
               <div className="min-w-0">
                 <p className="truncate text-xs font-bold text-on-surface">{file.name}</p>
                 <p className="text-[11px] text-secondary">
-                  {formatBytes(file.size)} • {getFileTypeLabel(file.type, file.name)}
+                  {formatBytes(file.size)} • {getFileTypeLabel(file.type, file.name, locale)}
                 </p>
               </div>
             </div>
@@ -258,7 +260,7 @@ export function MaterialUploadForm({
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
-              <span>Change</span>
+              <span>{t("teacher.materials.upload.change")}</span>
             </button>
           </div>
 
@@ -268,20 +270,20 @@ export function MaterialUploadForm({
               htmlFor={nameInputId}
               className="block text-xs font-semibold text-on-surface"
             >
-              Resource Display Name <span className="text-secondary font-normal">(optional)</span>
+              {t("teacher.materials.upload.displayNameLabel")} <span className="text-secondary font-normal">{t("teacher.materials.upload.optional")}</span>
             </label>
             <input
               id={nameInputId}
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="e.g. Chapter 3 Summary Notes"
+              placeholder={t("teacher.materials.upload.displayNamePlaceholder")}
               maxLength={MAX_MATERIAL_NAME_LENGTH}
               disabled={isUploading}
               className="mt-1.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-xs text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
             />
             <p className="mt-1 text-[11px] text-secondary">
-              Name visible to students. Defaults to the filename.
+              {t("teacher.materials.upload.nameHint")}
             </p>
           </div>
         </div>
@@ -300,10 +302,10 @@ export function MaterialUploadForm({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              Uploading to secure storage...
+              {t("teacher.materials.upload.uploadingToStorage")}
             </span>
           ) : (
-            <span>Private & encrypted in Cloudflare R2</span>
+            <span>{t("teacher.materials.upload.privateNote")}</span>
           )}
         </div>
 
@@ -315,7 +317,7 @@ export function MaterialUploadForm({
               disabled={isUploading}
               className="rounded-lg px-3 py-1.5 text-xs font-medium text-secondary hover:bg-surface-container hover:text-on-surface transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t("teacher.materials.upload.cancel")}
             </button>
           )}
           <button
@@ -333,7 +335,7 @@ export function MaterialUploadForm({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                <span>Uploading...</span>
+                <span>{t("teacher.materials.upload.uploading")}</span>
               </>
             ) : (
               <>
@@ -345,7 +347,7 @@ export function MaterialUploadForm({
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                   />
                 </svg>
-                <span>Upload Resource</span>
+                <span>{t("teacher.materials.upload.uploadResource")}</span>
               </>
             )}
           </button>

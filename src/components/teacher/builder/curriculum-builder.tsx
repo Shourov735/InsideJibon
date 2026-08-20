@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import type { CourseWithCurriculum } from "@/types/course";
 import type { MaterialSummary } from "@/types/material";
 import { StatusBadge } from "../status-badge";
+import { useTranslations } from "@/i18n/client";
 import { ModuleItem } from "./module-item";
 import { LessonEditor } from "./lesson-editor";
 import { PublishModal } from "./publish-modal";
@@ -24,6 +25,7 @@ export function CurriculumBuilder({
   course,
   initialMaterials = [],
 }: CurriculumBuilderProps) {
+  const { t, tn } = useTranslations();
   const router = useRouter();
 
   // Find first lesson to select by default if available
@@ -99,7 +101,7 @@ export function CurriculumBuilder({
       });
       router.refresh();
     } catch (err) {
-      alert("Failed to reorder modules: " + err);
+      alert(t("teacher.builder.reorderModulesFailed", { error: String(err) }));
     }
   };
 
@@ -125,7 +127,7 @@ export function CurriculumBuilder({
                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            <span>Courses</span>
+            <span>{t("teacher.courses.title")}</span>
           </Link>
 
           <div className="h-5 w-px bg-outline-variant" />
@@ -134,7 +136,10 @@ export function CurriculumBuilder({
             <h1 className="max-w-md truncate text-base font-bold text-on-surface">
               {course.title}
             </h1>
-            <StatusBadge status={course.status} />
+            <StatusBadge
+              status={course.status}
+              label={course.status === "draft" ? t("common.status.draft") : course.status === "published" ? t("common.status.published") : t("common.status.archived")}
+            />
           </div>
         </div>
 
@@ -143,7 +148,7 @@ export function CurriculumBuilder({
             href={`/teacher/courses/${course.id}/edit`}
             className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-xs font-medium text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
           >
-            Course Settings
+            {t("teacher.builder.courseSettings")}
           </Link>
 
           <button
@@ -168,7 +173,7 @@ export function CurriculumBuilder({
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span>{course.status === "published" ? "Live (Publishing Status)" : "Publish Course"}</span>
+            <span>{course.status === "published" ? t("teacher.builder.livePublishingStatus") : t("teacher.builder.publishCourse")}</span>
           </button>
         </div>
       </header>
@@ -184,7 +189,7 @@ export function CurriculumBuilder({
               : "border-transparent text-secondary hover:text-on-surface"
           }`}
         >
-          Structure ({course.modules.length} {course.modules.length === 1 ? "module" : "modules"})
+          {t("teacher.builder.structure")} ({tn("common.moduleCountLower", course.modules.length)})
         </button>
         <button
           type="button"
@@ -195,7 +200,9 @@ export function CurriculumBuilder({
               : "border-transparent text-secondary hover:text-on-surface"
           }`}
         >
-          {selectedLesson ? `Lesson: ${selectedLesson.title}` : "Lesson Editor"}
+          {selectedLesson
+            ? t("teacher.builder.lessonColonTitle", { title: selectedLesson.title })
+            : t("teacher.builder.lessonEditor")}
         </button>
       </div>
 
@@ -210,9 +217,9 @@ export function CurriculumBuilder({
           {/* Structure Header */}
           <div className="border-b border-outline-variant p-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-primary">Course Structure</h2>
+              <h2 className="text-sm font-bold text-primary">{t("teacher.builder.courseStructure")}</h2>
               <span className="text-xs text-secondary font-mono">
-                {course.modules.length} {course.modules.length === 1 ? "Module" : "Modules"}
+                {tn("common.moduleCount", course.modules.length)}
               </span>
             </div>
 
@@ -226,7 +233,7 @@ export function CurriculumBuilder({
                   type="text"
                   value={newModuleTitle}
                   onChange={(e) => setNewModuleTitle(e.target.value)}
-                  placeholder="Module title (e.g. Kinematics)"
+                  placeholder={t("teacher.builder.newModuleTitlePlaceholder")}
                   required
                   autoFocus
                   className="w-full rounded border border-outline-variant bg-surface-container-lowest px-2.5 py-1 text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
@@ -235,7 +242,7 @@ export function CurriculumBuilder({
                   type="text"
                   value={newModuleDesc}
                   onChange={(e) => setNewModuleDesc(e.target.value)}
-                  placeholder="Module summary (optional)"
+                  placeholder={t("teacher.builder.moduleSummaryPlaceholder")}
                   className="w-full rounded border border-outline-variant bg-surface-container-lowest px-2.5 py-1 text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <div className="flex items-center justify-end gap-2 pt-1">
@@ -244,14 +251,14 @@ export function CurriculumBuilder({
                     onClick={() => setIsAddingModule(false)}
                     className="rounded px-2.5 py-1 text-[11px] text-secondary hover:bg-surface-container"
                   >
-                    Cancel
+                    {t("teacher.examForm.cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmittingModule}
                     className="rounded bg-primary px-3 py-1 text-[11px] font-semibold text-on-primary"
                   >
-                    Create
+                    {t("teacher.builder.create")}
                   </button>
                 </div>
               </form>
@@ -274,7 +281,7 @@ export function CurriculumBuilder({
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                <span>Add Module</span>
+                <span>{t("teacher.builder.addModule")}</span>
               </button>
             )}
           </div>
@@ -284,7 +291,9 @@ export function CurriculumBuilder({
             {course.modules.length === 0 ? (
               <div className="rounded-xl border border-dashed border-outline-variant p-6 text-center">
                 <p className="text-xs text-secondary">
-                  No modules yet. Click <strong>Add Module</strong> above to begin structuring your curriculum.
+                  {t("teacher.builder.noModulesHint", {
+                    action: t("teacher.builder.addModule"),
+                  })}
                 </p>
               </div>
             ) : (
@@ -319,7 +328,10 @@ export function CurriculumBuilder({
               key={selectedLesson.id}
               courseId={course.id}
               lesson={selectedLesson}
-              moduleTitle={`Module ${selectedModule.position}: ${selectedModule.title}`}
+              moduleTitle={t("common.moduleLabelWithTitle", {
+                position: selectedModule.position,
+                title: selectedModule.title,
+              })}
               materials={materials.filter((m) => m.lessonId === selectedLesson.id)}
               onMaterialsChange={(updatedLessonMaterials) => {
                 setMaterials((prev) => [
@@ -352,17 +364,19 @@ export function CurriculumBuilder({
                   </svg>
                 </div>
                 <h3 className="text-base font-bold text-on-surface">
-                  No Lesson Selected
+                  {t("teacher.builder.noLessonSelected")}
                 </h3>
                 <p className="text-xs text-secondary">
-                  Select a lesson from the curriculum sidebar to edit its details, reading notes, and supplementary materials, or click <strong>Add Lesson</strong> under a module.
+                  {t("teacher.builder.selectLessonHint", {
+                    action: t("teacher.builder.addLesson"),
+                  })}
                 </p>
                 <button
                   type="button"
                   onClick={() => setMobileTab("structure")}
                   className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs font-semibold text-primary lg:hidden"
                 >
-                  View Curriculum Structure →
+                  {t("teacher.builder.viewCurriculumStructure")} →
                 </button>
               </div>
             </div>

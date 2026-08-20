@@ -1,42 +1,41 @@
 import Link from "next/link";
+import { getTranslator } from "@/i18n/server";
 
-const features = [
-  {
-    title: "কোর্স ও লেসন",
-    subtitle: "Courses & Lessons",
-    description:
-      "সাজানো মডিউল আর লেসনে শিখুন — নিজের গতিতে, নিজের সময়ে।",
-    icon: (
-      <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-    ),
-  },
-  {
-    title: "পরীক্ষা ও মূল্যায়ন",
-    subtitle: "Exams & Assessment",
-    description:
-      "অনলাইন পরীক্ষা দিন, উত্তর যাচাই হোক, ফলাফল জানুন তৎক্ষণাৎ।",
-    icon: (
-      <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-      </svg>
-    ),
-  },
-  {
-    title: "অগ্রগতি ট্র্যাকিং",
-    subtitle: "Progress Tracking",
-    description:
-      "প্রতিটি লেসন, পরীক্ষা আর অ্যাসাইনমেন্টের অগ্রগতি এক জায়গায়।",
-    icon: (
-      <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    ),
-  },
-];
+export default async function HomePage() {
+  const t = await getTranslator();
+  const features = [
+    {
+      eyebrow: t("marketing.feature1Subtitle"),
+      title: t("marketing.feature1Title"),
+      description: t("marketing.feature1Desc"),
+      icon: (
+        <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      ),
+    },
+    {
+      eyebrow: t("marketing.feature2Subtitle"),
+      title: t("marketing.feature2Title"),
+      description: t("marketing.feature2Desc"),
+      icon: (
+        <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+        </svg>
+      ),
+    },
+    {
+      eyebrow: t("marketing.feature3Subtitle"),
+      title: t("marketing.feature3Title"),
+      description: t("marketing.feature3Desc"),
+      icon: (
+        <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+  ];
 
-export default function HomePage() {
   return (
     <div className="space-y-0">
       {/* Hero Section */}
@@ -44,22 +43,21 @@ export default function HomePage() {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-20 sm:px-6 sm:py-28 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <p className="mb-4 inline-block rounded-full border border-outline-variant bg-surface-container-low px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              Learn · Practice · Perform
+              {t("marketing.heroBadge")}
             </p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-on-surface sm:text-5xl">
-              জ্ঞানের ভেতরে,{" "}
-              <span className="text-primary">শেখার যাত্রা</span>
+              {t("marketing.heroTitleA")}{" "}
+              <span className="text-primary">{t("marketing.heroTitleB")}</span>
             </h1>
             <p className="mt-5 text-base leading-relaxed text-on-surface-variant sm:text-lg">
-              কোর্স, পরীক্ষা, রিসোর্স আর অগ্রগতি — শিক্ষার্থী ও শিক্ষকের
-              জন্য সবকিছু এক জায়গায়। InsideJibon-এ জটিল বিষয়গুলো শেখা হয় সহজ, ধারাবাহিক ও ফলপ্রসূ পদ্ধতিতে।
+              {t("marketing.heroSubtitle")}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3.5">
               <Link
                 href="/courses"
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
               >
-                <span>কোর্সসমূহ দেখুন</span>
+                <span>{t("marketing.heroCta")}</span>
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -68,7 +66,7 @@ export default function HomePage() {
                 href="#instructor"
                 className="inline-flex items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-low px-6 py-3.5 text-sm font-semibold text-secondary transition-colors hover:bg-surface-container hover:text-on-surface"
               >
-                শিক্ষক পরিচিতি
+                {t("marketing.heroSecondaryCta")}
               </a>
             </div>
           </div>
@@ -84,7 +82,7 @@ export default function HomePage() {
                 />
                 <div>
                   <span className="rounded bg-primary-container px-2 py-0.5 text-[10px] font-bold text-on-primary-container uppercase">
-                    Lead Educator
+                    {t("marketing.leadEducator")}
                   </span>
                   <h3 className="mt-1 text-sm font-bold text-on-surface">
                     তানভীর হাসান জীবন
@@ -95,7 +93,7 @@ export default function HomePage() {
                 </div>
               </div>
               <p className="mt-4 text-xs leading-relaxed text-on-surface-variant border-t border-outline-variant/60 pt-3">
-                উদ্ভিদবিজ্ঞান ও জীববিজ্ঞানের জটিল বিষয়গুলোর স্পষ্ট ও কাঠামোগত পাঠদান।
+                উদ্ভিদবিজ্ঞান ও জীববিজ্ঞানের জটিল বিষয়গুলোর স্পষ্ট ও কাঠামোগত পাঠদান।
               </p>
             </div>
           </div>
@@ -110,13 +108,13 @@ export default function HomePage() {
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <div className="max-w-xl">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Platform Overview
+              {t("marketing.featuresEyebrow")}
             </span>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-              এক প্ল্যাটফর্মে পুরো শেখার চক্র
+              {t("marketing.featuresTitle")}
             </h2>
             <p className="mt-2 text-sm text-on-surface-variant">
-              ধারাবাহিক পাঠ্যসূচি, লেকচার নোটস এবং স্বয়ংক্রিয় পরীক্ষার মাধ্যমে পূর্ণাঙ্গ প্রস্তুতি।
+              {t("marketing.featuresSubtitle")}
             </p>
           </div>
 
@@ -130,7 +128,7 @@ export default function HomePage() {
                   {feature.icon}
                 </div>
                 <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-primary">
-                  {feature.subtitle}
+                  {feature.eyebrow}
                 </p>
                 <h3 className="mt-1.5 text-lg font-bold text-on-surface">
                   {feature.title}
@@ -182,11 +180,11 @@ export default function HomePage() {
                   তানভীর হাসান জীবন
                 </h2>
                 <p className="text-sm font-semibold text-secondary sm:text-base">
-                  শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — সরকারি তিতুমীর কলেজ, ঢাকা (DU Affiliated)
+                  শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — সরকারি তিতুমীর কলেজ, ঢাকা
                 </p>
 
                 <p className="text-sm leading-relaxed text-on-surface-variant sm:text-base">
-                  InsideJibon প্ল্যাটফর্মে শিক্ষার্থীদের বিজ্ঞান ও জীববিজ্ঞানের গভীর বিষয়সমূহ সহজ ও আকর্ষণীয়ভাবে শেখানো হয়। প্রতিটি ক্লাসে তাত্ত্বিক ধারণার পাশাপাশি পর্যাপ্ত চিত্র, নোটস ও অনুশীলনী প্রদান করা হয় যাতে শিক্ষার্থীরা বোর্ড এবং ভর্তি পরীক্ষায় সেরা ফলাফল করতে পারে।
+                  InsideJibon প্ল্যাটফর্মে শিক্ষার্থীদের বিজ্ঞান ও জীববিজ্ঞানের গভীর বিষয়সমূহ সহজ ও আকর্ষণীয়ভাবে শেখানো হয়। প্রতিটি ক্লাসে তাত্ত্বিক ধারণার পাশাপাশি পর্যাপ্ত চিত্র, নোটস ও অনুশীলনী প্রদান করা হয় যাতে শিক্ষার্থীরা বোর্ড এবং ভর্তি পরীক্ষায় সেরা ফলাফল করতে পারে।
                 </p>
 
                 {/* Highlights */}

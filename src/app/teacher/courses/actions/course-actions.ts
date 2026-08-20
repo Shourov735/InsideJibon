@@ -11,6 +11,8 @@ import {
 } from "@/schemas/course";
 import * as courseService from "@/services/courses";
 import type { ActionResult, Course } from "@/types/course";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 /**
  * Creates a new course under the authenticated teacher's account.
@@ -18,13 +20,14 @@ import type { ActionResult, Course } from "@/types/course";
 export async function createCourseAction(
   formData: unknown
 ): Promise<ActionResult<Course>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = createCourseSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed. Please check the form errors.",
+      error: localizeMessage("Validation failed. Please check the form errors.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -36,7 +39,7 @@ export async function createCourseAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create course",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to create course", t),
     };
   }
 }
@@ -47,13 +50,14 @@ export async function createCourseAction(
 export async function updateCourseAction(
   formData: unknown
 ): Promise<ActionResult<Course>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = updateCourseSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed. Please check the form errors.",
+      error: localizeMessage("Validation failed. Please check the form errors.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -72,7 +76,7 @@ export async function updateCourseAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update course",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to update course", t),
     };
   }
 }
@@ -83,13 +87,14 @@ export async function updateCourseAction(
 export async function deleteCourseAction(
   formData: unknown
 ): Promise<ActionResult<{ deleted: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = deleteCourseSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid course identifier",
+      error: localizeMessage("Invalid course identifier", t),
     };
   }
 
@@ -100,7 +105,7 @@ export async function deleteCourseAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete course",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to delete course", t),
     };
   }
 }
@@ -111,13 +116,14 @@ export async function deleteCourseAction(
 export async function archiveCourseAction(
   formData: unknown
 ): Promise<ActionResult<Course>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = courseActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid course identifier",
+      error: localizeMessage("Invalid course identifier", t),
     };
   }
 
@@ -130,7 +136,7 @@ export async function archiveCourseAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to archive course",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to archive course", t),
     };
   }
 }
@@ -141,13 +147,14 @@ export async function archiveCourseAction(
 export async function restoreCourseAction(
   formData: unknown
 ): Promise<ActionResult<Course>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = courseActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid course identifier",
+      error: localizeMessage("Invalid course identifier", t),
     };
   }
 
@@ -160,7 +167,7 @@ export async function restoreCourseAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to restore course",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to restore course", t),
     };
   }
 }
@@ -171,18 +178,19 @@ export async function restoreCourseAction(
 export async function publishCourseAction(
   formData: unknown
 ): Promise<ActionResult<Course>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = courseActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid course identifier",
+      error: localizeMessage("Invalid course identifier", t),
     };
   }
 
   try {
-    const course = await courseService.publishCourse(teacher.id, parsed.data.courseId);
+    const course = await courseService.publishCourse(teacher.id, parsed.data.courseId, t);
     revalidatePath("/teacher/courses");
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
@@ -190,7 +198,7 @@ export async function publishCourseAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to publish course",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to publish course", t),
     };
   }
 }
@@ -201,13 +209,14 @@ export async function publishCourseAction(
 export async function unpublishCourseAction(
   formData: unknown
 ): Promise<ActionResult<Course>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = courseActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid course identifier",
+      error: localizeMessage("Invalid course identifier", t),
     };
   }
 
@@ -220,7 +229,7 @@ export async function unpublishCourseAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to unpublish course",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to unpublish course", t),
     };
   }
 }

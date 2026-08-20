@@ -7,6 +7,8 @@ import { enrollCourseSchema } from "@/schemas/learning";
 import * as enrollmentService from "@/services/enrollments";
 import type { ActionResult } from "@/types/course";
 import type { Enrollment } from "@/types/learning";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 export interface EnrollActionResultData {
   enrollment: Enrollment;
@@ -22,11 +24,12 @@ export interface EnrollActionResultData {
 export async function enrollInCourseAction(
   formData: unknown
 ): Promise<ActionResult<EnrollActionResultData>> {
+  const t = await getTranslator();
   const student = await requireStudent();
   const parsed = enrollCourseSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid course identifier." };
+    return { success: false, error: localizeMessage("Invalid course identifier.", t) };
   }
 
   try {

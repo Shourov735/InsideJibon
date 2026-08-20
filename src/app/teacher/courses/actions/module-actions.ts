@@ -11,6 +11,8 @@ import {
 } from "@/schemas/course";
 import * as courseService from "@/services/courses";
 import type { ActionResult, CourseModule } from "@/types/course";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 /**
  * Creates a new module inside a course.
@@ -18,13 +20,14 @@ import type { ActionResult, CourseModule } from "@/types/course";
 export async function createModuleAction(
   formData: unknown
 ): Promise<ActionResult<CourseModule>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = createModuleSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for module data.",
+      error: localizeMessage("Validation failed for module data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -37,7 +40,7 @@ export async function createModuleAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create module",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to create module", t),
     };
   }
 }
@@ -49,13 +52,14 @@ export async function updateModuleAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<CourseModule>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = updateModuleSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for module data.",
+      error: localizeMessage("Validation failed for module data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -74,7 +78,7 @@ export async function updateModuleAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update module",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to update module", t),
     };
   }
 }
@@ -86,13 +90,14 @@ export async function deleteModuleAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<{ deleted: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = deleteModuleSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid module identifier",
+      error: localizeMessage("Invalid module identifier", t),
     };
   }
 
@@ -106,7 +111,7 @@ export async function deleteModuleAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete module",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to delete module", t),
     };
   }
 }
@@ -117,13 +122,14 @@ export async function deleteModuleAction(
 export async function reorderModulesAction(
   formData: unknown
 ): Promise<ActionResult<{ reordered: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = reorderModulesSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid reorder parameters",
+      error: localizeMessage("Invalid reorder parameters", t),
     };
   }
 
@@ -138,7 +144,7 @@ export async function reorderModulesAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to reorder modules",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to reorder modules", t),
     };
   }
 }

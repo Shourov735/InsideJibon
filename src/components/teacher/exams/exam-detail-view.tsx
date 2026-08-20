@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import type { ExamPublishCheck, ExamWithQuestions } from "@/types/exam";
 import type { Course, CourseWithCounts } from "@/types/course";
 import { StatusBadge } from "../status-badge";
+import { useTranslations } from "@/i18n/client";
 import { ExamPublishModal } from "./builder/exam-publish-modal";
 import {
   archiveExamAction,
@@ -26,6 +27,7 @@ export function ExamDetailView({
   course,
   publishCheck,
 }: ExamDetailViewProps) {
+  const { t, tn, locale } = useTranslations();
   const router = useRouter();
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -34,14 +36,13 @@ export function ExamDetailView({
   const [isUnpublishing, setIsUnpublishing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const formattedCreated = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(exam.createdAt));
+  const formattedCreated = new Intl.DateTimeFormat(
+    locale === "bn" ? "bn-BD" : "en-US",
+    { month: "short", day: "numeric", year: "numeric" }
+  ).format(new Date(exam.createdAt));
 
   const formattedPublished = exam.publishedAt
-    ? new Intl.DateTimeFormat("en-US", {
+    ? new Intl.DateTimeFormat(locale === "bn" ? "bn-BD" : "en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
@@ -59,14 +60,16 @@ export function ExamDetailView({
       }
       router.refresh();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Failed to unpublish exam.");
+      setActionError(
+        err instanceof Error ? err.message : t("teacher.examDetail.failedUnpublish")
+      );
     } finally {
       setIsUnpublishing(false);
     }
   };
 
   const handleArchive = async () => {
-    if (!window.confirm("Archive this exam? It will be hidden from active lists.")) return;
+    if (!window.confirm(t("teacher.examDetail.archiveConfirm"))) return;
     setIsArchiving(true);
     setActionError(null);
     try {
@@ -77,7 +80,9 @@ export function ExamDetailView({
       }
       router.refresh();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Failed to archive exam.");
+      setActionError(
+        err instanceof Error ? err.message : t("teacher.examDetail.failedArchive")
+      );
     } finally {
       setIsArchiving(false);
     }
@@ -94,14 +99,16 @@ export function ExamDetailView({
       }
       router.refresh();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Failed to restore exam.");
+      setActionError(
+        err instanceof Error ? err.message : t("teacher.examDetail.failedRestore")
+      );
     } finally {
       setIsRestoring(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Permanently delete this exam and all its questions? This action CANNOT be undone.")) {
+    if (!window.confirm(t("teacher.examDetail.deleteConfirm"))) {
       return;
     }
     setIsDeleting(true);
@@ -116,7 +123,9 @@ export function ExamDetailView({
       router.push("/teacher/exams");
       router.refresh();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Failed to delete exam.");
+      setActionError(
+        err instanceof Error ? err.message : t("teacher.examDetail.failedDelete")
+      );
       setIsDeleting(false);
     }
   };
@@ -126,7 +135,7 @@ export function ExamDetailView({
       {/* Top Breadcrumb */}
       <div className="flex items-center gap-2 text-xs font-medium text-secondary">
         <Link href="/teacher/exams" className="hover:text-primary transition-colors">
-          Exams
+          {t("teacher.examForm.breadcrumb.exams")}
         </Link>
         <svg className="h-3 w-3 text-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -140,7 +149,7 @@ export function ExamDetailView({
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <div>
-            <p className="font-semibold">Action Failed</p>
+            <p className="font-semibold">{t("teacher.examDetail.actionFailed")}</p>
             <p className="mt-0.5">{actionError}</p>
           </div>
         </div>
@@ -162,7 +171,10 @@ export function ExamDetailView({
                   <span className="truncate">{course.title}</span>
                 </Link>
               ) : null}
-              <StatusBadge status={exam.status} />
+              <StatusBadge
+              status={exam.status}
+              label={exam.status === "draft" ? t("common.status.draft") : exam.status === "published" ? t("common.status.published") : t("common.status.archived")}
+            />
             </div>
 
             <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
@@ -170,7 +182,7 @@ export function ExamDetailView({
             </h1>
 
             <p className="text-sm text-on-surface-variant leading-relaxed max-w-3xl">
-              {exam.description || "No description provided for this examination."}
+              {exam.description || t("teacher.examDetail.noDescription")}
             </p>
 
             {/* Metrics Chips */}
@@ -179,7 +191,7 @@ export function ExamDetailView({
                 <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
-                <span>{exam.questions.length} {exam.questions.length === 1 ? "Question" : "Questions"}</span>
+                <span>{tn("common.questionCountUpper", exam.questions.length)}</span>
               </div>
 
               <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-low px-3 py-1.5">
@@ -187,19 +199,26 @@ export function ExamDetailView({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
                 </svg>
-                <span>Total Marks: {exam.totalMarks}</span>
+                <span>{t("teacher.examDetail.totalMarks", { marks: exam.totalMarks })}</span>
               </div>
 
               <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-low px-3 py-1.5">
                 <svg className="h-4 w-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Duration: {exam.durationMinutes ? `${exam.durationMinutes} Minutes` : "Untimed"}</span>
+                <span>
+                  {exam.durationMinutes
+                    ? t("teacher.examDetail.duration", {
+                        minutes: exam.durationMinutes,
+                      })
+                    : t("common.status.untimed")}
+                </span>
               </div>
 
               <span className="text-[11px] text-outline">
-                Created on {formattedCreated}
-                {formattedPublished && ` • Published on ${formattedPublished}`}
+                {t("teacher.examDetail.createdOn", { date: formattedCreated })}
+                {formattedPublished &&
+                  t("teacher.examDetail.publishedOn", { date: formattedPublished })}
               </span>
             </div>
           </div>
@@ -213,7 +232,11 @@ export function ExamDetailView({
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              <span>{exam.status === "draft" ? "Open Question Builder" : "View Builder"}</span>
+              <span>
+                {exam.status === "draft"
+                  ? t("teacher.examDetail.openBuilder")
+                  : t("teacher.examDetail.viewBuilder")}
+              </span>
             </Link>
 
             <Link
@@ -224,7 +247,7 @@ export function ExamDetailView({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span>Edit Settings</span>
+              <span>{t("teacher.courseOverview.editSettings")}</span>
             </Link>
           </div>
         </div>
@@ -234,10 +257,17 @@ export function ExamDetailView({
       <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b border-outline-variant pb-3">
           <h2 className="text-xs font-bold uppercase tracking-wider text-secondary">
-            Publishing Status & Checklist
+            {t("teacher.examDetail.publishChecklistTitle")}
           </h2>
           <span className="text-xs font-semibold text-secondary">
-            Status: <span className="capitalize text-primary font-bold">{exam.status}</span>
+            {t("teacher.examDetail.statusLabel")}{" "}
+            <span className="capitalize text-primary font-bold">
+              {exam.status === "draft"
+                ? t("common.status.draft")
+                : exam.status === "published"
+                  ? t("common.status.published")
+                  : t("common.status.archived")}
+            </span>
           </span>
         </div>
 
@@ -252,9 +282,14 @@ export function ExamDetailView({
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-emerald-950">This Exam is Ready for Publication</h3>
+                    <h3 className="text-sm font-bold text-emerald-950">
+                      {t("teacher.examDetail.readyTitle")}
+                    </h3>
                     <p className="mt-0.5 text-xs text-emerald-800">
-                      All prerequisites are met: {exam.questions.length} questions, {exam.totalMarks} total marks, and all option invariants verified.
+                      {t("teacher.examDetail.readyDesc", {
+                        questions: exam.questions.length,
+                        marks: exam.totalMarks,
+                      })}
                     </p>
                   </div>
                 </div>
@@ -264,7 +299,7 @@ export function ExamDetailView({
                   onClick={() => setIsPublishModalOpen(true)}
                   className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-800 transition-colors shrink-0 cursor-pointer"
                 >
-                  <span>Publish Examination</span>
+                  <span>{t("teacher.examDetail.publishExam")}</span>
                 </button>
               </div>
             ) : (
@@ -273,7 +308,11 @@ export function ExamDetailView({
                   <svg className="h-4 w-4 text-amber-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <span>Publishing Prerequisites Pending ({publishCheck.errors.length} issues)</span>
+                  <span>
+                    {t("teacher.examDetail.prereqPending", {
+                      count: publishCheck.errors.length,
+                    })}
+                  </span>
                 </div>
                 <ul className="space-y-1 text-xs text-amber-900 list-disc list-inside">
                   {publishCheck.errors.map((err, i) => (
@@ -285,7 +324,7 @@ export function ExamDetailView({
                     href={`/teacher/exams/${exam.id}/builder`}
                     className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
                   >
-                    Open Question Builder to resolve issues →
+                    {t("teacher.examDetail.resolveIssues")} →
                   </Link>
                 </div>
               </div>
@@ -302,9 +341,11 @@ export function ExamDetailView({
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-emerald-950">Examination is Live & Published</h3>
+                <h3 className="text-sm font-bold text-emerald-950">
+                  {t("teacher.examDetail.liveTitle")}
+                </h3>
                 <p className="mt-0.5 text-xs text-emerald-800">
-                  Published exams are structurally locked. To edit questions or options, unpublish it to return to draft mode.
+                  {t("teacher.examDetail.liveDesc")}
                 </p>
               </div>
             </div>
@@ -315,7 +356,9 @@ export function ExamDetailView({
               onClick={handleUnpublish}
               className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-900 hover:bg-amber-100 transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
             >
-              {isUnpublishing ? "Unpublishing…" : "Unpublish to Draft"}
+              {isUnpublishing
+                ? t("teacher.examDetail.unpublishing")
+                : t("teacher.examDetail.unpublish")}
             </button>
           </div>
         )}
@@ -329,9 +372,11 @@ export function ExamDetailView({
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-amber-950">Examination is Archived</h3>
+                <h3 className="text-sm font-bold text-amber-950">
+                  {t("teacher.examDetail.archivedTitle")}
+                </h3>
                 <p className="mt-0.5 text-xs text-amber-800">
-                  This examination is hidden from active queries. You can restore it to draft mode at any time.
+                  {t("teacher.examDetail.archivedDesc")}
                 </p>
               </div>
             </div>
@@ -342,7 +387,9 @@ export function ExamDetailView({
               onClick={handleRestore}
               className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
             >
-              {isRestoring ? "Restoring…" : "Restore to Draft"}
+              {isRestoring
+                ? t("teacher.examDetail.restoring")
+                : t("teacher.examDetail.restore")}
             </button>
           </div>
         )}
@@ -353,28 +400,28 @@ export function ExamDetailView({
         <div className="flex items-center justify-between border-b border-outline-variant pb-4">
           <div>
             <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-              প্রশ্নপত্র প্রিভিউ
+              {t("teacher.examDetail.paperPreview")}
             </span>
             <h2 className="mt-1 text-lg font-bold text-on-surface">
-              Question Paper Overview
+              {t("teacher.examDetail.paperOverview")}
             </h2>
           </div>
           <span className="text-xs font-semibold text-secondary">
-            {exam.questions.length} {exam.questions.length === 1 ? "Question" : "Questions"}
+            {tn("common.questionCountUpper", exam.questions.length)}
           </span>
         </div>
 
         {exam.questions.length === 0 ? (
           <div className="rounded-xl border border-dashed border-outline-variant p-10 text-center space-y-3 bg-surface-container-low">
             <p className="text-sm text-secondary">
-              No questions have been added to this examination yet.
+              {t("teacher.examDetail.noQuestions")}
             </p>
             <div>
               <Link
                 href={`/teacher/exams/${exam.id}/builder`}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container transition-colors"
               >
-                <span>Add Questions in Builder</span>
+                <span>{t("teacher.examDetail.addQuestions")}</span>
               </Link>
             </div>
           </div>
@@ -395,7 +442,7 @@ export function ExamDetailView({
                     </p>
                   </div>
                   <span className="shrink-0 rounded-md bg-surface-container-high px-2 py-0.5 text-xs font-semibold text-secondary">
-                    {question.marks} {question.marks === 1 ? "Mark" : "Marks"}
+                    {question.marks} {tn("student.exam.marks", question.marks)}
                   </span>
                 </div>
 
@@ -422,7 +469,7 @@ export function ExamDetailView({
                       <span className="flex-1 break-words pt-0.5">{option.optionText}</span>
                       {option.isCorrect && (
                         <span className="shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-800">
-                          Correct
+                          {t("teacher.examDetail.correctBadge")}
                         </span>
                       )}
                     </div>
@@ -431,7 +478,9 @@ export function ExamDetailView({
 
                 {question.explanation && (
                   <div className="rounded-lg bg-surface-container-low p-3 text-xs text-secondary border border-outline-variant/50">
-                    <span className="font-bold text-on-surface">Explanation: </span>
+                    <span className="font-bold text-on-surface">
+                      {t("teacher.examDetail.explanationLabel")}
+                    </span>
                     {question.explanation}
                   </div>
                 )}
@@ -444,18 +493,20 @@ export function ExamDetailView({
       {/* Danger Zone & Exam Management */}
       <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xs space-y-4">
         <h2 className="text-xs font-bold uppercase tracking-wider text-secondary">
-          Exam Management & Danger Zone
+          {t("teacher.examDetail.dangerTitle")}
         </h2>
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-outline-variant pt-4">
           <div>
             <p className="text-sm font-semibold text-on-surface">
-              {exam.status === "archived" ? "Restore to Draft" : "Archive Examination"}
+              {exam.status === "archived"
+                ? t("teacher.examDetail.restore")
+                : t("teacher.examDetail.archiveExam")}
             </p>
             <p className="text-xs text-on-surface-variant">
               {exam.status === "archived"
-                ? "Restores this examination to draft status so you can edit and republish it."
-                : "Archive this examination to remove it from active listings without permanently deleting questions."}
+                ? t("teacher.examDetail.restoreDesc")
+                : t("teacher.examDetail.archiveDesc")}
             </p>
           </div>
 
@@ -466,7 +517,9 @@ export function ExamDetailView({
               onClick={handleRestore}
               className="rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {isRestoring ? "Restoring…" : "Restore to Draft"}
+              {isRestoring
+                ? t("teacher.examDetail.restoring")
+                : t("teacher.examDetail.restore")}
             </button>
           ) : (
             <button
@@ -475,7 +528,9 @@ export function ExamDetailView({
               onClick={handleArchive}
               className="rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {isArchiving ? "Archiving…" : "Archive Exam"}
+              {isArchiving
+                ? t("teacher.examDetail.archiving")
+                : t("teacher.examDetail.archiveBtn")}
             </button>
           )}
         </div>
@@ -483,9 +538,11 @@ export function ExamDetailView({
         {exam.status !== "published" && (
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-error/20 pt-4">
             <div>
-              <p className="text-sm font-semibold text-error">Permanently Delete Examination</p>
+              <p className="text-sm font-semibold text-error">
+                {t("teacher.examDetail.deleteTitle")}
+              </p>
               <p className="text-xs text-on-surface-variant">
-                Once deleted, this exam and all linked question assignments will be permanently removed.
+                {t("teacher.examDetail.deleteDesc")}
               </p>
             </div>
 
@@ -495,7 +552,9 @@ export function ExamDetailView({
               onClick={handleDelete}
               className="rounded-xl bg-error px-4 py-2 text-xs font-semibold text-on-error hover:bg-error-container hover:text-on-error-container transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {isDeleting ? "Deleting…" : "Delete Exam Permanently"}
+              {isDeleting
+                ? t("teacher.examDetail.deleting")
+                : t("teacher.examDetail.deletePermanent")}
             </button>
           </div>
         )}

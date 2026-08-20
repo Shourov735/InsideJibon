@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { markLessonCompleteAction } from "@/app/student/actions";
+import { useTranslations } from "@/i18n/client";
 
 interface LessonCompleteButtonProps {
   lessonId: string;
@@ -19,6 +20,7 @@ export function LessonCompleteButton({
   lessonId,
   completed,
 }: LessonCompleteButtonProps) {
+  const { t } = useTranslations();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +65,7 @@ export function LessonCompleteButton({
             >
               <path d="M20 6L9 17l-5-5" />
             </svg>
-            Completed — Undo
+            {t("student.learn.completedUndo")}
           </>
         ) : (
           <>
@@ -78,7 +80,7 @@ export function LessonCompleteButton({
             >
               <path d="M20 6L9 17l-5-5" />
             </svg>
-            Mark as Complete
+            {t("student.learn.markComplete")}
           </>
         )}
       </button>

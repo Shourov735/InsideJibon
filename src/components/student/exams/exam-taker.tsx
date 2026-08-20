@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { submitExamAction } from "@/app/student/actions";
 import type { ExamTakingQuestion } from "@/types/exam";
+import { useTranslations } from "@/i18n/client";
 
 interface ExamTakerProps {
   courseId: string;
@@ -25,6 +26,7 @@ export function ExamTaker({
   durationMinutes,
   startedAt,
 }: ExamTakerProps) {
+  const { t, tn } = useTranslations();
   const router = useRouter();
 
   // Active question index (0-indexed)
@@ -148,7 +150,7 @@ export function ExamTaker({
     return (
       <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-8 text-center">
         <p className="text-sm font-semibold text-on-surface">
-          This examination contains no questions.
+          {t("student.exam.noQuestions")}
         </p>
       </div>
     );
@@ -164,10 +166,14 @@ export function ExamTaker({
           </span>
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-on-surface truncate sm:text-base">
-              {examTitle || "Examination Assessment"}
+              {examTitle || t("student.exam.assessmentFallback")}
             </h2>
             <p className="text-xs text-secondary">
-              Question {currentIndex + 1} of {totalQuestions} • {answeredCount} Answered
+              {t("student.exam.questionProgressAnswered", {
+                current: currentIndex + 1,
+                total: totalQuestions,
+                answered: answeredCount,
+              })}
             </p>
           </div>
         </div>
@@ -200,14 +206,14 @@ export function ExamTaker({
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span>{formattedTime} remaining</span>
+              <span>{t("student.exam.timeRemaining", { time: formattedTime })}</span>
             </div>
           ) : (
             <div className="hidden sm:flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-secondary">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Untimed</span>
+              <span>{t("common.status.untimed")}</span>
             </div>
           )}
 
@@ -215,7 +221,11 @@ export function ExamTaker({
           <button
             type="button"
             onClick={handleToggleMark}
-            title={isCurrentMarked ? "Unmark question" : "Mark question for review"}
+            title={
+              isCurrentMarked
+                ? t("student.exam.unmarkQuestion")
+                : t("student.exam.markQuestionTitle")
+            }
             className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
               isCurrentMarked
                 ? "border-tertiary bg-amber-50 text-amber-900 shadow-2xs"
@@ -235,7 +245,9 @@ export function ExamTaker({
                 d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
               />
             </svg>
-            <span>{isCurrentMarked ? "Marked" : "Flag"}</span>
+            <span>
+              {isCurrentMarked ? t("student.exam.markedShort") : t("student.exam.flag")}
+            </span>
           </button>
 
           {/* Submit Button */}
@@ -244,7 +256,7 @@ export function ExamTaker({
             onClick={() => setIsSubmitModalOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
           >
-            <span>Submit Exam</span>
+            <span>{t("student.exam.submitExam")}</span>
           </button>
         </div>
       </header>
@@ -263,13 +275,17 @@ export function ExamTaker({
                     {currentQuestion.position}
                   </span>
                   <span className="text-xs font-bold uppercase tracking-wider text-secondary">
-                    Question {currentIndex + 1} of {totalQuestions}
+                    {t("student.exam.questionOf", {
+                      current: currentIndex + 1,
+                      total: totalQuestions,
+                    })}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className="rounded-md bg-surface-container-high px-2.5 py-1 text-xs font-semibold text-secondary">
-                    {currentQuestion.marks} {currentQuestion.marks === 1 ? "Mark" : "Marks"}
+                    {currentQuestion.marks}{" "}
+                    {tn("student.exam.marks", currentQuestion.marks)}
                   </span>
 
                   {isCurrentMarked && (
@@ -277,7 +293,7 @@ export function ExamTaker({
                       <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
                       </svg>
-                      Marked for Review
+                      {t("student.exam.flagged")}
                     </span>
                   )}
                 </div>
@@ -291,7 +307,13 @@ export function ExamTaker({
               </div>
 
               {/* MCQ Options Stack */}
-              <div className="space-y-3" role="radiogroup" aria-label={`Question ${currentQuestion.position} options`}>
+              <div
+                className="space-y-3"
+                role="radiogroup"
+                aria-label={t("student.exam.optionsAria", {
+                  n: currentQuestion.position,
+                })}
+              >
                 {currentQuestion.options.map((option, optIdx) => {
                   const isSelected = currentSelectedOptionId === option.id;
                   const letter = String.fromCharCode(65 + optIdx);
@@ -375,7 +397,11 @@ export function ExamTaker({
                       d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
                     />
                   </svg>
-                  <span>{isCurrentMarked ? "Remove Flag" : "Mark for Review"}</span>
+                  <span>
+                    {isCurrentMarked
+                      ? t("student.exam.removeFlag")
+                      : t("student.exam.markForReview")}
+                  </span>
                 </button>
 
                 {currentSelectedOptionId && (
@@ -387,7 +413,7 @@ export function ExamTaker({
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    <span>Clear Selection</span>
+                    <span>{t("student.exam.clearSelection")}</span>
                   </button>
                 )}
               </div>
@@ -405,7 +431,7 @@ export function ExamTaker({
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
-              <span>Previous</span>
+              <span>{t("student.learn.previous")}</span>
             </button>
 
             {/* Mobile Navigator Toggle Button */}
@@ -417,7 +443,12 @@ export function ExamTaker({
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
-              <span>Navigator ({answeredCount}/{totalQuestions})</span>
+              <span>
+                {t("student.exam.navigatorCount", {
+                  answered: answeredCount,
+                  total: totalQuestions,
+                })}
+              </span>
             </button>
 
             {currentIndex < totalQuestions - 1 ? (
@@ -426,7 +457,7 @@ export function ExamTaker({
                 onClick={() => setCurrentIndex((prev) => Math.min(totalQuestions - 1, prev + 1))}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
               >
-                <span>Next Question</span>
+                <span>{t("student.exam.nextQuestion")}</span>
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
@@ -437,7 +468,7 @@ export function ExamTaker({
                 onClick={() => setIsSubmitModalOpen(true)}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
               >
-                <span>Review & Submit</span>
+                <span>{t("student.exam.reviewAndSubmit")}</span>
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
@@ -450,9 +481,15 @@ export function ExamTaker({
         <aside className="hidden lg:flex lg:col-span-4 flex-col">
           <div className="sticky top-32 rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xs space-y-5">
             <div>
-              <h3 className="text-sm font-bold text-on-surface">Question Navigator</h3>
+              <h3 className="text-sm font-bold text-on-surface">
+                {t("student.exam.questionNavigator")}
+              </h3>
               <p className="text-xs text-secondary mt-0.5">
-                {answeredCount} of {totalQuestions} answered ({progressPercent}%)
+                {t("student.exam.progressAnswered", {
+                  answered: answeredCount,
+                  total: totalQuestions,
+                  percent: progressPercent,
+                })}
               </p>
             </div>
 
@@ -468,21 +505,29 @@ export function ExamTaker({
             <div className="grid grid-cols-2 gap-2 border-y border-outline-variant/60 py-3 text-[11px]">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-xs bg-primary" />
-                <span className="text-secondary font-medium">Answered ({answeredCount})</span>
+                <span className="text-secondary font-medium">
+                  {t("student.exam.legendAnswered", { count: answeredCount })}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-xs border border-outline-variant bg-surface-container-lowest" />
-                <span className="text-secondary font-medium">Unanswered ({unansweredCount})</span>
+                <span className="text-secondary font-medium">
+                  {t("student.exam.legendUnanswered", { count: unansweredCount })}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex h-3 w-3 items-center justify-center rounded-xs border border-amber-500 bg-amber-50 text-amber-700">
                   <div className="h-1.5 w-1.5 rounded-full bg-amber-600" />
                 </div>
-                <span className="text-secondary font-medium">Marked ({markedCount})</span>
+                <span className="text-secondary font-medium">
+                  {t("student.exam.legendMarked", { count: markedCount })}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-xs border-2 border-primary bg-primary/20" />
-                <span className="text-secondary font-medium">Current</span>
+                <span className="text-secondary font-medium">
+                  {t("student.exam.legendCurrent")}
+                </span>
               </div>
             </div>
 
@@ -507,7 +552,11 @@ export function ExamTaker({
                     key={q.id}
                     type="button"
                     onClick={() => setCurrentIndex(idx)}
-                    title={`Question ${idx + 1}${isAnswered ? " (Answered)" : ""}${isMarked ? " (Marked for review)" : ""}`}
+                    title={
+                      t("student.exam.questionShort", { n: idx + 1 }) +
+                      (isAnswered ? t("student.exam.answeredSuffix") : "") +
+                      (isMarked ? t("student.exam.markedSuffix") : "")
+                    }
                     className={`relative aspect-square rounded-xl border text-xs transition-all flex items-center justify-center cursor-pointer ${buttonStyle}`}
                   >
                     <span>{idx + 1}</span>
@@ -528,7 +577,7 @@ export function ExamTaker({
                 onClick={() => setIsSubmitModalOpen(true)}
                 className="w-full rounded-xl bg-primary py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
               >
-                Submit Examination
+                {t("student.exam.submitExamination")}
               </button>
             </div>
           </div>
@@ -541,9 +590,15 @@ export function ExamTaker({
           <div className="flex max-h-[80vh] flex-col rounded-t-3xl border-t border-outline-variant bg-surface-container-lowest p-6 shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200">
             <div className="flex items-center justify-between border-b border-outline-variant pb-4">
               <div>
-                <h3 className="text-base font-bold text-on-surface">Question Navigator</h3>
+                <h3 className="text-base font-bold text-on-surface">
+                  {t("student.exam.questionNavigator")}
+                </h3>
                 <p className="text-xs text-secondary mt-0.5">
-                  {answeredCount} of {totalQuestions} answered ({progressPercent}%)
+                  {t("student.exam.progressAnswered", {
+                    answered: answeredCount,
+                    total: totalQuestions,
+                    percent: progressPercent,
+                  })}
                 </p>
               </div>
               <button
@@ -560,19 +615,27 @@ export function ExamTaker({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-xs bg-primary" />
-                  <span className="text-secondary">Answered ({answeredCount})</span>
+                  <span className="text-secondary">
+                    {t("student.exam.legendAnswered", { count: answeredCount })}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-xs border border-outline-variant bg-surface-container-lowest" />
-                  <span className="text-secondary">Unanswered ({unansweredCount})</span>
+                  <span className="text-secondary">
+                    {t("student.exam.legendUnanswered", { count: unansweredCount })}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-xs border border-amber-500 bg-amber-50 text-amber-700" />
-                  <span className="text-secondary">Marked ({markedCount})</span>
+                  <span className="text-secondary">
+                    {t("student.exam.legendMarked", { count: markedCount })}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-xs border-2 border-primary bg-primary/20" />
-                  <span className="text-secondary">Current</span>
+                  <span className="text-secondary">
+                    {t("student.exam.legendCurrent")}
+                  </span>
                 </div>
               </div>
 
@@ -623,7 +686,7 @@ export function ExamTaker({
                 }}
                 className="w-full rounded-xl bg-primary py-3 text-xs font-bold text-on-primary shadow-xs"
               >
-                Submit Exam
+                {t("student.exam.submitExam")}
               </button>
             </div>
           </div>
@@ -642,14 +705,20 @@ export function ExamTaker({
                 </svg>
               </div>
               <div>
-                <h3 className="text-base font-bold text-on-surface">Submit Examination?</h3>
-                <p className="text-xs text-secondary">পরীক্ষা জমা দেওয়ার নিশ্চিতকরণ</p>
+                <h3 className="text-base font-bold text-on-surface">
+                  {t("student.exam.submitConfirmTitle")}
+                </h3>
+                <p className="text-xs text-secondary">
+                  {t("student.exam.submitConfirmSubtitle")}
+                </p>
               </div>
             </div>
 
             {submitError && (
               <div className="rounded-xl border border-error-container bg-error-container/40 p-3.5 text-xs text-on-error-container">
-                <p className="font-semibold">Submission Failed</p>
+                <p className="font-semibold">
+                  {t("student.exam.submissionFailed")}
+                </p>
                 <p className="mt-0.5">{submitError}</p>
               </div>
             )}
@@ -657,17 +726,23 @@ export function ExamTaker({
             {/* Answer Summary Stats */}
             <div className="grid grid-cols-3 gap-2 rounded-xl border border-outline-variant bg-surface-container-low p-3.5 text-center">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">Answered</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
+                  {t("student.exam.statAnswered")}
+                </span>
                 <p className="mt-0.5 text-lg font-extrabold text-primary">{answeredCount}</p>
               </div>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">Unanswered</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
+                  {t("student.exam.statUnanswered")}
+                </span>
                 <p className={`mt-0.5 text-lg font-extrabold ${unansweredCount > 0 ? "text-amber-700" : "text-secondary"}`}>
                   {unansweredCount}
                 </p>
               </div>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">Marked</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
+                  {t("student.exam.statMarked")}
+                </span>
                 <p className="mt-0.5 text-lg font-extrabold text-secondary">{markedCount}</p>
               </div>
             </div>
@@ -680,12 +755,15 @@ export function ExamTaker({
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                   <p>
-                    You have <strong>{unansweredCount} unanswered question{unansweredCount === 1 ? "" : "s"}</strong>. Unanswered questions score 0 marks.
+                    {t("student.exam.unansweredWarning", {
+                      count: unansweredCount,
+                      questions: tn("student.exam.question", unansweredCount),
+                    })}
                   </p>
                 </div>
               )}
               <p className="text-xs text-secondary">
-                Once submitted, your answers are immediately graded on the server and cannot be edited.
+                {t("student.exam.finalNote")}
               </p>
             </div>
 
@@ -697,7 +775,7 @@ export function ExamTaker({
                 disabled={isSubmitting}
                 className="rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors disabled:opacity-50 cursor-pointer"
               >
-                Continue Taking Exam
+                {t("student.exam.continueTaking")}
               </button>
 
               <button
@@ -712,10 +790,10 @@ export function ExamTaker({
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    <span>Submitting & Grading…</span>
+                    <span>{t("student.exam.submitting")}</span>
                   </>
                 ) : (
-                  <span>Confirm & Submit</span>
+                  <span>{t("student.exam.confirmSubmit")}</span>
                 )}
               </button>
             </div>

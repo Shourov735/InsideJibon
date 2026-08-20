@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { enrollInCourseAction } from "@/app/student/actions";
+import { useTranslations } from "@/i18n/client";
 
 interface EnrollButtonProps {
   courseId: string;
@@ -23,6 +24,7 @@ export function EnrollButton({
   enrolled,
 }: EnrollButtonProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ export function EnrollButton({
         href="/sign-in"
         className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
       >
-        Sign in to enroll
+        {t("marketing.courseDetail.signInToEnroll")}
       </Link>
     );
   }
@@ -54,7 +56,7 @@ export function EnrollButton({
         >
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        Continue Learning
+        {t("marketing.courseDetail.continueLearning")}
       </Link>
     );
   }
@@ -79,11 +81,11 @@ export function EnrollButton({
         disabled={isSubmitting}
         className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isSubmitting ? "Enrolling…" : "Enroll Now"}
+        {isSubmitting ? t("marketing.courseDetail.enrolling") : t("marketing.courseDetail.enrollNow")}
       </button>
       {error && <p className="text-sm font-medium text-error">{error}</p>}
       <p className="text-xs text-secondary">
-        You will be able to start learning immediately after enrolling.
+        {t("marketing.courseDetail.enrollHint")}
       </p>
     </div>
   );

@@ -5,6 +5,7 @@ import { getTeacherCourses } from "@/services/courses";
 import { getTeacherExams } from "@/services/exams";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseCard } from "@/components/teacher/course-card";
+import { getTranslator } from "@/i18n/server";
 import { ExamCard } from "@/components/teacher/exams/exam-card";
 
 export const metadata = {
@@ -14,6 +15,7 @@ export const metadata = {
 
 export default async function TeacherDashboardPage() {
   const teacher = await requireTeacher();
+  const t = await getTranslator();
   const [coursesList, examsList] = await Promise.all([
     getTeacherCourses(teacher.id),
     getTeacherExams(teacher.id),
@@ -42,15 +44,15 @@ export default async function TeacherDashboardPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
-                শিক্ষক ড্যাশবোর্ড
+                {t("teacher.dashboard.badge")}
               </span>
-              <span className="text-xs text-secondary">• Control Center</span>
+              <span className="text-xs text-secondary">• {t("teacher.dashboard.controlCenter")}</span>
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-              Welcome back, {teacher.name ?? "Educator"}
+              {t("teacher.dashboard.greeting", { name: teacher.name ?? "Educator" })}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant">
-              InsideJibon Educator Portal — orchestrate your curriculum, lesson materials, and examinations.
+              {t("teacher.dashboard.welcomeSubtitle")}
             </p>
           </div>
 
@@ -68,7 +70,7 @@ export default async function TeacherDashboardPage() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
-              <span>Create Exam</span>
+              <span>{t("teacher.dashboard.createExam")}</span>
             </Link>
 
             <Link
@@ -88,7 +90,7 @@ export default async function TeacherDashboardPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span>Create Course</span>
+              <span>{t("teacher.dashboard.createCourse")}</span>
             </Link>
           </div>
         </div>
@@ -98,7 +100,7 @@ export default async function TeacherDashboardPage() {
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                Total Courses
+                {t("teacher.dashboard.stats.totalCourses")}
               </span>
               <div className="rounded-lg bg-surface-container p-2 text-primary">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -110,14 +112,17 @@ export default async function TeacherDashboardPage() {
               {coursesList.length}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
-              {publishedCourses} published • {totalLessons} lessons
+              {t("teacher.dashboard.stats.coursesDesc", {
+                published: publishedCourses,
+                lessons: totalLessons,
+              })}
             </span>
           </div>
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                Total Exams
+                {t("teacher.dashboard.stats.totalExams")}
               </span>
               <div className="rounded-lg bg-surface-container p-2 text-primary">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -129,14 +134,17 @@ export default async function TeacherDashboardPage() {
               {examsList.length}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
-              {publishedExams} published • {totalQuestions} questions
+              {t("teacher.dashboard.stats.examsDesc", {
+                published: publishedExams,
+                questions: totalQuestions,
+              })}
             </span>
           </div>
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                Published Content
+                {t("teacher.dashboard.stats.published")}
               </span>
               <div className="rounded-lg bg-emerald-50 p-2 text-emerald-700">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -148,14 +156,14 @@ export default async function TeacherDashboardPage() {
               {publishedCourses + publishedExams}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
-              Live & active for students
+              {t("teacher.dashboard.stats.publishedDesc")}
             </span>
           </div>
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                Question Bank
+                {t("teacher.dashboard.stats.questionBank")}
               </span>
               <div className="rounded-lg bg-surface-container p-2 text-primary">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -167,7 +175,7 @@ export default async function TeacherDashboardPage() {
               {totalQuestions}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
-              Total questions configured
+              {t("teacher.dashboard.stats.questionBankDesc")}
             </span>
           </div>
         </div>
@@ -177,31 +185,31 @@ export default async function TeacherDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold tracking-tight text-on-surface">
-                My Courses
+                {t("teacher.dashboard.recentCoursesTitle")}
               </h2>
               <p className="text-xs text-on-surface-variant">
-                Curriculum structure, modules, and learning units.
+                {t("teacher.dashboard.recentCoursesSubtitle")}
               </p>
             </div>
             <Link
               href="/teacher/courses"
               className="text-xs font-semibold text-primary hover:underline"
             >
-              View all ({coursesList.length}) →
+              {t("teacher.dashboard.viewAll", { count: coursesList.length })} →
             </Link>
           </div>
 
           {recentCourses.length === 0 ? (
             <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
               <p className="text-sm text-secondary">
-                You haven&apos;t created any courses yet.
+                {t("teacher.dashboard.noCourses")}
               </p>
               <div className="mt-3">
                 <Link
                   href="/teacher/courses/new"
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-container transition-colors"
                 >
-                  Create Course
+                  {t("teacher.dashboard.createCourse")}
                 </Link>
               </div>
             </div>
@@ -219,31 +227,31 @@ export default async function TeacherDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold tracking-tight text-on-surface">
-                My Examinations
+                {t("teacher.dashboard.recentExamsTitle")}
               </h2>
               <p className="text-xs text-on-surface-variant">
-                Question builders, papers, and assessment configurations.
+                {t("teacher.dashboard.recentExamsSubtitle")}
               </p>
             </div>
             <Link
               href="/teacher/exams"
               className="text-xs font-semibold text-primary hover:underline"
             >
-              View all ({examsList.length}) →
+              {t("teacher.dashboard.viewAll", { count: examsList.length })} →
             </Link>
           </div>
 
           {recentExams.length === 0 ? (
             <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
               <p className="text-sm text-secondary">
-                No examinations created yet.
+                {t("teacher.dashboard.noExams")}
               </p>
               <div className="mt-3">
                 <Link
                   href="/teacher/exams/new"
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-container transition-colors"
                 >
-                  Create Exam
+                  {t("teacher.dashboard.createExam")}
                 </Link>
               </div>
             </div>

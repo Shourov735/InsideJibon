@@ -2,13 +2,15 @@ import Link from "next/link";
 
 import type { CourseWithCounts } from "@/types/course";
 import { StatusBadge } from "./status-badge";
+import { getTranslator } from "@/i18n/server";
 
 interface CourseCardProps {
   course: CourseWithCounts;
 }
 
-export function CourseCard({ course }: CourseCardProps) {
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
+export async function CourseCard({ course }: CourseCardProps) {
+  const t = await getTranslator();
+  const formattedDate = new Intl.DateTimeFormat(t.locale === "bn" ? "bn-BD" : "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -24,11 +26,14 @@ export function CourseCard({ course }: CourseCardProps) {
               {course.title}
             </h3>
           </div>
-          <StatusBadge status={course.status} />
+          <StatusBadge
+            status={course.status}
+            label={course.status === "draft" ? t("common.status.draft") : course.status === "published" ? t("common.status.published") : t("common.status.archived")}
+          />
         </div>
 
         <p className="mt-2 line-clamp-2 text-sm text-on-surface-variant">
-          {course.description || "No description provided for this course."}
+          {course.description || t("teacher.courseCard.noDescription")}
         </p>
 
         <div className="mt-4 flex items-center gap-4 text-xs font-medium text-secondary">
@@ -43,7 +48,7 @@ export function CourseCard({ course }: CourseCardProps) {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-            <span>{course.moduleCount} {course.moduleCount === 1 ? "Module" : "Modules"}</span>
+            <span>{t.tn("common.moduleCount", course.moduleCount)}</span>
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -57,11 +62,11 @@ export function CourseCard({ course }: CourseCardProps) {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>{course.lessonCount} {course.lessonCount === 1 ? "Lesson" : "Lessons"}</span>
+            <span>{t.tn("common.lessonCount", course.lessonCount)}</span>
           </div>
 
           <span className="ml-auto text-[11px] text-outline">
-            Updated {formattedDate}
+            {t("teacher.courseCard.updatedOn", { date: formattedDate })}
           </span>
         </div>
       </div>
@@ -81,20 +86,20 @@ export function CourseCard({ course }: CourseCardProps) {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
-          <span>Curriculum Builder</span>
+          <span>{t("teacher.courseCard.curriculumBuilder")}</span>
         </Link>
 
         <Link
           href={`/teacher/courses/${course.id}`}
           className="inline-flex items-center justify-center rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-xs font-medium text-on-surface transition-colors hover:bg-surface-container hover:text-primary"
         >
-          Overview
+          {t("teacher.courseCard.overview")}
         </Link>
 
         <Link
           href={`/teacher/courses/${course.id}/edit`}
           className="inline-flex items-center justify-center rounded-lg border border-outline-variant bg-surface-container-low p-2 text-secondary transition-colors hover:bg-surface-container hover:text-primary"
-          title="Edit Settings"
+          title={t("teacher.courseCard.editSettings")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

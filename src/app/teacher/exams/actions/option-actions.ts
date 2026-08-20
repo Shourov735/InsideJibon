@@ -11,6 +11,8 @@ import {
 import * as examService from "@/services/exams";
 import type { ActionResult } from "@/types/course";
 import type { QuestionOption } from "@/types/exam";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 /**
  * Creates an answer option on a question inside a draft exam owned by the
@@ -20,13 +22,14 @@ export async function createOptionAction(
   formData: unknown,
   examId?: string
 ): Promise<ActionResult<QuestionOption>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = createOptionSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for option data.",
+      error: localizeMessage("Validation failed for option data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -41,7 +44,7 @@ export async function createOptionAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create option.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to create option.", t),
     };
   }
 }
@@ -53,13 +56,14 @@ export async function updateOptionAction(
   formData: unknown,
   examId?: string
 ): Promise<ActionResult<QuestionOption>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = updateOptionSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for option data.",
+      error: localizeMessage("Validation failed for option data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -74,7 +78,7 @@ export async function updateOptionAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update option.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to update option.", t),
     };
   }
 }
@@ -86,11 +90,12 @@ export async function deleteOptionAction(
   formData: unknown,
   examId?: string
 ): Promise<ActionResult<{ deleted: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = optionActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid option identifier." };
+    return { success: false, error: localizeMessage("Invalid option identifier.", t) };
   }
 
   try {
@@ -103,7 +108,7 @@ export async function deleteOptionAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete option.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to delete option.", t),
     };
   }
 }

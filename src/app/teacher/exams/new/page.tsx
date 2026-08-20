@@ -4,6 +4,7 @@ import { requireTeacher } from "@/lib/permissions";
 import { getTeacherCourses } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamForm } from "@/components/teacher/exams/exam-form";
+import { getTranslator } from "@/i18n/server";
 
 export const metadata = {
   title: "Create Exam | InsideJibon Educator",
@@ -17,6 +18,7 @@ interface NewExamPageProps {
 export default async function NewExamPage({ searchParams }: NewExamPageProps) {
   const { courseId } = await searchParams;
   const teacher = await requireTeacher();
+  const t = await getTranslator();
   const coursesList = await getTeacherCourses(teacher.id);
 
   return (
@@ -27,7 +29,7 @@ export default async function NewExamPage({ searchParams }: NewExamPageProps) {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-xs font-medium text-secondary">
           <Link href="/teacher/exams" className="hover:text-primary transition-colors">
-            Exams
+            {t("teacher.examForm.breadcrumb.exams")}
           </Link>
           <svg
             className="h-3 w-3 text-outline"
@@ -37,7 +39,9 @@ export default async function NewExamPage({ searchParams }: NewExamPageProps) {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
           </svg>
-          <span className="text-on-surface font-semibold">New Exam</span>
+          <span className="text-on-surface font-semibold">
+            {t("teacher.examForm.breadcrumb.new")}
+          </span>
         </div>
 
         {/* Card Container */}
@@ -45,15 +49,17 @@ export default async function NewExamPage({ searchParams }: NewExamPageProps) {
           <div className="border-b border-outline-variant pb-5">
             <div className="flex items-center gap-2">
               <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                নতুন পরীক্ষা
+                {t("teacher.examForm.breadcrumb.new")}
               </span>
-              <span className="text-xs text-secondary">• Assessment Setup</span>
+              <span className="text-xs text-secondary">
+                • {t("teacher.examForm.assessmentSetup")}
+              </span>
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface">
-              Create New Examination
+              {t("teacher.examForm.title")}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant">
-              Associate this assessment with one of your courses, provide instructions, then add questions in the interactive Exam Builder.
+              {t("teacher.examForm.subtitle")}
             </p>
           </div>
 
@@ -65,16 +71,18 @@ export default async function NewExamPage({ searchParams }: NewExamPageProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 </div>
-                <h3 className="mt-3 text-base font-bold text-on-surface">Course Required</h3>
+                <h3 className="mt-3 text-base font-bold text-on-surface">
+                  {t("teacher.examForm.courseRequired")}
+                </h3>
                 <p className="mt-1 text-sm text-secondary max-w-sm mx-auto">
-                  Every examination must be associated with a course. Please create your first course before setting up an exam.
+                  {t("teacher.examForm.courseRequiredDesc")}
                 </p>
                 <div className="mt-5">
                   <Link
                     href="/teacher/courses/new"
                     className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-xs hover:bg-primary-container transition-colors"
                   >
-                    <span>Create a Course First</span>
+                    <span>{t("teacher.examForm.createCourseFirst")}</span>
                   </Link>
                 </div>
               </div>

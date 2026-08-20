@@ -11,6 +11,8 @@ import {
 } from "@/schemas/course";
 import * as courseService from "@/services/courses";
 import type { ActionResult, Lesson } from "@/types/course";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 /**
  * Creates a new lesson inside a module.
@@ -19,13 +21,14 @@ export async function createLessonAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<Lesson>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = createLessonSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for lesson data.",
+      error: localizeMessage("Validation failed for lesson data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -39,7 +42,7 @@ export async function createLessonAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create lesson",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to create lesson", t),
     };
   }
 }
@@ -51,13 +54,14 @@ export async function updateLessonAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<Lesson>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = updateLessonSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for lesson data.",
+      error: localizeMessage("Validation failed for lesson data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -75,7 +79,7 @@ export async function updateLessonAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update lesson",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to update lesson", t),
     };
   }
 }
@@ -87,13 +91,14 @@ export async function deleteLessonAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<{ deleted: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = deleteLessonSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid lesson identifier",
+      error: localizeMessage("Invalid lesson identifier", t),
     };
   }
 
@@ -106,7 +111,7 @@ export async function deleteLessonAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete lesson",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to delete lesson", t),
     };
   }
 }
@@ -118,13 +123,14 @@ export async function reorderLessonsAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<{ reordered: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = reorderLessonsSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid reorder parameters",
+      error: localizeMessage("Invalid reorder parameters", t),
     };
   }
 
@@ -141,7 +147,7 @@ export async function reorderLessonsAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to reorder lessons",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to reorder lessons", t),
     };
   }
 }

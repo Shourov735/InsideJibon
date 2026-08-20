@@ -2,6 +2,7 @@
 
 import type { ExamWithQuestions } from "@/types/exam";
 import { StatusBadge } from "../status-badge";
+import { useTranslations } from "@/i18n/client";
 
 interface ExamPreviewModalProps {
   exam: ExamWithQuestions;
@@ -16,6 +17,7 @@ export function ExamPreviewModal({
   isOpen,
   onClose,
 }: ExamPreviewModalProps) {
+  const { t, tn } = useTranslations();
   if (!isOpen) return null;
 
   return (
@@ -25,12 +27,15 @@ export function ExamPreviewModal({
         <div className="flex items-center justify-between border-b border-outline-variant bg-surface-container-low px-6 py-4 shrink-0">
           <div className="flex items-center gap-3">
             <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">
-              Teacher Preview
+              {t("teacher.examPreview.title")}
             </span>
             <h3 className="text-base font-bold text-on-surface">
-              Examination Paper Preview
+              {t("teacher.examPreview.badge")}
             </h3>
-            <StatusBadge status={exam.status} />
+            <StatusBadge
+            status={exam.status}
+            label={exam.status === "draft" ? t("common.status.draft") : exam.status === "published" ? t("common.status.published") : t("common.status.archived")}
+          />
           </div>
           <button
             type="button"
@@ -49,7 +54,7 @@ export function ExamPreviewModal({
           <div className="rounded-xl border border-outline-variant bg-surface-container-low p-6 text-center space-y-2">
             <div className="flex items-center justify-center gap-2">
               <span className="font-bold text-xs uppercase tracking-widest text-primary">
-                INSIDEJIBON ACADEMIC EXAMINATION
+                {t("teacher.examPreview.academicHeader")}
               </span>
             </div>
             {courseTitle && (
@@ -63,22 +68,28 @@ export function ExamPreviewModal({
             )}
 
             <div className="mt-4 flex flex-wrap items-center justify-center gap-6 border-t border-outline-variant/60 pt-3 text-xs font-semibold text-secondary">
-              <span>Total Questions: {exam.questions.length}</span>
-              <span>Total Marks: {exam.totalMarks}</span>
-              <span>Duration: {exam.durationMinutes ? `${exam.durationMinutes} Minutes` : "Untimed"}</span>
+              <span>{t("student.result.totalQuestions")}: {exam.questions.length}</span>
+              <span>{t("teacher.examDetail.totalMarks", { marks: exam.totalMarks })}</span>
+              <span>
+                {exam.durationMinutes
+                  ? t("teacher.examDetail.duration", {
+                      minutes: exam.durationMinutes,
+                    })
+                  : t("common.status.untimed")}
+              </span>
             </div>
           </div>
 
           {/* Instructions note */}
           <div className="rounded-lg border border-outline-variant/60 bg-surface-container-lowest p-4 text-xs text-on-surface-variant">
-            <span className="font-bold text-on-surface">Instructions: </span>
-            Read each question carefully. Select the one correct option for each question. All questions carry the indicated marks.
+            <span className="font-bold text-on-surface">{t("teacher.examPreview.instructions")}: </span>
+            {t("teacher.examPreview.instructionsBody")}
           </div>
 
           {/* Question List */}
           {exam.questions.length === 0 ? (
             <div className="rounded-xl border border-dashed border-outline-variant p-8 text-center text-sm text-secondary">
-              No questions added yet. Use the question builder to add questions.
+              {t("teacher.examPreview.noQuestions")}
             </div>
           ) : (
             <div className="space-y-6">
@@ -97,7 +108,7 @@ export function ExamPreviewModal({
                       </p>
                     </div>
                     <span className="shrink-0 rounded-md bg-surface-container-high px-2 py-0.5 text-xs font-semibold text-secondary">
-                      [{question.marks} {question.marks === 1 ? "Mark" : "Marks"}]
+                      [{tn("common.markCountUpper", question.marks)}]
                     </span>
                   </div>
 
@@ -124,7 +135,7 @@ export function ExamPreviewModal({
                         <span className="flex-1 break-words pt-0.5">{option.optionText}</span>
                         {option.isCorrect && (
                           <span className="shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-800">
-                            Correct
+                            {t("teacher.examDetail.correctBadge")}
                           </span>
                         )}
                       </div>
@@ -134,7 +145,7 @@ export function ExamPreviewModal({
                   {/* Explanation if any */}
                   {question.explanation && (
                     <div className="rounded-lg bg-surface-container-low p-3 text-xs text-secondary border border-outline-variant/40">
-                      <span className="font-semibold text-on-surface">Explanation: </span>
+                      <span className="font-semibold text-on-surface">{t("teacher.examDetail.explanationLabel")}</span>
                       {question.explanation}
                     </div>
                   )}
@@ -151,7 +162,7 @@ export function ExamPreviewModal({
             onClick={onClose}
             className="rounded-xl bg-primary px-5 py-2 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container transition-colors"
           >
-            Close Preview
+            {t("teacher.examPreview.closePreview")}
           </button>
         </div>
       </div>

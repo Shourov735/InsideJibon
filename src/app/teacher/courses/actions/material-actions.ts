@@ -12,6 +12,8 @@ import {
 import * as materialService from "@/services/materials";
 import type { ActionResult } from "@/types/course";
 import type { MaterialSummary } from "@/types/material";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 const DOWNLOAD_REVALIDATE_PATHS = [
   "/teacher/courses",
@@ -36,11 +38,12 @@ export async function uploadMaterialAction(
   formData: FormData,
   courseId?: string
 ): Promise<ActionResult<MaterialSummary>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
 
   const file = formData.get("file");
   if (!(file instanceof File)) {
-    return { success: false, error: "No file was uploaded." };
+    return { success: false, error: localizeMessage("No file was uploaded.", t) };
   }
 
   const metadata: Record<string, FormDataEntryValue> = {};
@@ -50,7 +53,7 @@ export async function uploadMaterialAction(
 
   const parsed = uploadMaterialSchema.safeParse(metadata);
   if (!parsed.success) {
-    return { success: false, error: "Invalid lesson identifier." };
+    return { success: false, error: localizeMessage("Invalid lesson identifier.", t) };
   }
 
   try {
@@ -80,11 +83,12 @@ export async function deleteMaterialAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<{ deleted: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = deleteMaterialSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid material identifier." };
+    return { success: false, error: localizeMessage("Invalid material identifier.", t) };
   }
 
   try {
@@ -113,11 +117,12 @@ export async function updateMaterialAction(
   formData: unknown,
   courseId?: string
 ): Promise<ActionResult<MaterialSummary>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = updateMaterialSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid material data." };
+    return { success: false, error: localizeMessage("Invalid material data.", t) };
   }
 
   try {

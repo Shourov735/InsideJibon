@@ -3,21 +3,23 @@ import Link from "next/link";
 import { requireStudent } from "@/lib/permissions";
 import { getStudentDashboard } from "@/services/learning";
 import { StudentCourseCard } from "@/components/student/student-course-card";
+import { getTranslator } from "@/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function StudentCoursesPage() {
   const user = await requireStudent();
+  const t = await getTranslator();
   const courses = await getStudentDashboard(user.id);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-          My Courses
+          {t("student.courses.title")}
         </h1>
         <p className="text-sm text-on-surface-variant">
-          Courses you have enrolled in — pick up where you left off.
+          {t("student.courses.subtitle")}
         </p>
       </div>
 
@@ -39,17 +41,16 @@ export default async function StudentCoursesPage() {
             </svg>
           </div>
           <h2 className="mt-4 text-lg font-bold text-on-surface">
-            No courses yet
+            {t("student.courses.emptyTitle")}
           </h2>
           <p className="mt-1 text-sm text-secondary">
-            Explore the catalog and enroll in your first course to start
-            learning.
+            {t("student.courses.emptyDesc")}
           </p>
           <Link
             href="/courses"
             className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
           >
-            Browse Courses
+            {t("student.courses.emptyCta")}
             <svg
               className="h-4 w-4"
               fill="none"

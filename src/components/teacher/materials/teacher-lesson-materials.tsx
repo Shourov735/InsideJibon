@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MaterialUploadForm } from "./material-upload-form";
 import { TeacherMaterialCard } from "./teacher-material-card";
 import type { MaterialSummary } from "@/types/material";
+import { useTranslations } from "@/i18n/client";
 
 interface TeacherLessonMaterialsProps {
   courseId: string;
@@ -18,6 +19,7 @@ export function TeacherLessonMaterials({
   materials: initialMaterials,
   onMaterialsChange,
 }: TeacherLessonMaterialsProps) {
+  const { t, tn } = useTranslations();
   const [materials, setMaterials] = useState<MaterialSummary[]>(initialMaterials);
   const [isUploading, setIsUploading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export function TeacherLessonMaterials({
     const updated = [...materials, newMaterial];
     setMaterials(updated);
     setIsUploading(false);
-    setFeedback(`"${newMaterial.name}" uploaded successfully.`);
+    setFeedback(t("teacher.materials.lessonList.uploadedFeedback", { name: newMaterial.name }));
     onMaterialsChange?.(updated);
 
     // Auto-clear feedback after 4 seconds
@@ -38,7 +40,7 @@ export function TeacherLessonMaterials({
   const handleDeleted = (deletedId: string) => {
     const updated = materials.filter((m) => m.id !== deletedId);
     setMaterials(updated);
-    setFeedback("Material deleted.");
+    setFeedback(t("teacher.materials.lessonList.deletedFeedback"));
     onMaterialsChange?.(updated);
 
     setTimeout(() => {
@@ -51,7 +53,7 @@ export function TeacherLessonMaterials({
       m.id === updatedMaterial.id ? updatedMaterial : m
     );
     setMaterials(updated);
-    setFeedback("Material updated.");
+    setFeedback(t("teacher.materials.lessonList.updatedFeedback"));
     onMaterialsChange?.(updated);
 
     setTimeout(() => {
@@ -66,14 +68,14 @@ export function TeacherLessonMaterials({
         <div>
           <div className="flex items-center gap-2">
             <h4 className="text-sm font-bold text-on-surface">
-              Supplementary Materials
+              {t("teacher.materials.lessonList.title")}
             </h4>
             <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-[11px] font-semibold text-secondary">
-              {materials.length} {materials.length === 1 ? "file" : "files"}
+              {tn("common.fileCountLower", materials.length)}
             </span>
           </div>
           <p className="text-xs text-secondary mt-0.5">
-            Downloadable PDFs, worksheets, slides, or archives for this lesson.
+            {t("teacher.materials.lessonList.subtitle")}
           </p>
         </div>
 
@@ -86,7 +88,7 @@ export function TeacherLessonMaterials({
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Upload File</span>
+            <span>{t("teacher.materials.lessonList.uploadFile")}</span>
           </button>
         )}
       </div>
@@ -107,7 +109,7 @@ export function TeacherLessonMaterials({
             type="button"
             onClick={() => setFeedback(null)}
             className="text-emerald-700 hover:text-emerald-900"
-            aria-label="Dismiss feedback"
+            aria-label={t("teacher.materials.lessonList.dismissFeedback")}
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -141,9 +143,9 @@ export function TeacherLessonMaterials({
               />
             </svg>
           </div>
-          <h5 className="mt-2.5 text-xs font-bold text-on-surface">No materials attached yet</h5>
+          <h5 className="mt-2.5 text-xs font-bold text-on-surface">{t("teacher.materials.lessonList.emptyTitle")}</h5>
           <p className="mt-1 max-w-sm text-[11px] text-secondary">
-            Provide students with lecture slides, formula sheets, practice worksheets, or datasets.
+            {t("teacher.materials.lessonList.emptyDesc")}
           </p>
           <button
             type="button"
@@ -153,7 +155,7 @@ export function TeacherLessonMaterials({
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Upload First Resource</span>
+            <span>{t("teacher.materials.lessonList.uploadFirst")}</span>
           </button>
         </div>
       ) : (

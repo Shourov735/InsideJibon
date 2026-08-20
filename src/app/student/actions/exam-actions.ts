@@ -7,6 +7,8 @@ import { startExamSchema, submitExamSchema } from "@/schemas/exam-attempt";
 import * as examAttemptService from "@/services/exams/attempts";
 import type { ActionResult } from "@/types/course";
 import type { StartedAttempt, SubmittedExamResult } from "@/types/exam";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 const EXAM_PATHS = (courseId: string, examId: string) => [
   `/student/courses/${courseId}/exams`,
@@ -22,11 +24,12 @@ const EXAM_PATHS = (courseId: string, examId: string) => [
 export async function startExamAction(
   formData: unknown
 ): Promise<ActionResult<StartedAttempt>> {
+  const t = await getTranslator();
   const student = await requireStudent();
   const parsed = startExamSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid exam identifier." };
+    return { success: false, error: localizeMessage("Invalid exam identifier.", t) };
   }
 
   try {
@@ -54,11 +57,12 @@ export async function startExamAction(
 export async function submitExamAction(
   formData: unknown
 ): Promise<ActionResult<SubmittedExamResult>> {
+  const t = await getTranslator();
   const student = await requireStudent();
   const parsed = submitExamSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid submission data." };
+    return { success: false, error: localizeMessage("Invalid submission data.", t) };
   }
 
   try {

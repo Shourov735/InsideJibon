@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import type { CurrentUser } from "@/lib/auth";
+import { getTranslator } from "@/i18n/server";
 
 interface StudentNavProps {
   user: CurrentUser;
   activeSection?: "dashboard" | "courses";
 }
 
-export function StudentNav({ user, activeSection = "dashboard" }: StudentNavProps) {
+export async function StudentNav({ user, activeSection = "dashboard" }: StudentNavProps) {
+  const t = await getTranslator();
   return (
     <header className="sticky top-0 z-40 w-full border-b border-outline-variant bg-surface-container-lowest text-on-surface shadow-xs">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -31,10 +34,10 @@ export function StudentNav({ user, activeSection = "dashboard" }: StudentNavProp
             </div>
             <div>
               <span className="text-lg font-bold tracking-tight text-primary">
-                InsideJibon
+                {t("brand.name")}
               </span>
               <span className="ml-2 rounded bg-surface-container-high px-1.5 py-0.5 text-[10px] font-semibold text-secondary uppercase">
-                Learner
+                {t("nav.student.learnerBadge")}
               </span>
             </div>
           </Link>
@@ -48,7 +51,7 @@ export function StudentNav({ user, activeSection = "dashboard" }: StudentNavProp
                   : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
               }`}
             >
-              Dashboard
+              {t("nav.student.dashboard")}
             </Link>
             <Link
               href="/student/courses"
@@ -58,17 +61,19 @@ export function StudentNav({ user, activeSection = "dashboard" }: StudentNavProp
                   : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
               }`}
             >
-              My Courses
+              {t("nav.student.courses")}
             </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+
           <Link
             href="/courses"
             className="hidden items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest px-3.5 py-2 text-sm font-medium text-on-surface-variant transition-colors hover:border-primary/40 hover:text-primary sm:inline-flex"
           >
-            Browse Courses
+            {t("nav.student.browseCourses")}
           </Link>
 
           <div className="h-6 w-px bg-outline-variant" />

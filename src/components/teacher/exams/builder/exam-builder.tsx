@@ -15,6 +15,7 @@ import {
   updateQuestionAction,
 } from "@/app/teacher/exams/actions";
 import { StatusBadge } from "@/components/teacher/status-badge";
+import { useTranslations } from "@/i18n/client";
 import { ExamPublishModal } from "./exam-publish-modal";
 import { ExamPreviewModal } from "@/components/teacher/exams/exam-preview-modal";
 import { QuestionEditor } from "./question-editor";
@@ -27,6 +28,7 @@ interface ExamBuilderProps {
 type SaveState = "saved" | "saving" | "error";
 
 export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
+  const { t, tn } = useTranslations();
   const router = useRouter();
   const editable = exam.status === "draft";
 
@@ -63,7 +65,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
       router.refresh();
     } catch (err) {
       setSaveState("error");
-      setErrorMessage(err instanceof Error ? err.message : "Action failed.");
+      setErrorMessage(err instanceof Error ? err.message : t("teacher.examBuilder.actionFailed"));
     }
   };
 
@@ -93,7 +95,9 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
   // Quick Add Question
   const handleQuickAddQuestion = async () => {
     await runAction(async () => {
-      const defaultText = `Question ${exam.questions.length + 1}`;
+      const defaultText = t("common.questionLabel", {
+        position: exam.questions.length + 1,
+      });
       const res = await createQuestionAction({
         examId: exam.id,
         questionText: defaultText,
@@ -105,11 +109,11 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
 
       // Create default 2 initial placeholder options for convenience
       await createOptionAction(
-        { questionId: res.data.id, optionText: "Option 1", isCorrect: true },
+        { questionId: res.data.id, optionText: t("teacher.qe.option", { position: 1 }), isCorrect: true },
         exam.id
       );
       await createOptionAction(
-        { questionId: res.data.id, optionText: "Option 2", isCorrect: false },
+        { questionId: res.data.id, optionText: t("teacher.qe.option", { position: 2 }), isCorrect: false },
         exam.id
       );
 
@@ -140,7 +144,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
 
   // Delete question
   const handleDeleteQuestion = async (questionId: string) => {
-    if (!window.confirm("Are you sure you want to delete this question and all its options?")) {
+    if (!window.confirm(t("teacher.examBuilder.deleteQuestionConfirm"))) {
       return;
     }
 
@@ -228,6 +232,13 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
     });
   };
 
+  const statusLabel =
+    exam.status === "draft"
+      ? t("common.status.draft")
+      : exam.status === "published"
+        ? t("common.status.published")
+        : t("common.status.archived");
+
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col bg-surface text-on-surface overflow-hidden">
       {/* Top Header / Builder Navigation Bar */}
@@ -240,7 +251,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            <span className="hidden sm:inline">Exam Overview</span>
+            <span className="hidden sm:inline">{t("teacher.examBuilder.examOverview")}</span>
           </Link>
 
           <div className="h-5 w-px bg-outline-variant hidden sm:block" />
@@ -250,11 +261,14 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
               <h1 className="text-sm font-bold tracking-tight text-on-surface truncate sm:text-base">
                 {exam.title}
               </h1>
-              <StatusBadge status={exam.status} />
+              <StatusBadge
+              status={exam.status}
+              label={exam.status === "draft" ? t("common.status.draft") : exam.status === "published" ? t("common.status.published") : t("common.status.archived")}
+            />
             </div>
             {courseTitle && (
               <p className="text-[11px] text-secondary truncate hidden sm:block">
-                Course: {courseTitle}
+                {t("teacher.examBuilder.courseLabel", { title: courseTitle })}
               </p>
             )}
           </div>
@@ -270,7 +284,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Saving…
+                {t("common.saving")}
               </span>
             )}
             {saveState === "saved" && (
@@ -278,7 +292,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                 <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
-                Saved
+                {t("common.saved")}
               </span>
             )}
             {saveState === "error" && (
@@ -286,20 +300,20 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                 <svg className="h-3.5 w-3.5 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                Error saving
+                {t("teacher.examBuilder.errorSaving")}
               </span>
             )}
           </div>
 
           {/* Quick Metrics */}
           <div className="hidden lg:flex items-center gap-2 text-xs font-semibold text-secondary bg-surface-container-low px-3 py-1.5 rounded-lg">
-            <span>{exam.questions.length} Questions</span>
+            <span>{tn("common.questionCountUpper", exam.questions.length)}</span>
             <span>•</span>
-            <span>{exam.totalMarks} Total Marks</span>
+            <span>{t("student.exam.totalMarksLabel", { marks: exam.totalMarks })}</span>
             {exam.durationMinutes && (
               <>
                 <span>•</span>
-                <span>{exam.durationMinutes}m</span>
+                <span>{t("student.exam.durationShort", { minutes: exam.durationMinutes })}</span>
               </>
             )}
           </div>
@@ -314,7 +328,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span className="hidden sm:inline">Preview Paper</span>
+            <span className="hidden sm:inline">{t("teacher.examBuilder.previewPaper")}</span>
           </button>
 
           {/* Publish / Unpublish Button */}
@@ -330,7 +344,11 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
-            <span>{exam.status === "published" ? "Publishing Status" : "Publish Exam"}</span>
+            <span>
+              {exam.status === "published"
+                ? t("teacher.examBuilder.publishingStatus")
+                : t("teacher.examBuilder.publishExam")}
+            </span>
           </button>
         </div>
       </header>
@@ -343,7 +361,8 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
             <span>
-              <strong>Structure Locked:</strong> This examination is currently <strong>{exam.status}</strong>. Questions and options cannot be altered. To edit, unpublish it to return to draft mode.
+              <strong>{t("teacher.examBuilder.structureLocked")}</strong>{" "}
+              {t("teacher.examBuilder.structureLockedDesc", { status: statusLabel })}
             </span>
           </div>
           <button
@@ -351,7 +370,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             onClick={() => setIsPublishModalOpen(true)}
             className="rounded-md border border-amber-400 bg-amber-200 px-2.5 py-1 font-bold text-amber-900 hover:bg-amber-300 text-[11px] cursor-pointer"
           >
-            Unpublish
+            {t("teacher.examBuilder.unpublish")}
           </button>
         </div>
       )}
@@ -367,7 +386,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
               : "border-transparent text-secondary hover:text-on-surface"
           }`}
         >
-          Questions ({exam.questions.length})
+          ({tn("common.questionCountUpper", exam.questions.length)})
         </button>
         <button
           type="button"
@@ -378,7 +397,11 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
               : "border-transparent text-secondary hover:text-on-surface"
           }`}
         >
-          Question Editor {activeQuestion ? `#${activeQuestion.position}` : ""}
+          {activeQuestion
+            ? t("teacher.examBuilder.questionEditorPosition", {
+                position: activeQuestion.position,
+              })
+            : t("teacher.examBuilder.questionEditor")}
         </button>
       </div>
 
@@ -394,10 +417,10 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
           <div className="p-4 border-b border-outline-variant bg-surface-container-low shrink-0 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-bold uppercase tracking-wider text-secondary">
-                Questions ({exam.questions.length})
+                ({tn("common.questionCountUpper", exam.questions.length)})
               </h2>
               <span className="text-xs font-semibold text-primary">
-                {exam.totalMarks} Total Marks
+                {t("student.exam.totalMarksLabel", { marks: exam.totalMarks })}
               </span>
             </div>
 
@@ -411,12 +434,12 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  <span>+ Quick Add Question</span>
+                  <span>{t("teacher.examBuilder.quickAddQuestion")}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsAddingQuestion(!isAddingQuestion)}
-                  title="Add with custom text"
+                  title={t("teacher.examBuilder.addWithCustomText")}
                   className="rounded-xl border border-outline-variant bg-surface-container-lowest p-2 text-secondary hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -432,12 +455,12 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                 onSubmit={handleCreateQuestion}
                 className="mt-2 rounded-xl border border-outline-variant bg-surface-container-lowest p-3 space-y-2.5 shadow-xs"
               >
-                <p className="text-xs font-bold text-on-surface">New Question</p>
+                <p className="text-xs font-bold text-on-surface">{t("teacher.examBuilder.newQuestion")}</p>
                 <textarea
                   value={newQuestionFormText}
                   onChange={(e) => setNewQuestionFormText(e.target.value)}
                   rows={2}
-                  placeholder="Enter question text…"
+                  placeholder={t("teacher.examBuilder.enterQuestionText")}
                   className="w-full rounded-lg border border-outline-variant bg-surface-container-low p-2 text-xs text-on-surface outline-none focus:border-primary"
                   autoFocus
                 />
@@ -448,21 +471,21 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                     max={1000}
                     value={newQuestionFormMarks}
                     onChange={(e) => setNewQuestionFormMarks(e.target.value)}
-                    placeholder="Marks"
+                    placeholder={t("teacher.qe.marks")}
                     className="w-20 rounded-lg border border-outline-variant bg-surface-container-low p-1.5 text-xs text-on-surface outline-none focus:border-primary"
                   />
                   <button
                     type="submit"
                     className="flex-1 rounded-lg bg-primary py-1.5 text-xs font-semibold text-on-primary hover:bg-primary-container cursor-pointer"
                   >
-                    Add
+                    {t("teacher.builder.add")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsAddingQuestion(false)}
                     className="rounded-lg border border-outline-variant px-2.5 py-1.5 text-xs text-secondary hover:bg-surface-container cursor-pointer"
                   >
-                    Cancel
+                    {t("teacher.examForm.cancel")}
                   </button>
                 </div>
               </form>
@@ -473,8 +496,8 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {exam.questions.length === 0 ? (
               <div className="rounded-xl border border-dashed border-outline-variant p-6 text-center text-xs text-secondary space-y-2">
-                <p>No questions created yet.</p>
-                <p className="text-[11px] text-outline">Click &ldquo;+ Quick Add Question&rdquo; above to get started.</p>
+                <p>{t("teacher.examBuilder.noQuestionsCreated")}</p>
+                <p className="text-[11px] text-outline">{t("teacher.examBuilder.noQuestionsHint")}</p>
               </div>
             ) : (
               exam.questions.map((question, idx) => {
@@ -510,7 +533,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                           {question.position}
                         </span>
                         <span className="rounded bg-surface-container-high px-1.5 py-0.5 text-[10px] font-semibold text-secondary">
-                          {question.marks} {question.marks === 1 ? "mark" : "marks"}
+                          {tn("common.markCountLower", question.marks)}
                         </span>
                       </div>
 
@@ -524,7 +547,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleMoveQuestion(idx, -1)}
-                            title="Move Up"
+                            title={t("teacher.builder.moveUp")}
                             className="rounded p-1 text-secondary hover:bg-surface-container hover:text-on-surface disabled:opacity-30 cursor-pointer"
                           >
                             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -535,7 +558,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                             type="button"
                             disabled={idx === exam.questions.length - 1}
                             onClick={() => handleMoveQuestion(idx, 1)}
-                            title="Move Down"
+                            title={t("teacher.builder.moveDown")}
                             className="rounded p-1 text-secondary hover:bg-surface-container hover:text-on-surface disabled:opacity-30 cursor-pointer"
                           >
                             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -545,7 +568,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                           <button
                             type="button"
                             onClick={() => handleDeleteQuestion(question.id)}
-                            title="Delete Question"
+                            title={t("teacher.qe.deleteQuestion")}
                             className="rounded p-1 text-secondary hover:bg-error-container/50 hover:text-error cursor-pointer"
                           >
                             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -563,29 +586,29 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
 
                     {/* Option & status indicators */}
                     <div className="mt-2 flex items-center justify-between text-[11px] text-secondary">
-                      <span>{question.options.length} {question.options.length === 1 ? "option" : "options"}</span>
+                      <span>{tn("common.optionCountLower", question.options.length)}</span>
                       {hasWarning ? (
                         <span
                           className="flex items-center gap-1 font-semibold text-amber-700"
                           title={
                             !isOptionCountValid
-                              ? "Need at least 2 options"
+                              ? t("teacher.examBuilder.needTwoOptions")
                               : correctCount === 0
-                              ? "No correct answer marked"
-                              : "Multiple correct answers marked"
+                                ? t("teacher.examBuilder.noCorrectAnswer")
+                                : t("teacher.examBuilder.multipleCorrectAnswers")
                           }
                         >
                           <svg className="h-3.5 w-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                           </svg>
-                          Needs attention
+                          {t("teacher.examBuilder.needsAttention")}
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 font-medium text-emerald-700">
                           <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                           </svg>
-                          Valid
+                          {t("teacher.examBuilder.valid")}
                         </span>
                       )}
                     </div>
@@ -608,7 +631,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div>
-                <p className="font-semibold">Action Error</p>
+                <p className="font-semibold">{t("teacher.examBuilder.actionError")}</p>
                 <p className="mt-0.5">{errorMessage}</p>
               </div>
             </div>
@@ -621,9 +644,9 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="mt-4 text-base font-bold text-on-surface">No Question Selected</h3>
+              <h3 className="mt-4 text-base font-bold text-on-surface">{t("teacher.examBuilder.noQuestionSelected")}</h3>
               <p className="mt-1 max-w-sm text-xs text-secondary">
-                Select a question from the sidebar or click below to create your first multiple-choice question.
+                {t("teacher.examBuilder.noQuestionSelectedDesc")}
               </p>
               {editable && (
                 <button
@@ -634,7 +657,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  <span>+ Create First Question</span>
+                  <span>{t("teacher.examBuilder.createFirstQuestion")}</span>
                 </button>
               )}
             </div>

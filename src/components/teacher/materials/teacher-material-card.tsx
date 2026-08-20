@@ -14,6 +14,7 @@ import {
 } from "@/lib/material-utils";
 import { MAX_MATERIAL_NAME_LENGTH } from "@/schemas/material";
 import type { MaterialSummary } from "@/types/material";
+import { useTranslations } from "@/i18n/client";
 
 interface TeacherMaterialCardProps {
   material: MaterialSummary;
@@ -28,6 +29,8 @@ export function TeacherMaterialCard({
   onDeleted,
   onUpdated,
 }: TeacherMaterialCardProps) {
+  const { t, tn, locale } = useTranslations();
+
   // Rename state
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(material.name);
@@ -70,7 +73,7 @@ export function TeacherMaterialCard({
       onUpdated(result.data);
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to update material name."
+        err instanceof Error ? err.message : t("teacher.materials.card.updateFailed")
       );
     } finally {
       setIsSavingName(false);
@@ -98,7 +101,7 @@ export function TeacherMaterialCard({
       onDeleted(material.id);
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to delete material."
+        err instanceof Error ? err.message : t("teacher.materials.card.deleteFailed")
       );
       setIsDeleting(false);
       setIsConfirmingDelete(false);
@@ -135,7 +138,7 @@ export function TeacherMaterialCard({
                   disabled={isSavingName || !editName.trim()}
                   className="rounded-md bg-primary px-2.5 py-1 text-xs font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50"
                 >
-                  {isSavingName ? "..." : "Save"}
+                  {isSavingName ? "..." : t("teacher.builder.save")}
                 </button>
                 <button
                   type="button"
@@ -147,7 +150,7 @@ export function TeacherMaterialCard({
                   disabled={isSavingName}
                   className="rounded-md px-2 py-1 text-xs text-secondary hover:bg-surface-container"
                 >
-                  Cancel
+                  {t("teacher.materials.card.cancel")}
                 </button>
               </form>
             ) : (
@@ -159,8 +162,8 @@ export function TeacherMaterialCard({
                   type="button"
                   onClick={() => setIsEditing(true)}
                   className="rounded p-1 text-outline hover:bg-surface-container-low hover:text-primary transition-colors"
-                  title="Rename resource"
-                  aria-label={`Rename ${material.name}`}
+                  title={t("teacher.materials.card.renameTitle")}
+                  aria-label={t("teacher.materials.card.renameAria", { name: material.name })}
                 >
                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
@@ -177,7 +180,7 @@ export function TeacherMaterialCard({
             <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-secondary">
               <span>{formatBytes(material.sizeBytes)}</span>
               <span>•</span>
-              <span>{getFileTypeLabel(material.mimeType, material.originalFilename)}</span>
+              <span>{getFileTypeLabel(material.mimeType, material.originalFilename, locale)}</span>
               {material.originalFilename !== material.name && (
                 <>
                   <span>•</span>
@@ -189,7 +192,7 @@ export function TeacherMaterialCard({
               {material.createdAt && (
                 <>
                   <span>•</span>
-                  <span>{formatMaterialDate(material.createdAt)}</span>
+                  <span>{formatMaterialDate(material.createdAt, locale)}</span>
                 </>
               )}
             </div>
@@ -202,7 +205,7 @@ export function TeacherMaterialCard({
             href={downloadUrl}
             download={material.originalFilename}
             className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-secondary hover:bg-surface-container hover:text-primary transition-colors"
-            title={`Download ${material.originalFilename}`}
+            title={t("teacher.materials.card.downloadTitle", { name: material.originalFilename })}
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -212,7 +215,7 @@ export function TeacherMaterialCard({
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
               />
             </svg>
-            <span>Download</span>
+            <span>{t("common.download")}</span>
           </a>
 
           <button
@@ -220,7 +223,7 @@ export function TeacherMaterialCard({
             onClick={() => setIsConfirmingDelete(true)}
             disabled={isDeleting}
             className="inline-flex items-center gap-1 rounded-lg border border-error/20 bg-error-container/20 px-2.5 py-1.5 text-xs font-medium text-error hover:bg-error-container/40 transition-colors disabled:opacity-50"
-            title={`Delete ${material.name}`}
+            title={t("teacher.materials.card.deleteTitle", { name: material.name })}
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -230,7 +233,7 @@ export function TeacherMaterialCard({
                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
               />
             </svg>
-            <span>Delete</span>
+            <span>{t("teacher.materials.card.delete")}</span>
           </button>
         </div>
       </div>
@@ -267,16 +270,18 @@ export function TeacherMaterialCard({
               </div>
               <div>
                 <h4 id={`delete-title-${material.id}`} className="text-sm font-bold text-on-surface">
-                  Delete Material
+                  {t("teacher.materials.card.deleteDialogTitle")}
                 </h4>
                 <p className="text-xs text-secondary">
-                  This action is permanent and cannot be undone.
+                  {t("teacher.materials.card.deletePermanentDesc")}
                 </p>
               </div>
             </div>
 
             <p className="text-xs text-on-surface-variant leading-relaxed">
-              Are you sure you want to delete <strong className="text-on-surface font-semibold">{material.name}</strong>? This will permanently remove this resource from secure cloud storage and enrolled students will no longer have access.
+              {t("teacher.materials.card.deleteConfirmBefore")}
+              <strong className="text-on-surface font-semibold">{material.name}</strong>
+              {t("teacher.materials.card.deleteConfirmAfter")}
             </p>
 
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-outline-variant">
@@ -286,7 +291,7 @@ export function TeacherMaterialCard({
                 disabled={isDeleting}
                 className="rounded-lg border border-outline-variant px-4 py-2 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors disabled:opacity-50"
               >
-                Cancel
+                {t("teacher.materials.card.cancel")}
               </button>
               <button
                 type="button"
@@ -304,10 +309,10 @@ export function TeacherMaterialCard({
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       />
                     </svg>
-                    <span>Deleting...</span>
+                    <span>{t("teacher.builder.deleting")}</span>
                   </>
                 ) : (
-                  <span>Permanently Delete</span>
+                  <span>{t("teacher.materials.card.deletePermanently")}</span>
                 )}
               </button>
             </div>

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { requireStudent } from "@/lib/permissions";
 import { getAttemptResult, getStudentExamDetail } from "@/services/exams";
 import { ExamResultView } from "@/components/student/exams/exam-result-view";
+import { getTranslator } from "@/i18n/server";
 
 interface ResultPageProps {
   params: Promise<{ courseId: string; examId: string }>;
@@ -32,6 +33,7 @@ export default async function ResultPage({
   const { courseId, examId } = await params;
   const { attempt: attemptParam } = await searchParams;
   const user = await requireStudent();
+  const t = await getTranslator();
 
   let attemptId = attemptParam && UUID_RE.test(attemptParam) ? attemptParam : null;
 
@@ -53,7 +55,7 @@ export default async function ResultPage({
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
         <Link href="/student" className="hover:text-primary transition-colors">
-          Dashboard
+          {t("nav.student.dashboard")}
         </Link>
         <svg
           className="h-3 w-3 text-outline"
@@ -68,7 +70,7 @@ export default async function ResultPage({
           href="/student/courses"
           className="hover:text-primary transition-colors"
         >
-          My Courses
+          {t("nav.student.courses")}
         </Link>
         <svg
           className="h-3 w-3 text-outline"
@@ -83,7 +85,7 @@ export default async function ResultPage({
           href={`/student/courses/${courseId}/exams`}
           className="hover:text-primary transition-colors"
         >
-          Exams
+          {t("student.exams.breadcrumb")}
         </Link>
         <svg
           className="h-3 w-3 text-outline"
@@ -109,7 +111,7 @@ export default async function ResultPage({
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-        <span className="text-on-surface font-semibold">Result</span>
+        <span className="text-on-surface font-semibold">{t("student.result.title")}</span>
       </nav>
 
       {/* Result Scorecard & Breakdown */}

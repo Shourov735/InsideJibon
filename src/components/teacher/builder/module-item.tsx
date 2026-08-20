@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { ModuleWithLessons } from "@/types/course";
+import { useTranslations } from "@/i18n/client";
 import {
   createLessonAction,
   deleteModuleAction,
@@ -32,6 +33,7 @@ export function ModuleItem({
   onMoveModuleUp,
   onMoveModuleDown,
 }: ModuleItemProps) {
+  const { t } = useTranslations();
   const router = useRouter();
 
   const [isEditingModule, setIsEditingModule] = useState(false);
@@ -68,7 +70,10 @@ export function ModuleItem({
 
   const handleDeleteModule = async () => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete module "${module.title}" and its ${module.lessons.length} lessons?`
+      t("teacher.builder.deleteModuleConfirm", {
+        title: module.title,
+        count: module.lessons.length,
+      })
     );
     if (!confirmed) return;
 
@@ -138,7 +143,7 @@ export function ModuleItem({
       );
       router.refresh();
     } catch (err) {
-      alert("Failed to reorder lessons: " + err);
+      alert(t("teacher.builder.reorderLessonsFailed", { error: String(err) }));
     }
   };
 
@@ -152,7 +157,7 @@ export function ModuleItem({
               type="text"
               value={moduleTitle}
               onChange={(e) => setModuleTitle(e.target.value)}
-              placeholder="Module title"
+              placeholder={t("teacher.builder.editModuleTitlePlaceholder")}
               required
               className="w-full rounded border border-outline-variant bg-surface-container-lowest px-2.5 py-1 text-xs text-on-surface"
             />
@@ -160,7 +165,7 @@ export function ModuleItem({
               type="text"
               value={moduleDesc}
               onChange={(e) => setModuleDesc(e.target.value)}
-              placeholder="Module description (optional)"
+              placeholder={t("teacher.builder.moduleDescriptionPlaceholder")}
               className="w-full rounded border border-outline-variant bg-surface-container-lowest px-2.5 py-1 text-xs text-on-surface"
             />
             <div className="flex items-center justify-end gap-2 pt-1">
@@ -169,14 +174,14 @@ export function ModuleItem({
                 onClick={() => setIsEditingModule(false)}
                 className="rounded px-2 py-1 text-[11px] text-secondary hover:bg-surface-container"
               >
-                Cancel
+                {t("teacher.examForm.cancel")}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="rounded bg-primary px-2.5 py-1 text-[11px] font-semibold text-on-primary"
               >
-                Save
+                {t("teacher.builder.save")}
               </button>
             </div>
           </form>
@@ -185,7 +190,7 @@ export function ModuleItem({
             <div className="flex-1">
               <div className="flex items-center gap-1.5">
                 <span className="rounded bg-primary-container px-1.5 py-0.5 text-[10px] font-bold text-on-primary-container">
-                  M{module.position}
+                  {t("teacher.builder.moduleShort", { position: module.position })}
                 </span>
                 <h4 className="line-clamp-1 text-xs font-bold text-on-surface">
                   {module.title}
@@ -205,7 +210,7 @@ export function ModuleItem({
                 onClick={onMoveModuleUp}
                 disabled={isFirstModule}
                 className="rounded p-1 hover:bg-surface-container hover:text-on-surface disabled:opacity-30"
-                title="Move Module Up"
+                title={t("teacher.builder.moveModuleUp")}
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7" />
@@ -217,7 +222,7 @@ export function ModuleItem({
                 onClick={onMoveModuleDown}
                 disabled={isLastModule}
                 className="rounded p-1 hover:bg-surface-container hover:text-on-surface disabled:opacity-30"
-                title="Move Module Down"
+                title={t("teacher.builder.moveModuleDown")}
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
@@ -228,7 +233,7 @@ export function ModuleItem({
                 type="button"
                 onClick={() => setIsEditingModule(true)}
                 className="rounded p-1 hover:bg-surface-container hover:text-primary"
-                title="Edit Module"
+                title={t("teacher.builder.editModule")}
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -239,7 +244,7 @@ export function ModuleItem({
                 type="button"
                 onClick={handleDeleteModule}
                 className="rounded p-1 hover:bg-error-container/40 hover:text-error"
-                title="Delete Module"
+                title={t("teacher.builder.deleteModule")}
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -254,7 +259,7 @@ export function ModuleItem({
       <div className="p-2 space-y-1">
         {module.lessons.length === 0 ? (
           <p className="py-2 text-center text-[11px] text-outline">
-            No lessons in this module yet.
+            {t("teacher.builder.noLessonsInModule")}
           </p>
         ) : (
           module.lessons.map((lesson, idx) => {
@@ -279,7 +284,7 @@ export function ModuleItem({
                   <span className="truncate">{lesson.title}</span>
                   {lesson.isFree && (
                     <span className="rounded bg-emerald-50 px-1 py-0.2 text-[9px] font-bold text-emerald-700 border border-emerald-200">
-                      Free
+                      {t("teacher.builder.free")}
                     </span>
                   )}
                 </button>
@@ -291,7 +296,7 @@ export function ModuleItem({
                     onClick={() => handleMoveLesson(idx, "up")}
                     disabled={idx === 0}
                     className="p-0.5 text-secondary hover:text-on-surface disabled:opacity-20"
-                    title="Move Lesson Up"
+                    title={t("teacher.builder.moveLessonUp")}
                   >
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7" />
@@ -302,7 +307,7 @@ export function ModuleItem({
                     onClick={() => handleMoveLesson(idx, "down")}
                     disabled={idx === module.lessons.length - 1}
                     className="p-0.5 text-secondary hover:text-on-surface disabled:opacity-20"
-                    title="Move Lesson Down"
+                    title={t("teacher.builder.moveLessonDown")}
                   >
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
@@ -321,7 +326,7 @@ export function ModuleItem({
               type="text"
               value={newLessonTitle}
               onChange={(e) => setNewLessonTitle(e.target.value)}
-              placeholder="New lesson title..."
+              placeholder={t("teacher.builder.newLessonTitlePlaceholder")}
               required
               autoFocus
               className="w-full rounded border border-outline-variant bg-surface-container-lowest px-2 py-1 text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
@@ -332,14 +337,14 @@ export function ModuleItem({
                 onClick={() => setIsAddingLesson(false)}
                 className="rounded px-2 py-0.5 text-[11px] text-secondary hover:bg-surface-container"
               >
-                Cancel
+                {t("teacher.examForm.cancel")}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="rounded bg-primary px-2 py-0.5 text-[11px] font-semibold text-on-primary"
               >
-                Add
+                {t("teacher.builder.add")}
               </button>
             </div>
           </form>
@@ -352,7 +357,7 @@ export function ModuleItem({
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Add Lesson</span>
+            <span>{t("teacher.builder.addLesson")}</span>
           </button>
         )}
       </div>

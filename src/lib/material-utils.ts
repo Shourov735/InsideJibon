@@ -93,26 +93,31 @@ export function getFileTypeCategory(mimeType: string, filename: string): FileCat
 
 /**
  * Returns a human-friendly label for a file type (e.g. "PDF Document", "Excel Sheet").
+ * Locale-aware: `locale === "bn"` returns Bangla labels.
  */
-export function getFileTypeLabel(mimeType: string, filename: string): string {
+export function getFileTypeLabel(
+  mimeType: string,
+  filename: string,
+  locale: "en" | "bn" = "en"
+): string {
   const category = getFileTypeCategory(mimeType, filename);
   switch (category) {
     case "pdf":
-      return "PDF Document";
+      return locale === "bn" ? "PDF ডকুমেন্ট" : "PDF Document";
     case "doc":
-      return "Word Document";
+      return locale === "bn" ? "Word ডকুমেন্ট" : "Word Document";
     case "ppt":
-      return "PowerPoint Presentation";
+      return locale === "bn" ? "PowerPoint উপস্থাপনা" : "PowerPoint Presentation";
     case "xls":
-      return "Excel Spreadsheet";
+      return locale === "bn" ? "Excel স্প্রেডশিট" : "Excel Spreadsheet";
     case "image":
-      return "Image File";
+      return locale === "bn" ? "ছবি ফাইল" : "Image File";
     case "archive":
-      return "ZIP Archive";
+      return locale === "bn" ? "ZIP আর্কাইভ" : "ZIP Archive";
     case "text":
-      return "Text File";
+      return locale === "bn" ? "টেক্সট ফাইল" : "Text File";
     default:
-      return "Attachment";
+      return locale === "bn" ? "অ্যাটাচমেন্ট" : "Attachment";
   }
 }
 
@@ -124,12 +129,16 @@ export function getMaterialDownloadUrl(materialId: string): string {
 }
 
 /**
- * Formats dates for materials (e.g. "Aug 20, 2026").
+ * Formats dates for materials (e.g. "Aug 20, 2026"). Locale-aware:
+ * `locale === "bn"` uses the bn-BD calendar formatting.
  */
-export function formatMaterialDate(date: Date | string): string {
+export function formatMaterialDate(
+  date: Date | string,
+  locale: "en" | "bn" = "en"
+): string {
   try {
     const d = typeof date === "string" ? new Date(date) : date;
-    return new Intl.DateTimeFormat("en-US", {
+    return new Intl.DateTimeFormat(locale === "bn" ? "bn-BD" : "en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",

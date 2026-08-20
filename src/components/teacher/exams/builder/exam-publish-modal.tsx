@@ -8,6 +8,7 @@ import {
   publishExamAction,
   unpublishExamAction,
 } from "@/app/teacher/exams/actions";
+import { useTranslations } from "@/i18n/client";
 
 interface ExamPublishModalProps {
   exam: ExamWithQuestions;
@@ -22,6 +23,7 @@ export function ExamPublishModal({
   onClose,
   serverErrors = [],
 }: ExamPublishModalProps) {
+  const { t } = useTranslations();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -38,25 +40,44 @@ export function ExamPublishModal({
 
   if (hasQuestions) {
     for (const q of exam.questions) {
-      const qLabel = `Question ${q.position}`;
       if (!q.questionText || q.questionText.trim().length < 2) {
-        questionErrors.push(`${qLabel}: Must have at least 2 characters of text.`);
+        questionErrors.push(
+          t("teacher.examPublish.qErrorText", { position: q.position })
+        );
       }
       if (q.marks < 1) {
-        questionErrors.push(`${qLabel}: Marks must be at least 1.`);
+        questionErrors.push(
+          t("teacher.examPublish.qErrorMarks", { position: q.position })
+        );
       }
       if (q.options.length < 2) {
-        questionErrors.push(`${qLabel}: Needs at least 2 answer options (currently ${q.options.length}).`);
+        questionErrors.push(
+          t("teacher.examPublish.qErrorOptions", {
+            position: q.position,
+            count: q.options.length,
+          })
+        );
       } else {
         const correctCount = q.options.filter((o) => o.isCorrect).length;
         if (correctCount === 0) {
-          questionErrors.push(`${qLabel}: Must have 1 correct answer marked (none selected).`);
+          questionErrors.push(
+            t("teacher.examPublish.qErrorNoCorrect", { position: q.position })
+          );
         } else if (correctCount > 1) {
-          questionErrors.push(`${qLabel}: Must have exactly 1 correct answer (currently ${correctCount} selected).`);
+          questionErrors.push(
+            t("teacher.examPublish.qErrorManyCorrect", {
+              position: q.position,
+              count: correctCount,
+            })
+          );
         }
         for (const opt of q.options) {
           if (!opt.optionText || opt.optionText.trim().length === 0) {
-            questionErrors.push(`${qLabel}: Has an answer option with empty text.`);
+            questionErrors.push(
+              t("teacher.examPublish.qErrorEmptyOption", {
+                position: q.position,
+              })
+            );
             break;
           }
         }
@@ -79,7 +100,7 @@ export function ExamPublishModal({
       router.refresh();
       onClose();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Failed to publish exam.");
+      setActionError(err instanceof Error ? err.message : t("teacher.examPublish.failedPublish"));
     } finally {
       setIsProcessing(false);
     }
@@ -97,7 +118,7 @@ export function ExamPublishModal({
       router.refresh();
       onClose();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Failed to unpublish exam.");
+      setActionError(err instanceof Error ? err.message : t("teacher.examDetail.failedUnpublish"));
     } finally {
       setIsProcessing(false);
     }
@@ -111,12 +132,18 @@ export function ExamPublishModal({
           <div>
             <div className="flex items-center gap-2">
               <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                {exam.status === "published" ? "পরীক্ষা স্থিতি" : "পরীক্ষা প্রকাশ"}
+                {exam.status === "published"
+                  ? t("teacher.examPublish.statusBadgePublished")
+                  : t("teacher.examPublish.statusBadgeDraft")}
               </span>
-              <span className="text-xs text-secondary">• Lifecycle Control</span>
+              <span className="text-xs text-secondary">
+                • {t("teacher.examDetail.lifecycleControl")}
+              </span>
             </div>
             <h3 className="mt-1 text-lg font-bold text-on-surface">
-              {exam.status === "published" ? "Exam Publishing Status" : "Publish Examination"}
+              {exam.status === "published"
+                ? t("teacher.examPublish.titlePublished")
+                : t("teacher.examPublish.titleDraft")}
             </h3>
           </div>
           <button
@@ -134,39 +161,41 @@ export function ExamPublishModal({
         <div className="mt-4 space-y-4 overflow-y-auto pr-1 flex-1">
           {actionError && (
             <div className="rounded-xl border border-error-container bg-error-container/40 p-3.5 text-xs text-on-error-container">
-              <p className="font-semibold">Publish Action Failed</p>
+              <p className="font-semibold">{t("teacher.examPublish.actionFailed")}</p>
               <p className="mt-0.5">{actionError}</p>
             </div>
           )}
 
           <p className="text-sm text-on-surface-variant">
             {exam.status === "published"
-              ? "This exam is published and live. Its question structure is frozen. To edit questions or options, unpublish it back to draft mode."
-              : "Review the pre-flight checklist below. All requirements are authoritative and enforced by the examination service."}
+              ? t("teacher.examPublish.publishedDesc")
+              : t("teacher.examPublish.checklistIntro")}
           </p>
 
           {/* Checklist */}
           <div className="rounded-xl border border-outline-variant bg-surface-container-low p-4 space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-secondary">
-              Prerequisites Checklist
+              {t("teacher.builder.prerequisitesChecklist")}
             </h4>
 
             <div className="space-y-2.5 text-xs">
               <ChecklistItem
                 passed={titleValid}
-                label="Exam title (at least 3 characters)"
+                label={t("teacher.examPublish.checklistTitle")}
               />
               <ChecklistItem
                 passed={descValid}
-                label="Exam description / instructions (at least 10 characters)"
+                label={t("teacher.examPublish.checklistDescription")}
               />
               <ChecklistItem
                 passed={hasQuestions}
-                label={`At least 1 question added (Current: ${exam.questions.length})`}
+                label={t("teacher.examPublish.checklistQuestions", {
+                  count: exam.questions.length,
+                })}
               />
               <ChecklistItem
                 passed={allQuestionsValid}
-                label="All questions have valid text, marks (≥1), ≥2 options, and exactly 1 correct answer"
+                label={t("teacher.examPublish.checklistQuestionsValid")}
               />
             </div>
           </div>
@@ -178,7 +207,7 @@ export function ExamPublishModal({
                 <svg className="h-4 w-4 shrink-0 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <span>Items requiring resolution before publishing:</span>
+                <span>{t("teacher.examPublish.itemsRequiringResolution")}</span>
               </div>
               <ul className="mt-2 space-y-1 text-xs text-amber-900 list-disc list-inside">
                 {questionErrors.map((err, idx) => (
@@ -197,7 +226,11 @@ export function ExamPublishModal({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <span>
-                <strong>Ready for publication:</strong> Total of {exam.questions.length} questions ({exam.totalMarks} total marks) verified.
+                <strong>{t("teacher.examPublish.readyForPublication")}</strong>{" "}
+                {t("teacher.examPublish.readyDesc", {
+                  count: exam.questions.length,
+                  marks: exam.totalMarks,
+                })}
               </span>
             </div>
           )}
@@ -210,7 +243,7 @@ export function ExamPublishModal({
             onClick={onClose}
             className="rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-secondary transition-colors hover:bg-surface-container hover:text-on-surface"
           >
-            Close
+            {t("teacher.examPreview.close")}
           </button>
 
           {exam.status === "published" ? (
@@ -226,10 +259,10 @@ export function ExamPublishModal({
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  <span>Unpublishing…</span>
+                  <span>{t("teacher.examDetail.unpublishing")}</span>
                 </>
               ) : (
-                <span>Unpublish Exam (Return to Draft)</span>
+                <span>{t("teacher.examPublish.unpublishExam")}</span>
               )}
             </button>
           ) : (
@@ -245,10 +278,10 @@ export function ExamPublishModal({
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  <span>Publishing…</span>
+                  <span>{t("teacher.examPublish.publishing")}</span>
                 </>
               ) : (
-                <span>Confirm & Publish Exam</span>
+                <span>{t("teacher.examPublish.confirmPublish")}</span>
               )}
             </button>
           )}

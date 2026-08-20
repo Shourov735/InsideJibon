@@ -5,6 +5,7 @@ import { getTeacherExams } from "@/services/exams";
 import { getTeacherCourses } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamDirectory } from "@/components/teacher/exams/exam-directory";
+import { getTranslator } from "@/i18n/server";
 
 export const metadata = {
   title: "Examination Management | InsideJibon Educator",
@@ -13,6 +14,7 @@ export const metadata = {
 
 export default async function TeacherExamsPage() {
   const teacher = await requireTeacher();
+  const t = await getTranslator();
   const [examsList, coursesList] = await Promise.all([
     getTeacherExams(teacher.id),
     getTeacherCourses(teacher.id),
@@ -28,15 +30,14 @@ export default async function TeacherExamsPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
-                পরীক্ষা ব্যবস্থাপনা
+                {t("teacher.exams.badge")}
               </span>
-              <span className="text-xs text-secondary">• Assessment Hub</span>
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-              Examination Management
+              {t("teacher.exams.title")}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant max-w-2xl">
-              Design comprehensive question papers, configure examination parameters, and publish assessments for enrolled students.
+              {t("teacher.exams.subtitle")}
             </p>
           </div>
 
@@ -53,7 +54,7 @@ export default async function TeacherExamsPage() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Create New Exam</span>
+            <span>{t("teacher.exams.create")}</span>
           </Link>
         </div>
 

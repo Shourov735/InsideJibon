@@ -14,6 +14,7 @@ import { LessonCompleteButton } from "@/components/student/lesson-complete-butto
 import { LessonResources } from "@/components/student/lesson-resources";
 import { LessonVideo } from "@/components/student/lesson-video";
 import { ProgressBar } from "@/components/student/progress-bar";
+import { getTranslator } from "@/i18n/server";
 
 interface LearnPageProps {
   params: Promise<{ courseId: string }>;
@@ -41,6 +42,7 @@ export default async function LearnPage({
   const { lesson: lessonParam } = await searchParams;
 
   const user = await requireStudent();
+  const t = await getTranslator();
   const course = await getLearningCourse(user.id, courseId);
   if (!course) notFound();
 
@@ -62,16 +64,16 @@ export default async function LearnPage({
     return (
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
         <p className="text-sm font-medium text-on-surface">
-          This course has no lessons yet.
+          {t("student.learn.noLessons")}
         </p>
         <p className="mt-1 text-sm text-secondary">
-          The teacher has not published any lessons. Please check back later.
+          {t("student.learn.noLessonsDesc")}
         </p>
         <Link
           href="/student/courses"
           className="mt-6 inline-flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-primary/40"
         >
-          Back to My Courses
+          {t("student.learn.backToMyCourses")}
         </Link>
       </main>
     );
@@ -93,7 +95,9 @@ export default async function LearnPage({
       {/* Mobile curriculum toggle */}
       <details className="border-b border-outline-variant bg-surface-container-lowest lg:hidden">
         <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-3 text-sm font-semibold text-on-surface">
-          <span>Curriculum · {course.progress.percent}% complete</span>
+          <span>
+            {t("student.learn.curriculumPercent", { percent: course.progress.percent })}
+          </span>
           <svg
             className="h-4 w-4 text-secondary"
             fill="none"
@@ -129,7 +133,7 @@ export default async function LearnPage({
         <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
           <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
             <Link href="/student" className="hover:text-primary hover:underline">
-              Dashboard
+              {t("nav.student.dashboard")}
             </Link>
             <svg
               className="h-3 w-3 text-outline"
@@ -144,7 +148,7 @@ export default async function LearnPage({
               href="/student/courses"
               className="hover:text-primary hover:underline"
             >
-              My Courses
+              {t("nav.student.courses")}
             </Link>
             <svg
               className="h-3 w-3 text-outline"
@@ -167,7 +171,10 @@ export default async function LearnPage({
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between text-xs font-medium text-secondary">
                 <span>
-                  {lesson.completedCount} of {lesson.totalLessons} lessons
+                  {t("student.learn.lessonsProgress", {
+                    completed: lesson.completedCount,
+                    total: lesson.totalLessons,
+                  })}
                 </span>
                 <span className="font-bold text-primary">
                   {course.progress.percent}%
@@ -176,7 +183,9 @@ export default async function LearnPage({
               <ProgressBar percent={course.progress.percent} className="mt-2" />
             </div>
             <span className="hidden shrink-0 rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 sm:block">
-              {course.completedAt ? "Completed" : "In Progress"}
+              {course.completedAt
+                ? t("common.status.completed")
+                : t("common.status.inProgress")}
             </span>
           </div>
 
@@ -193,7 +202,10 @@ export default async function LearnPage({
           <div className="mt-6 flex flex-col gap-4 border-b border-outline-variant pb-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="font-mono text-xs font-semibold text-secondary">
-                Module {lesson.module.position} · Lesson {lesson.lesson.position}
+                {t("common.moduleLessonLabel", {
+                  module: lesson.module.position,
+                  lesson: lesson.lesson.position,
+                })}
               </p>
               <h1 className="mt-1 text-xl font-bold leading-tight tracking-tight text-on-surface sm:text-2xl">
                 {lesson.lesson.title}
@@ -240,7 +252,7 @@ export default async function LearnPage({
                 >
                   <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
-                Previous
+                {t("student.learn.previous")}
               </Link>
             ) : (
               <span />
@@ -251,7 +263,7 @@ export default async function LearnPage({
                 href={lessonHref(lesson.nextLessonId)}
                 className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
               >
-                Next Lesson
+                {t("student.learn.nextLesson")}
                 <svg
                   className="h-4 w-4"
                   fill="none"
@@ -266,7 +278,7 @@ export default async function LearnPage({
               </Link>
             ) : isLastLesson && course.progress.percent < 100 ? (
               <span className="text-sm font-medium text-secondary">
-                You have reached the end of this course.
+                {t("student.learn.courseEnd")}
               </span>
             ) : null}
           </div>

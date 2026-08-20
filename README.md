@@ -17,6 +17,7 @@ Educational platform — courses, exams, assignments, and student progress track
 | `npm run dev`      | Next.js dev server (Node)                            |
 | `npm run build`    | Local production build (validation)                  |
 | `npm run lint`     | ESLint                                               |
+| `npm run check:i18n` | Verify en/bn dictionary key + param parity        |
 | `npm run preview`  | Production build in the Workers runtime (workerd)    |
 | `npm run deploy`   | Build + deploy to Cloudflare Workers                 |
 | `npm run db:generate` | Generate Drizzle migrations from schema          |
@@ -40,6 +41,33 @@ src/
   services/       # business logic (called by actions/route handlers)
   types/          # shared domain types
 ```
+
+## i18n
+
+The UI is bilingual (English + Bangla). `en.ts` in `src/i18n/dictionaries/` is
+the source of truth: a flat object of dotted keys, values may contain
+`{param}` placeholders. `bn.ts` is typed as `Dictionary`, so TypeScript
+enforces that both files expose the exact same key set.
+
+- **Server components:** `const t = await getTranslator()` (from
+  `@/i18n/server`) → `t("key", { param })`, `t.tn("keyBase", count)` for
+  `_one`/`_other` plurals, `t.locale` for locale-aware formatting.
+- **Client components:** `const { t, tn, locale } = useTranslations()` (from
+  `@/i18n/client`) — always destructure `tn`; it does not exist as `t.tn`.
+- **Language switcher:** `LanguageSwitcher` in the marketing nav sets the
+  `ij_lang` cookie (`en`/`bn`); `getTranslator()` resolves locale per request.
+- **Dates/labels:** pass `t.locale`/`locale` into `formatMaterialDate` and
+  `getFileTypeLabel` (`src/lib/material-utils.ts`).
+- **Errors:** server actions wrap error strings with `localizeMessage(...)`;
+  service messages map through the `ERROR_CATALOG` in `src/i18n/errors.ts`.
+  Publish-validation messages are localized via the `teacher.publishCheck.*`
+  keys threaded into `validateExamForPublishing`/`validateCourseForPublishing`.
+- **Verification:** `npm run check:i18n` asserts key parity, no duplicate
+  keys, and matching `{param}` sets between `en.ts` and `bn.ts`.
+
+Rules of thumb: metadata titles/descriptions stay English; teacher-authored
+content (course/exam/lesson titles) is never translated; badge strings that
+are bilingual in the UI keep both languages in the `bn.ts` value.
 
 ## Deployment
 

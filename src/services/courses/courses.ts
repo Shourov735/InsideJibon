@@ -16,6 +16,7 @@ import type {
   CourseWithCurriculum,
   PublishValidationResult,
 } from "@/types/course";
+import type { Translator } from "@/i18n/core";
 
 /**
  * Generates a guaranteed unique slug for a course.
@@ -296,49 +297,74 @@ export async function restoreCourse(
  */
 export async function validateCourseForPublishing(
   teacherId: string,
-  courseId: string
+  courseId: string,
+  t?: Translator
 ): Promise<PublishValidationResult> {
   const courseWithCurriculum = await getTeacherCourseWithCurriculum(teacherId, courseId);
 
   if (!courseWithCurriculum) {
     return {
       canPublish: false,
-      errors: ["Course does not exist or you do not have permission."],
+      errors: t
+        ? [t("teacher.publishCheck.courseNotFound")]
+        : ["Course does not exist or you do not have permission."],
     };
   }
 
   const errors: string[] = [];
 
   if (!courseWithCurriculum.title || courseWithCurriculum.title.trim().length < 3) {
-    errors.push("Course title must be at least 3 characters long.");
+    errors.push(
+      t
+        ? t("teacher.publishCheck.courseTitleTooShort")
+        : "Course title must be at least 3 characters long."
+    );
   }
 
   if (!courseWithCurriculum.slug || courseWithCurriculum.slug.trim().length === 0) {
-    errors.push("Course must have a valid URL slug.");
+    errors.push(
+      t ? t("teacher.publishCheck.courseSlugInvalid") : "Course must have a valid URL slug."
+    );
   }
 
   if (!courseWithCurriculum.description || courseWithCurriculum.description.trim().length < 10) {
-    errors.push("Course description must be at least 10 characters long.");
+    errors.push(
+      t
+        ? t("teacher.publishCheck.courseDescriptionTooShort")
+        : "Course description must be at least 10 characters long."
+    );
   }
 
   if (courseWithCurriculum.modules.length === 0) {
-    errors.push("Course must contain at least one module.");
+    errors.push(t ? t("teacher.publishCheck.noModules") : "Course must contain at least one module.");
   } else {
     let totalLessons = 0;
     for (const mod of courseWithCurriculum.modules) {
+      const modTitle = mod.title || (t ? t("teacher.publishCheck.untitled") : "Untitled");
       if (!mod.title || mod.title.trim().length < 2) {
-        errors.push(`Module "${mod.title || 'Untitled'}" must have a valid title.`);
+        errors.push(
+          t
+            ? t("teacher.publishCheck.moduleTitleInvalid", { title: modTitle })
+            : `Module "${modTitle}" must have a valid title.`
+        );
       }
       totalLessons += mod.lessons.length;
       for (const lesson of mod.lessons) {
+        const lessonTitle = lesson.title || (t ? t("teacher.publishCheck.untitled") : "Untitled");
         if (!lesson.title || lesson.title.trim().length < 2) {
-          errors.push(`Lesson "${lesson.title || 'Untitled'}" must have a valid title.`);
+          errors.push(
+            t
+              ? t("teacher.publishCheck.lessonTitleInvalid", { title: lessonTitle })
+              : `Lesson "${lessonTitle}" must have a valid title.`
+          );
         }
       }
     }
 
     if (totalLessons === 0) {
-      errors.push("Course must contain at least one lesson across its modules.");
+      errors.push(
+        t ? t("teacher.publishCheck.noLessons") : "Course must contain at least one lesson across its modules."
+      );
     }
   }
 
@@ -353,12 +379,15 @@ export async function validateCourseForPublishing(
  */
 export async function publishCourse(
   teacherId: string,
-  courseId: string
+  courseId: string,
+  t?: Translator
 ): Promise<Course> {
-  const validation = await validateCourseForPublishing(teacherId, courseId);
+  const validation = await validateCourseForPublishing(teacherId, courseId, t);
   if (!validation.canPublish) {
     throw new Error(
-      `Cannot publish course:\n${validation.errors.map((e) => `• ${e}`).join("\n")}`
+      `${
+        t ? t("teacher.publishCheck.cannotPublishCourse") : "Cannot publish course:"
+      }\n${validation.errors.map((e) => `• ${e}`).join("\n")}`
     );
   }
 

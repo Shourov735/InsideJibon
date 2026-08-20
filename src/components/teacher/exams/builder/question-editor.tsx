@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ExamQuestionWithDetails, QuestionOption } from "@/types/exam";
+import { useTranslations } from "@/i18n/client";
 
 interface QuestionEditorProps {
   question: ExamQuestionWithDetails;
@@ -36,6 +37,7 @@ export function QuestionEditor({
   hasPrev,
   hasNext,
 }: QuestionEditorProps) {
+  const { t, tn } = useTranslations();
   const [text, setText] = useState(question.questionText);
   const [marks, setMarks] = useState(String(question.marks));
   const [explanation, setExplanation] = useState(question.explanation ?? "");
@@ -79,10 +81,14 @@ export function QuestionEditor({
             </span>
             <div>
               <h2 className="text-base font-bold text-on-surface">
-                Question {question.position} of {totalQuestions}
+                {t("teacher.examBuilder.questionOf", {
+                  position: question.position,
+                  total: totalQuestions,
+                })}
               </h2>
               <span className="text-[11px] text-secondary">
-                Multiple Choice • {question.options.length} {question.options.length === 1 ? "option" : "options"}
+                {t("student.exam.multipleChoice")} •{" "}
+                {tn("common.optionCountLower", question.options.length)}
               </span>
             </div>
           </div>
@@ -90,7 +96,7 @@ export function QuestionEditor({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <label htmlFor="marksInput" className="text-xs font-semibold text-secondary">
-                Marks:
+                {t("teacher.examBuilder.marksLabel")}
               </label>
               <input
                 id="marksInput"
@@ -110,7 +116,9 @@ export function QuestionEditor({
                 disabled={isSaving}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container hover:text-on-primary-container transition-colors cursor-pointer disabled:opacity-50"
               >
-                {isSaving ? "Saving…" : "Save Question Text"}
+                {isSaving
+                  ? t("common.saving")
+                  : t("teacher.examBuilder.saveQuestionText")}
               </button>
             )}
           </div>
@@ -119,7 +127,7 @@ export function QuestionEditor({
         {/* Question Text Field */}
         <div className="space-y-1.5">
           <label htmlFor="questionText" className="block text-xs font-bold uppercase tracking-wider text-secondary">
-            Question Text <span className="text-error">*</span>
+            {t("teacher.qe.questionText")} <span className="text-error">*</span>
           </label>
           <textarea
             id="questionText"
@@ -128,7 +136,7 @@ export function QuestionEditor({
             value={text}
             onChange={(e) => setText(e.target.value)}
             disabled={!editable}
-            placeholder="Write the question prompt here…"
+            placeholder={t("teacher.examBuilder.questionPromptPlaceholder")}
             className="w-full rounded-xl border border-outline-variant bg-surface-container-low p-3.5 text-sm text-on-surface outline-none focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 disabled:opacity-50 leading-relaxed font-sans"
           />
           <div className="flex justify-end text-[11px] text-outline">
@@ -139,7 +147,7 @@ export function QuestionEditor({
         {/* Optional Explanation Field */}
         <div className="space-y-1.5">
           <label htmlFor="explanationText" className="block text-xs font-bold uppercase tracking-wider text-secondary">
-            Explanation / Solution Rationale (Optional)
+            {t("teacher.examBuilder.explanationOptional")}
           </label>
           <textarea
             id="explanationText"
@@ -148,7 +156,7 @@ export function QuestionEditor({
             value={explanation}
             onChange={(e) => setExplanation(e.target.value)}
             disabled={!editable}
-            placeholder="Provide an explanation that explains why the correct answer is right…"
+            placeholder={t("teacher.examBuilder.explanationPlaceholder")}
             className="w-full rounded-xl border border-outline-variant bg-surface-container-low p-3 text-xs text-on-surface outline-none focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 disabled:opacity-50 font-sans"
           />
         </div>
@@ -159,15 +167,15 @@ export function QuestionEditor({
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant pb-4">
           <div>
             <h3 className="text-sm font-bold text-on-surface">
-              Answer Options
+              {t("teacher.examBuilder.answerOptions")}
             </h3>
             <p className="text-xs text-on-surface-variant">
-              Select the radio button beside the correct answer. Exactly one option must be marked correct.
+              {t("teacher.examBuilder.answerOptionsHint")}
             </p>
           </div>
 
           <span className="rounded-md bg-surface-container-high px-2.5 py-1 text-xs font-semibold text-secondary">
-            {question.options.length} {question.options.length === 1 ? "Option" : "Options"}
+            {tn("common.optionCountUpper", question.options.length)}
           </span>
         </div>
 
@@ -175,7 +183,7 @@ export function QuestionEditor({
         <div className="space-y-3">
           {question.options.length === 0 ? (
             <div className="rounded-xl border border-dashed border-outline-variant p-6 text-center text-xs text-secondary">
-              No options yet. Add at least two answer options below.
+              {t("teacher.examBuilder.noOptionsYet")}
             </div>
           ) : (
             question.options.map((option) => {
@@ -194,7 +202,11 @@ export function QuestionEditor({
                     type="button"
                     disabled={!editable}
                     onClick={() => onSetCorrectOption(option)}
-                    title={option.isCorrect ? "Correct answer" : "Click to mark as correct answer"}
+                    title={
+                      option.isCorrect
+                        ? t("teacher.examBuilder.correctAnswerTitle")
+                        : t("teacher.examBuilder.markCorrectTitle")
+                    }
                     className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors cursor-pointer ${
                       option.isCorrect
                         ? "border-emerald-600 bg-emerald-600 text-white"
@@ -233,7 +245,7 @@ export function QuestionEditor({
                       }}
                       disabled={!editable}
                       maxLength={500}
-                      placeholder={`Enter text for Option ${letter}…`}
+                      placeholder={t("teacher.examBuilder.enterOptionText", { letter })}
                       className={`w-full rounded-lg border bg-transparent px-3 py-1.5 text-sm text-on-surface outline-none transition-colors focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 ${
                         option.isCorrect
                           ? "border-emerald-300 font-medium"
@@ -246,7 +258,7 @@ export function QuestionEditor({
                   <div className="flex items-center gap-2 shrink-0">
                     {option.isCorrect ? (
                       <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-800">
-                        Correct
+                        {t("teacher.examDetail.correctBadge")}
                       </span>
                     ) : (
                       editable && (
@@ -255,7 +267,7 @@ export function QuestionEditor({
                           onClick={() => onSetCorrectOption(option)}
                           className="text-[11px] font-semibold text-secondary hover:text-primary underline cursor-pointer"
                         >
-                          Mark Correct
+                          {t("teacher.examBuilder.markCorrect")}
                         </button>
                       )
                     )}
@@ -264,7 +276,7 @@ export function QuestionEditor({
                       <button
                         type="button"
                         onClick={() => onDeleteOption(option.id)}
-                        title="Remove Option"
+                        title={t("teacher.qe.deleteOption")}
                         className="rounded-lg p-1.5 text-secondary hover:bg-error-container/50 hover:text-error transition-colors cursor-pointer"
                       >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -287,7 +299,9 @@ export function QuestionEditor({
               value={newOptionText}
               onChange={(e) => setNewOptionText(e.target.value)}
               maxLength={500}
-              placeholder={`Add Option ${String.fromCharCode(65 + question.options.length)}…`}
+              placeholder={t("teacher.examBuilder.addOptionPlaceholder", {
+                letter: String.fromCharCode(65 + question.options.length),
+              })}
               className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-sm text-on-surface outline-none focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20"
             />
             <button
@@ -298,7 +312,7 @@ export function QuestionEditor({
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
-              <span>Add Option</span>
+              <span>{t("teacher.qe.addOption")}</span>
             </button>
           </form>
         )}
@@ -315,7 +329,7 @@ export function QuestionEditor({
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          <span>Previous Question</span>
+          <span>{t("teacher.examBuilder.previousQuestion")}</span>
         </button>
 
         <button
@@ -324,7 +338,7 @@ export function QuestionEditor({
           onClick={onNextQuestion}
           className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
-          <span>Next Question</span>
+          <span>{t("student.exam.nextQuestion")}</span>
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>

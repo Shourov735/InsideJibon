@@ -7,6 +7,7 @@ import { getTeacherCourseMaterials } from "@/services/materials";
 import { getTeacherExams } from "@/services/exams";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { StatusBadge } from "@/components/teacher/status-badge";
+import { getTranslator } from "@/i18n/server";
 
 interface CourseOverviewPageProps {
   params: Promise<{ courseId: string }>;
@@ -30,6 +31,7 @@ export default async function CourseOverviewPage({
 }: CourseOverviewPageProps) {
   const { courseId } = await params;
   const teacher = await requireTeacher();
+  const t = await getTranslator();
   const course = await getTeacherCourseWithCurriculum(teacher.id, courseId);
 
   if (!course) {
@@ -49,14 +51,16 @@ export default async function CourseOverviewPage({
     .flatMap((m) => m.lessons)
     .filter((l) => l.isFree).length;
 
-  const formattedCreated = new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-  }).format(new Date(course.createdAt));
+  const formattedCreated = new Intl.DateTimeFormat(
+    t.locale === "bn" ? "bn-BD" : "en-US",
+    { dateStyle: "medium" }
+  ).format(new Date(course.createdAt));
 
   const formattedPublished = course.publishedAt
-    ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-        new Date(course.publishedAt)
-      )
+    ? new Intl.DateTimeFormat(
+        t.locale === "bn" ? "bn-BD" : "en-US",
+        { dateStyle: "medium" }
+      ).format(new Date(course.publishedAt))
     : null;
 
   return (
@@ -70,7 +74,7 @@ export default async function CourseOverviewPage({
             href="/teacher/courses"
             className="hover:text-on-surface hover:underline"
           >
-            Courses
+            {t("teacher.courseForm.breadcrumb.courses")}
           </Link>
           <svg
             className="h-3 w-3 text-outline"
@@ -95,10 +99,15 @@ export default async function CourseOverviewPage({
               <span className="font-mono text-xs font-semibold text-secondary">
                 /{course.slug}
               </span>
-              <StatusBadge status={course.status} />
+              <StatusBadge
+              status={course.status}
+              label={course.status === "draft" ? t("common.status.draft") : course.status === "published" ? t("common.status.published") : t("common.status.archived")}
+            />
               {formattedPublished && (
                 <span className="text-xs text-secondary">
-                  Published on {formattedPublished}
+                  {t("teacher.courseOverview.publishedOn", {
+                    date: formattedPublished,
+                  })}
                 </span>
               )}
             </div>
@@ -108,11 +117,13 @@ export default async function CourseOverviewPage({
             </h1>
 
             <p className="max-w-3xl text-sm text-on-surface-variant">
-              {course.description || "No overview description added yet."}
+              {course.description || t("teacher.courseOverview.noDescription")}
             </p>
 
             <div className="pt-2 text-xs text-outline">
-              Created on {formattedCreated}
+              {t("teacher.courseOverview.createdOn", {
+                date: formattedCreated,
+              })}
             </div>
           </div>
 
@@ -140,7 +151,7 @@ export default async function CourseOverviewPage({
                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span>Edit Settings</span>
+              <span>{t("teacher.courseOverview.editSettings")}</span>
             </Link>
 
             <Link
@@ -160,7 +171,7 @@ export default async function CourseOverviewPage({
                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                 />
               </svg>
-              <span>Open Curriculum Builder</span>
+              <span>{t("teacher.courseOverview.openBuilder")}</span>
             </Link>
           </div>
         </div>
@@ -169,7 +180,7 @@ export default async function CourseOverviewPage({
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Curriculum Modules
+              {t("teacher.courseOverview.stats.modules")}
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {course.modules.length}
@@ -178,7 +189,7 @@ export default async function CourseOverviewPage({
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Total Lessons
+              {t("teacher.courseOverview.stats.lessons")}
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {totalLessons}
@@ -187,7 +198,7 @@ export default async function CourseOverviewPage({
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Course Exams
+              {t("teacher.courseOverview.stats.exams")}
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {courseExams.length}
@@ -196,7 +207,7 @@ export default async function CourseOverviewPage({
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Lesson Resources
+              {t("teacher.courseOverview.stats.materials")}
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {materials.length}
@@ -205,7 +216,7 @@ export default async function CourseOverviewPage({
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Free Previews
+              {t("teacher.courseOverview.stats.freePreviews")}
             </span>
             <p className="mt-1 text-2xl font-bold text-emerald-700">
               {freeLessons}
@@ -217,20 +228,20 @@ export default async function CourseOverviewPage({
         <div className="mt-8 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-on-surface">
-              Curriculum Breakdown
+              {t("teacher.courseOverview.curriculumTitle")}
             </h2>
             <Link
               href={`/teacher/courses/${course.id}/builder`}
               className="text-xs font-semibold text-primary hover:underline"
             >
-              Edit in Builder →
+              {t("teacher.courseOverview.editInBuilder")} →
             </Link>
           </div>
 
           {course.modules.length === 0 ? (
             <div className="rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
               <p className="text-sm text-secondary">
-                This course has no modules yet. Open the Curriculum Builder to add modules and lessons.
+                {t("teacher.courseOverview.noModules")}
               </p>
             </div>
           ) : (
@@ -244,7 +255,7 @@ export default async function CourseOverviewPage({
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="rounded bg-primary-container px-2 py-0.5 text-xs font-bold text-on-primary-container">
-                          Module {mod.position}
+                          {t("common.moduleLabelShort", { position: mod.position })}
                         </span>
                         <h3 className="text-sm font-bold text-on-surface">
                           {mod.title}
@@ -258,14 +269,14 @@ export default async function CourseOverviewPage({
                     </div>
 
                     <span className="text-xs text-secondary font-mono">
-                      {mod.lessons.length} {mod.lessons.length === 1 ? "lesson" : "lessons"}
+                      {t.tn("common.lessonCountLower", mod.lessons.length)}
                     </span>
                   </div>
 
                   <div className="space-y-1.5 pl-2">
                     {mod.lessons.length === 0 ? (
                       <p className="text-xs text-outline italic">
-                        No lessons added to this module yet.
+                        {t("teacher.courseOverview.noLessonsInModule")}
                       </p>
                     ) : (
                       mod.lessons.map((lesson) => (
@@ -282,7 +293,7 @@ export default async function CourseOverviewPage({
                             </span>
                             {lesson.isFree && (
                               <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 border border-emerald-200">
-                                Free Preview
+                                {t("teacher.courseOverview.freePreviewBadge")}
                               </span>
                             )}
                           </div>
@@ -304,8 +315,10 @@ export default async function CourseOverviewPage({
                                   />
                                 </svg>
                                 <span>
-                                  {materials.filter((m) => m.lessonId === lesson.id).length}{" "}
-                                  {materials.filter((m) => m.lessonId === lesson.id).length === 1 ? "file" : "files"}
+                                  {t.tn(
+                                    "common.fileCount",
+                                    materials.filter((m) => m.lessonId === lesson.id).length
+                                  )}
                                 </span>
                               </span>
                             )}
@@ -331,7 +344,7 @@ export default async function CourseOverviewPage({
                                     d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                   />
                                 </svg>
-                                <span>Video</span>
+                                <span>{t("teacher.courseOverview.videoTag")}</span>
                               </span>
                             )}
                           </div>
@@ -350,10 +363,10 @@ export default async function CourseOverviewPage({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-on-surface">
-                Course Examinations & Assessments
+                {t("teacher.courseOverview.examsTitle")}
               </h2>
               <p className="text-xs text-secondary mt-0.5">
-                Exams and quizzes configured for this course
+                {t("teacher.courseOverview.examsSubtitle")}
               </p>
             </div>
 
@@ -364,21 +377,23 @@ export default async function CourseOverviewPage({
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
-              <span>Create Exam</span>
+              <span>{t("teacher.courseOverview.createExam")}</span>
             </Link>
           </div>
 
           {courseExams.length === 0 ? (
             <div className="rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center space-y-2">
               <p className="text-sm text-secondary">
-                No examinations created for this course yet.
+                {t("teacher.courseOverview.noExams")}
               </p>
               <div>
                 <Link
                   href={`/teacher/exams/new?courseId=${course.id}`}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                 >
-                  + Add your first assessment for {course.title}
+                  {t("teacher.courseOverview.addFirstAssessment", {
+                    course: course.title,
+                  })}
                 </Link>
               </div>
             </div>
@@ -399,7 +414,10 @@ export default async function CourseOverviewPage({
                           {exam.title}
                         </Link>
                       </h3>
-                      <StatusBadge status={exam.status} />
+                      <StatusBadge
+                        status={exam.status}
+                        label={exam.status === "draft" ? t("common.status.draft") : exam.status === "published" ? t("common.status.published") : t("common.status.archived")}
+                      />
                     </div>
                     {exam.description && (
                       <p className="mt-1 line-clamp-2 text-xs text-on-surface-variant">
@@ -407,9 +425,15 @@ export default async function CourseOverviewPage({
                       </p>
                     )}
                     <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-medium text-secondary">
-                      <span>{exam.questionCount} {exam.questionCount === 1 ? "question" : "questions"}</span>
+                      <span>{t.tn("common.questionCountLower", exam.questionCount)}</span>
                       <span>•</span>
-                      <span>{exam.durationMinutes ? `${exam.durationMinutes}m` : "Untimed"}</span>
+                      <span>
+                        {exam.durationMinutes
+                          ? t("student.exam.durationShort", {
+                              minutes: exam.durationMinutes,
+                            })
+                          : t("common.status.untimed")}
+                      </span>
                     </div>
                   </div>
 
@@ -418,13 +442,15 @@ export default async function CourseOverviewPage({
                       href={`/teacher/exams/${exam.id}/builder`}
                       className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-on-primary shadow-2xs hover:bg-primary-container transition-colors"
                     >
-                      {exam.status === "draft" ? "Question Builder" : "View Paper"}
+                      {exam.status === "draft"
+                        ? t("teacher.courseOverview.questionBuilder")
+                        : t("teacher.courseOverview.viewPaper")}
                     </Link>
                     <Link
                       href={`/teacher/exams/${exam.id}`}
                       className="rounded-lg border border-outline-variant bg-surface-container-low px-2.5 py-1.5 text-xs font-medium text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
                     >
-                      Overview
+                      {t("teacher.courseOverview.overview")}
                     </Link>
                   </div>
                 </div>

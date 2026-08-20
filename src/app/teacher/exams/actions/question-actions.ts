@@ -12,6 +12,8 @@ import {
 import * as examService from "@/services/exams";
 import type { ActionResult } from "@/types/course";
 import type { ExamQuestionWithDetails } from "@/types/exam";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 /**
  * Creates a question inside a draft exam owned by the teacher.
@@ -19,13 +21,14 @@ import type { ExamQuestionWithDetails } from "@/types/exam";
 export async function createQuestionAction(
   formData: unknown
 ): Promise<ActionResult<ExamQuestionWithDetails>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = createQuestionSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for question data.",
+      error: localizeMessage("Validation failed for question data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -39,7 +42,7 @@ export async function createQuestionAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create question.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to create question.", t),
     };
   }
 }
@@ -50,13 +53,14 @@ export async function createQuestionAction(
 export async function updateQuestionAction(
   formData: unknown
 ): Promise<ActionResult<ExamQuestionWithDetails>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = updateQuestionSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed for question data.",
+      error: localizeMessage("Validation failed for question data.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -69,7 +73,7 @@ export async function updateQuestionAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update question.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to update question.", t),
     };
   }
 }
@@ -80,11 +84,12 @@ export async function updateQuestionAction(
 export async function deleteQuestionAction(
   formData: unknown
 ): Promise<ActionResult<{ deleted: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = questionActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid question identifier." };
+    return { success: false, error: localizeMessage("Invalid question identifier.", t) };
   }
 
   try {
@@ -100,7 +105,7 @@ export async function deleteQuestionAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete question.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to delete question.", t),
     };
   }
 }
@@ -111,11 +116,12 @@ export async function deleteQuestionAction(
 export async function reorderQuestionsAction(
   formData: unknown
 ): Promise<ActionResult<{ reordered: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = reorderQuestionsSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid reorder parameters." };
+    return { success: false, error: localizeMessage("Invalid reorder parameters.", t) };
   }
 
   try {
@@ -130,7 +136,7 @@ export async function reorderQuestionsAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to reorder questions.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to reorder questions.", t),
     };
   }
 }

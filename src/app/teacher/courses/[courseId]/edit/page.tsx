@@ -6,6 +6,7 @@ import { getTeacherCourseById } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseForm } from "@/components/teacher/course-form";
 import { CourseDangerZone } from "@/components/teacher/course-danger-zone";
+import { getTranslator } from "@/i18n/server";
 
 interface EditCoursePageProps {
   params: Promise<{ courseId: string }>;
@@ -35,6 +36,8 @@ export default async function EditCoursePage({
     notFound();
   }
 
+  const t = await getTranslator();
+
   return (
     <div className="min-h-screen bg-surface flex flex-col">
       <TeacherNav user={teacher} activeSection="courses" />
@@ -46,7 +49,7 @@ export default async function EditCoursePage({
             href="/teacher/courses"
             className="hover:text-on-surface hover:underline"
           >
-            Courses
+            {t("teacher.courseForm.breadcrumb.courses")}
           </Link>
           <svg
             className="h-3 w-3 text-outline"
@@ -80,17 +83,19 @@ export default async function EditCoursePage({
               d="M9 5l7 7-7 7"
             />
           </svg>
-          <span className="text-on-surface">Settings</span>
+          <span className="text-on-surface">
+            {t("teacher.courseForm.breadcrumb.settings")}
+          </span>
         </div>
 
         {/* Edit Form */}
         <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 sm:p-8 shadow-xs">
           <div className="border-b border-outline-variant pb-5">
             <h1 className="text-xl font-bold tracking-tight text-on-surface">
-              Course Settings & Metadata
+              {t("teacher.courseForm.settingsTitle")}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant">
-              Update the title, URL slug, description, and thumbnail for this course.
+              {t("teacher.courseForm.settingsDesc")}
             </p>
           </div>
 

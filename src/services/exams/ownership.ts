@@ -45,10 +45,8 @@ export class ExamLifecycleError extends Error {
 }
 
 export class ExamPublishBlockedError extends Error {
-  constructor(errors: string[]) {
-    super(
-      `Cannot publish exam:\n${errors.map((e) => `• ${e}`).join("\n")}`
-    );
+  constructor(message: string) {
+    super(message);
   }
 }
 

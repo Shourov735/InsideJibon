@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { startExamAction } from "@/app/student/actions";
+import { useTranslations } from "@/i18n/client";
 
 interface ExamStartButtonProps {
   examId: string;
@@ -18,9 +19,10 @@ interface ExamStartButtonProps {
  */
 export function ExamStartButton({
   examId,
-  label = "Start Exam",
+  label,
   className,
 }: ExamStartButtonProps) {
+  const { t } = useTranslations();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,11 +72,11 @@ export function ExamStartButton({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            <span>Starting Examination…</span>
+            <span>{t("student.exam.starting")}</span>
           </>
         ) : (
           <>
-            <span>{label}</span>
+            <span>{label ?? t("student.exam.startExam")}</span>
             <svg
               className="h-4 w-4"
               fill="none"

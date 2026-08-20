@@ -6,6 +6,7 @@ import { getTeacherExamById } from "@/services/exams";
 import { getTeacherCourseById } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamForm } from "@/components/teacher/exams/exam-form";
+import { getTranslator } from "@/i18n/server";
 
 interface ExamEditPageProps {
   params: Promise<{ examId: string }>;
@@ -31,6 +32,8 @@ export default async function ExamEditPage({ params }: ExamEditPageProps) {
 
   if (!exam) notFound();
 
+  const t = await getTranslator();
+
   const course = await getTeacherCourseById(teacher.id, exam.courseId);
 
   return (
@@ -41,7 +44,7 @@ export default async function ExamEditPage({ params }: ExamEditPageProps) {
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-xs font-medium text-secondary">
           <Link href="/teacher/exams" className="hover:text-primary transition-colors">
-            Exams
+            {t("teacher.examForm.breadcrumb.exams")}
           </Link>
           <svg
             className="h-3 w-3 text-outline"
@@ -65,7 +68,9 @@ export default async function ExamEditPage({ params }: ExamEditPageProps) {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
           </svg>
-          <span className="text-on-surface font-semibold">Edit Settings</span>
+          <span className="text-on-surface font-semibold">
+            {t("teacher.examForm.breadcrumb.settings")}
+          </span>
         </div>
 
         {/* Card Container */}
@@ -73,15 +78,17 @@ export default async function ExamEditPage({ params }: ExamEditPageProps) {
           <div className="border-b border-outline-variant pb-5">
             <div className="flex items-center gap-2">
               <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                সেটিংস পরিবর্তন
+                {t("teacher.examForm.breadcrumb.settings")}
               </span>
-              <span className="text-xs text-secondary">• Exam Metadata</span>
+              <span className="text-xs text-secondary">
+                • {t("teacher.examForm.metadataBadge")}
+              </span>
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface">
-              Edit Examination Settings
+              {t("teacher.examForm.titleEditSettings")}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant">
-              Update title, instructions, and duration. Questions and options are managed in the interactive Question Builder.
+              {t("teacher.examForm.settingsDesc")}
             </p>
           </div>
 

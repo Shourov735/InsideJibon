@@ -4,6 +4,7 @@ import { requireTeacher } from "@/lib/permissions";
 import { getTeacherCourses } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseCard } from "@/components/teacher/course-card";
+import { getTranslator } from "@/i18n/server";
 
 export const metadata = {
   title: "My Courses | InsideJibon Educator",
@@ -12,6 +13,7 @@ export const metadata = {
 
 export default async function TeacherCoursesPage() {
   const teacher = await requireTeacher();
+  const t = await getTranslator();
   const coursesList = await getTeacherCourses(teacher.id);
 
   const publishedCount = coursesList.filter(
@@ -29,10 +31,10 @@ export default async function TeacherCoursesPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-on-surface">
-              Course Management
+              {t("teacher.courses.badge")}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant">
-              Create, organize modules and lessons, and publish educational courses for your students.
+              {t("teacher.courses.subtitle")}
             </p>
           </div>
 
@@ -49,7 +51,7 @@ export default async function TeacherCoursesPage() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Create New Course</span>
+            <span>{t("teacher.courses.create")}</span>
           </Link>
         </div>
 
@@ -57,7 +59,7 @@ export default async function TeacherCoursesPage() {
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Total Courses
+              {t("teacher.dashboard.stats.totalCourses")}
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {coursesList.length}
@@ -66,7 +68,7 @@ export default async function TeacherCoursesPage() {
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Published
+              {t("teacher.courses.stat.published")}
             </span>
             <p className="mt-1 text-2xl font-bold text-emerald-700">
               {publishedCount}
@@ -75,7 +77,7 @@ export default async function TeacherCoursesPage() {
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Drafts
+              {t("teacher.courses.stat.drafts")}
             </span>
             <p className="mt-1 text-2xl font-bold text-secondary">
               {draftCount}
@@ -84,7 +86,7 @@ export default async function TeacherCoursesPage() {
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Archived
+              {t("teacher.courses.stat.archived")}
             </span>
             <p className="mt-1 text-2xl font-bold text-amber-700">
               {archivedCount}
@@ -108,10 +110,10 @@ export default async function TeacherCoursesPage() {
                 </svg>
               </div>
               <h3 className="mt-4 text-lg font-bold text-on-surface">
-                No courses created yet
+                {t("teacher.courses.emptyTitle")}
               </h3>
               <p className="mt-1 text-sm text-secondary">
-                Get started by creating your first educational course structure.
+                {t("teacher.courses.emptyDesc")}
               </p>
               <div className="mt-6">
                 <Link
@@ -127,7 +129,7 @@ export default async function TeacherCoursesPage() {
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  <span>Create Your First Course</span>
+                  <span>{t("teacher.courses.emptyCta")}</span>
                 </Link>
               </div>
             </div>

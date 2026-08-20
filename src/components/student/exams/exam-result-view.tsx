@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { AttemptResult } from "@/types/exam";
+import { useTranslations } from "@/i18n/client";
 
 interface ExamResultViewProps {
   result: AttemptResult;
@@ -10,14 +11,15 @@ interface ExamResultViewProps {
 }
 
 export function ExamResultView({ result, courseId }: ExamResultViewProps) {
+  const { t, tn, locale } = useTranslations();
   const [filter, setFilter] = useState<"all" | "correct" | "incorrect" | "unanswered">("all");
 
   const formattedDate = useMemo(() => {
-    return new Intl.DateTimeFormat("en-US", {
+    return new Intl.DateTimeFormat(locale === "bn" ? "bn-BD" : "en-US", {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(new Date(result.submittedAt));
-  }, [result.submittedAt]);
+  }, [result.submittedAt, locale]);
 
   const stats = useMemo(() => {
     let correct = 0;
@@ -47,38 +49,38 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
     const p = result.percentage;
     if (p >= 90) {
       return {
-        label: "Outstanding (অসাধারণ)",
+        label: t("student.result.perfOutstanding"),
         badgeBg: "bg-emerald-100 text-emerald-900 border-emerald-300",
         barBg: "bg-emerald-600",
       };
     }
     if (p >= 75) {
       return {
-        label: "Excellent (চমৎকার)",
+        label: t("student.result.perfExcellent"),
         badgeBg: "bg-blue-100 text-blue-900 border-blue-300",
         barBg: "bg-primary",
       };
     }
     if (p >= 60) {
       return {
-        label: "Good Pass (ভালো)",
+        label: t("student.result.perfGoodPass"),
         badgeBg: "bg-indigo-100 text-indigo-900 border-indigo-300",
         barBg: "bg-indigo-600",
       };
     }
     if (p >= 40) {
       return {
-        label: "Passed (উত্তীর্ণ)",
+        label: t("student.result.perfPassed"),
         badgeBg: "bg-amber-100 text-amber-900 border-amber-300",
         barBg: "bg-amber-600",
       };
     }
     return {
-      label: "Needs Improvement (পুনর্বিবেচনা প্রয়োজন)",
+      label: t("student.result.perfNeedsImprovement"),
       badgeBg: "bg-error-container text-on-error-container border-error/30",
       barBg: "bg-error",
     };
-  }, [result.percentage]);
+  }, [result.percentage, t]);
 
   const filteredQuestions = useMemo(() => {
     return result.questions.filter((q) => {
@@ -95,9 +97,9 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
       <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 sm:p-10 shadow-sm space-y-6 text-center">
         {/* Header meta */}
         <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-secondary">
-          <span>Attempt {result.attemptNumber}</span>
+          <span>{t("student.exam.attempt", { n: result.attemptNumber })}</span>
           <span>•</span>
-          <span>Submitted on {formattedDate}</span>
+          <span>{t("student.result.submittedOn", { date: formattedDate })}</span>
         </div>
 
         {/* Big Score Display */}
@@ -117,7 +119,8 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
           </div>
 
           <p className="text-sm font-medium text-on-surface pt-1">
-            <strong>{result.score}</strong> out of <strong>{result.totalPoints}</strong> marks awarded
+            <strong>{result.score}</strong> {t("student.result.outOf")}{" "}
+            <strong>{result.totalPoints}</strong> {t("student.result.marksAwarded")}
           </p>
         </div>
 
@@ -135,28 +138,28 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 max-w-2xl mx-auto pt-2">
           <div className="rounded-xl border border-outline-variant bg-surface-container-low p-3 text-center">
             <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
-              Total Questions
+              {t("student.result.totalQuestions")}
             </span>
             <p className="mt-0.5 text-lg font-bold text-on-surface">{stats.total}</p>
           </div>
 
           <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-center">
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
-              Correct
+              {t("student.result.correct")}
             </span>
             <p className="mt-0.5 text-lg font-extrabold text-emerald-700">{stats.correct}</p>
           </div>
 
           <div className="rounded-xl border border-error-container bg-error-container/30 p-3 text-center">
             <span className="text-[10px] font-bold uppercase tracking-wider text-error">
-              Incorrect
+              {t("student.result.incorrect")}
             </span>
             <p className="mt-0.5 text-lg font-extrabold text-error">{stats.incorrect}</p>
           </div>
 
           <div className="rounded-xl border border-outline-variant bg-surface-container-low p-3 text-center">
             <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
-              Unanswered
+              {t("student.result.unanswered")}
             </span>
             <p className="mt-0.5 text-lg font-bold text-secondary">{stats.unanswered}</p>
           </div>
@@ -168,21 +171,21 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
             href={`/student/courses/${courseId}/exams/${result.examId}`}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
           >
-            <span>Back to Exam Details</span>
+            <span>{t("student.result.backToExam")}</span>
           </Link>
 
           <Link
             href={`/student/courses/${courseId}/exams`}
             className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-surface-container hover:text-primary transition-colors"
           >
-            <span>All Course Exams</span>
+            <span>{t("student.result.allCourseExams")}</span>
           </Link>
 
           <Link
             href={`/student/courses/${courseId}/learn`}
             className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
           >
-            <span>Return to Lessons</span>
+            <span>{t("student.exams.returnToLessons")}</span>
           </Link>
         </div>
       </div>
@@ -193,10 +196,10 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-bold tracking-tight text-on-surface">
-              Detailed Answer Review
+              {t("student.result.reviewTitle")}
             </h2>
             <p className="text-xs text-secondary mt-0.5">
-              Review your answers, correct options, and detailed educational explanations below.
+              {t("student.result.reviewSubtitle")}
             </p>
           </div>
 
@@ -211,7 +214,7 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                   : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
               }`}
             >
-              All ({stats.total})
+              {t("student.result.filterAll", { count: stats.total })}
             </button>
             <button
               type="button"
@@ -222,7 +225,7 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                   : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
               }`}
             >
-              Correct ({stats.correct})
+              {t("student.result.filterCorrect", { count: stats.correct })}
             </button>
             <button
               type="button"
@@ -233,7 +236,7 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                   : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
               }`}
             >
-              Incorrect ({stats.incorrect})
+              {t("student.result.filterIncorrect", { count: stats.incorrect })}
             </button>
             <button
               type="button"
@@ -244,7 +247,7 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                   : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
               }`}
             >
-              Unanswered ({stats.unanswered})
+              {t("student.result.filterUnanswered", { count: stats.unanswered })}
             </button>
           </div>
         </div>
@@ -252,7 +255,7 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
         {/* Question Cards List */}
         {filteredQuestions.length === 0 ? (
           <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-8 text-center text-sm text-secondary">
-            No questions in this filter view.
+            {t("student.result.noFiltered")}
           </div>
         ) : (
           <div className="space-y-5">
@@ -283,7 +286,8 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                             : "bg-red-50 text-red-800 border border-red-200"
                         }`}
                       >
-                        {q.awardedPoints} / {q.marks} {q.marks === 1 ? "Mark" : "Marks"}
+                        {q.awardedPoints} / {q.marks}{" "}
+                        {tn("student.exam.marks", q.marks)}
                       </span>
                     </div>
                   </div>
@@ -328,17 +332,17 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                           <div className="flex items-center gap-2 shrink-0">
                             {isSelected && isCorrectAnswer && (
                               <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
-                                ✓ Your Correct Answer
+                                ✓ {t("student.result.yourCorrectAnswer")}
                               </span>
                             )}
                             {isSelected && !isCorrectAnswer && (
                               <span className="inline-flex items-center gap-1 rounded-md bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-900">
-                                ✗ Your Answer
+                                ✗ {t("student.result.yourAnswer")}
                               </span>
                             )}
                             {!isSelected && isCorrectAnswer && (
                               <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
-                                ✓ Correct Answer
+                                ✓ {t("student.result.correctAnswer")}
                               </span>
                             )}
                           </div>
@@ -348,7 +352,7 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
 
                     {isUnanswered && (
                       <div className="rounded-lg bg-surface-container-low p-2.5 text-xs text-secondary italic">
-                        Not answered — 0 marks awarded.
+                        {t("student.result.notAnswered")}
                       </div>
                     )}
                   </div>
@@ -360,7 +364,7 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Explanation & Solution Guide:</span>
+                        <span>{t("student.result.explanationHeading")}</span>
                       </div>
                       <p className="pl-5 text-on-surface whitespace-pre-wrap">{q.explanation}</p>
                     </div>

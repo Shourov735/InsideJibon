@@ -6,16 +6,18 @@ import {
   getMaterialDownloadUrl,
 } from "@/lib/material-utils";
 import type { MaterialSummary } from "@/types/material";
+import { getTranslator } from "@/i18n/server";
 
 interface LessonResourcesProps {
   materials: MaterialSummary[] | null;
   className?: string;
 }
 
-export function LessonResources({
+export async function LessonResources({
   materials,
   className = "",
 }: LessonResourcesProps) {
+  const t = await getTranslator();
   // If null, the student cannot access materials (not enrolled or course unpublished)
   if (materials === null) {
     return null;
@@ -48,16 +50,16 @@ export function LessonResources({
               id="lesson-resources-heading"
               className="text-sm font-bold text-on-surface"
             >
-              Lesson Resources
+              {t("student.learn.resourcesHeading")}
             </h3>
             <p className="text-xs text-secondary">
-              Supplementary study materials provided by the instructor.
+              {t("student.learn.resourcesSubtitle")}
             </p>
           </div>
         </div>
 
         <span className="rounded-full bg-surface-container-low px-2.5 py-0.5 text-xs font-semibold text-secondary">
-          {materials.length} {materials.length === 1 ? "file" : "files"}
+          {t.tn("common.fileCount", materials.length)}
         </span>
       </div>
 
@@ -77,7 +79,7 @@ export function LessonResources({
             />
           </svg>
           <p className="text-xs">
-            No downloadable materials are attached to this lesson.
+            {t("student.learn.resourcesEmpty")}
           </p>
         </div>
       ) : (
@@ -86,7 +88,8 @@ export function LessonResources({
             const downloadUrl = getMaterialDownloadUrl(material.id);
             const fileLabel = getFileTypeLabel(
               material.mimeType,
-              material.originalFilename
+              material.originalFilename,
+              t.locale
             );
 
             return (
@@ -125,7 +128,7 @@ export function LessonResources({
                       {material.createdAt && (
                         <>
                           <span>•</span>
-                          <span>{formatMaterialDate(material.createdAt)}</span>
+                          <span>{formatMaterialDate(material.createdAt, t.locale)}</span>
                         </>
                       )}
                     </div>
@@ -136,7 +139,10 @@ export function LessonResources({
                   href={downloadUrl}
                   download={material.originalFilename}
                   className="inline-flex items-center justify-center gap-2 self-end sm:self-center rounded-lg bg-primary px-3.5 py-1.5 text-xs font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                  aria-label={`Download ${material.name} (${formatBytes(material.sizeBytes)})`}
+                  aria-label={t("student.learn.downloadAria", {
+                    name: material.name,
+                    size: formatBytes(material.sizeBytes),
+                  })}
                 >
                   <svg
                     className="h-3.5 w-3.5"
@@ -151,7 +157,7 @@ export function LessonResources({
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                     />
                   </svg>
-                  <span>Download</span>
+                  <span>{t("common.download")}</span>
                 </a>
               </li>
             );

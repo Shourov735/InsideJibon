@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { CourseWithCurriculum } from "@/types/course";
+import { useTranslations } from "@/i18n/client";
 import {
   publishCourseAction,
   unpublishCourseAction,
@@ -16,6 +17,7 @@ interface PublishModalProps {
 }
 
 export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
+  const { t } = useTranslations();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
       onClose();
     } catch (err) {
       setActionError(
-        err instanceof Error ? err.message : "Failed to publish course"
+        err instanceof Error ? err.message : t("teacher.builder.publishCourseFailed")
       );
     } finally {
       setIsProcessing(false);
@@ -71,7 +73,7 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
       onClose();
     } catch (err) {
       setActionError(
-        err instanceof Error ? err.message : "Failed to unpublish course"
+        err instanceof Error ? err.message : t("teacher.builder.unpublishCourseFailed")
       );
     } finally {
       setIsProcessing(false);
@@ -84,8 +86,8 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
         <div className="flex items-center justify-between border-b border-outline-variant pb-4">
           <h3 className="text-lg font-bold text-on-surface">
             {course.status === "published"
-              ? "Course Publishing Status"
-              : "Publish Course"}
+              ? t("teacher.builder.publishingStatus")
+              : t("teacher.builder.publishCourse")}
           </h3>
           <button
             onClick={onClose}
@@ -116,36 +118,38 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
         <div className="mt-4 space-y-4">
           <p className="text-sm text-on-surface-variant">
             {course.status === "published"
-              ? "This course is live and publicly accessible. You can unpublish it anytime to return it to draft mode."
-              : "Review the publishing checklist below. All requirements must be satisfied before publishing."}
+              ? t("teacher.builder.liveCourseDesc")
+              : t("teacher.builder.publishChecklistIntro")}
           </p>
 
           {/* Checklist */}
           <div className="rounded-xl border border-outline-variant bg-surface-container-low p-4 space-y-2.5">
             <h4 className="text-xs font-bold uppercase tracking-wider text-secondary">
-              Prerequisites Checklist
+              {t("teacher.builder.prerequisitesChecklist")}
             </h4>
 
             <div className="space-y-2 text-xs">
               <ChecklistItem
                 passed={titleValid}
-                label="Course title (at least 3 characters)"
+                label={t("teacher.builder.checklistTitle")}
               />
               <ChecklistItem
                 passed={slugValid}
-                label="Valid unique URL slug"
+                label={t("teacher.builder.checklistSlug")}
               />
               <ChecklistItem
                 passed={descValid}
-                label="Course description (at least 10 characters)"
+                label={t("teacher.builder.checklistDescription")}
               />
               <ChecklistItem
                 passed={hasModules}
-                label={`At least 1 module (Current: ${course.modules.length})`}
+                label={t("teacher.builder.checklistModules", {
+                  count: course.modules.length,
+                })}
               />
               <ChecklistItem
                 passed={hasLessons}
-                label={`At least 1 lesson across modules (Current: ${totalLessons})`}
+                label={t("teacher.builder.checklistLessons", { count: totalLessons })}
               />
             </div>
           </div>
@@ -158,7 +162,7 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
             onClick={onClose}
             className="rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-medium text-secondary transition-colors hover:bg-surface-container hover:text-on-surface"
           >
-            Close
+            {t("teacher.examPreview.close")}
           </button>
 
           {course.status === "published" ? (
@@ -168,7 +172,7 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
               disabled={isProcessing}
               className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100 disabled:opacity-50"
             >
-              {isProcessing ? "Processing..." : "Unpublish Course (Set to Draft)"}
+              {isProcessing ? t("teacher.builder.processing") : t("teacher.builder.unpublishToDraft")}
             </button>
           ) : (
             <button
@@ -177,7 +181,7 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
               disabled={!canPublish || isProcessing}
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isProcessing ? "Publishing..." : "Confirm & Publish Course"}
+              {isProcessing ? t("teacher.builder.publishing") : t("teacher.builder.confirmPublish")}
             </button>
           )}
         </div>

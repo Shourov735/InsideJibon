@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireTeacher } from "@/lib/permissions";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseForm } from "@/components/teacher/course-form";
+import { getTranslator } from "@/i18n/server";
 
 export const metadata = {
   title: "Create Course | InsideJibon Educator",
@@ -11,6 +12,7 @@ export const metadata = {
 
 export default async function NewCoursePage() {
   const teacher = await requireTeacher();
+  const t = await getTranslator();
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
@@ -23,7 +25,7 @@ export default async function NewCoursePage() {
             href="/teacher/courses"
             className="hover:text-on-surface hover:underline"
           >
-            Courses
+            {t("teacher.courseForm.breadcrumb.courses")}
           </Link>
           <svg
             className="h-3 w-3 text-outline"
@@ -38,16 +40,16 @@ export default async function NewCoursePage() {
               d="M9 5l7 7-7 7"
             />
           </svg>
-          <span className="text-on-surface">New Course</span>
+          <span className="text-on-surface">{t("teacher.courseForm.breadcrumb.new")}</span>
         </div>
 
         <div className="mt-4 rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 sm:p-8 shadow-xs">
           <div className="border-b border-outline-variant pb-5">
             <h1 className="text-xl font-bold tracking-tight text-on-surface">
-              Create New Course
+              {t("teacher.courseForm.title")}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant">
-              Provide basic course information. You can add modules, lessons, reading notes, and videos in the next step.
+              {t("teacher.courseForm.subtitle")}
             </p>
           </div>
 

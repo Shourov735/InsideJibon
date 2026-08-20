@@ -6,6 +6,7 @@ import type { ExamWithQuestionCount } from "@/types/exam";
 import type { CourseWithCounts } from "@/types/course";
 import { StatusBadge } from "../status-badge";
 import { ExamCard } from "./exam-card";
+import { useTranslations } from "@/i18n/client";
 
 interface ExamDirectoryProps {
   exams: ExamWithQuestionCount[];
@@ -13,6 +14,7 @@ interface ExamDirectoryProps {
 }
 
 export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
+  const { t, tn, locale } = useTranslations();
   const [activeTab, setActiveTab] = useState<"all" | "draft" | "published" | "archived">("all");
   const [selectedCourseId, setSelectedCourseId] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,7 +69,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
         <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Total Exams
+              {t("teacher.exams.stat.total")}
             </span>
             <div className="rounded-lg bg-surface-container p-2 text-primary">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -77,14 +79,16 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
           </div>
           <p className="mt-2 text-3xl font-bold text-primary">{counts.all}</p>
           <span className="mt-1 block text-xs text-on-surface-variant">
-            {counts.totalQuestions} questions across exams
+            {t("teacher.examDirectory.questionsAcrossExams", {
+              count: counts.totalQuestions,
+            })}
           </span>
         </div>
 
         <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Published
+              {t("teacher.exams.stat.published")}
             </span>
             <div className="rounded-lg bg-emerald-50 p-2 text-emerald-700">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -93,13 +97,13 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
             </div>
           </div>
           <p className="mt-2 text-3xl font-bold text-emerald-700">{counts.published}</p>
-          <span className="mt-1 block text-xs text-on-surface-variant">Live for students</span>
+          <span className="mt-1 block text-xs text-on-surface-variant">{t("teacher.examDirectory.liveForStudents")}</span>
         </div>
 
         <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Drafts
+              {t("teacher.exams.stat.drafts")}
             </span>
             <div className="rounded-lg bg-surface-container p-2 text-secondary">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -108,13 +112,13 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
             </div>
           </div>
           <p className="mt-2 text-3xl font-bold text-secondary">{counts.draft}</p>
-          <span className="mt-1 block text-xs text-on-surface-variant">Under development</span>
+          <span className="mt-1 block text-xs text-on-surface-variant">{t("teacher.examDirectory.underDevelopment")}</span>
         </div>
 
         <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              Archived
+              {t("teacher.exams.stat.archived")}
             </span>
             <div className="rounded-lg bg-amber-50 p-2 text-amber-700">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -123,7 +127,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
             </div>
           </div>
           <p className="mt-2 text-3xl font-bold text-amber-700">{counts.archived}</p>
-          <span className="mt-1 block text-xs text-on-surface-variant">Stored or retired</span>
+          <span className="mt-1 block text-xs text-on-surface-variant">{t("teacher.examDirectory.storedOrRetired")}</span>
         </div>
       </div>
 
@@ -140,7 +144,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
                 : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
             }`}
           >
-            All ({counts.all})
+            {t("teacher.exams.tabs.all")} ({counts.all})
           </button>
           <button
             type="button"
@@ -151,7 +155,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
                 : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
             }`}
           >
-            Drafts ({counts.draft})
+            {t("teacher.examDirectory.tabDrafts")} ({counts.draft})
           </button>
           <button
             type="button"
@@ -162,7 +166,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
                 : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
             }`}
           >
-            Published ({counts.published})
+            {t("teacher.exams.tabs.published")} ({counts.published})
           </button>
           <button
             type="button"
@@ -173,7 +177,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
                 : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
             }`}
           >
-            Archived ({counts.archived})
+            {t("teacher.exams.tabs.archived")} ({counts.archived})
           </button>
         </div>
 
@@ -186,7 +190,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
               onChange={(e) => setSelectedCourseId(e.target.value)}
               className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-on-surface outline-none focus:border-primary"
             >
-              <option value="all">All Associated Courses</option>
+              <option value="all">{t("teacher.examDirectory.allCourses")}</option>
               {courses.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.title}
@@ -201,7 +205,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search exams…"
+              placeholder={t("teacher.exams.searchPlaceholder")}
               className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 pl-8 text-xs text-on-surface outline-none focus:border-primary"
             />
             <svg
@@ -233,7 +237,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              title="Grid View"
+              title={t("teacher.examDirectory.gridView")}
               className={`rounded-md p-1.5 transition-colors ${
                 viewMode === "grid"
                   ? "bg-surface-container-lowest text-primary shadow-2xs"
@@ -247,7 +251,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
             <button
               type="button"
               onClick={() => setViewMode("table")}
-              title="Table View"
+              title={t("teacher.examDirectory.tableView")}
               className={`rounded-md p-1.5 transition-colors ${
                 viewMode === "table"
                   ? "bg-surface-container-lowest text-primary shadow-2xs"
@@ -280,9 +284,9 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
               />
             </svg>
           </div>
-          <h3 className="mt-4 text-lg font-bold text-on-surface">No exams created yet</h3>
+          <h3 className="mt-4 text-lg font-bold text-on-surface">{t("teacher.examDirectory.emptyTitle")}</h3>
           <p className="mx-auto mt-1 max-w-md text-sm text-secondary">
-            Build interactive question papers, set time limits, and publish examinations for your course students.
+            {t("teacher.examDirectory.emptyDesc")}
           </p>
           <div className="mt-6">
             <Link
@@ -292,17 +296,17 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
-              <span>Create Your First Exam</span>
+              <span>{t("teacher.examDirectory.createFirstExam")}</span>
             </Link>
           </div>
         </div>
       ) : filteredExams.length === 0 ? (
         <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-10 text-center shadow-xs">
           <p className="text-sm font-medium text-on-surface">
-            No exams match the selected filter criteria.
+            {t("teacher.examDirectory.noMatches")}
           </p>
           <p className="mt-1 text-xs text-secondary">
-            Try adjusting your search query, status tab, or course selection.
+            {t("teacher.examDirectory.noMatchesHint")}
           </p>
           <button
             type="button"
@@ -313,7 +317,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
             }}
             className="mt-4 inline-flex items-center rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors"
           >
-            Reset Filters
+            {t("teacher.examDirectory.resetFilters")}
           </button>
         </div>
       ) : viewMode === "grid" ? (
@@ -332,13 +336,13 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-outline-variant bg-surface-container-low text-xs uppercase tracking-wider text-secondary">
                 <tr>
-                  <th className="px-5 py-3 font-semibold">Exam Title & Details</th>
-                  <th className="px-5 py-3 font-semibold">Associated Course</th>
-                  <th className="px-5 py-3 font-semibold">Questions</th>
-                  <th className="px-5 py-3 font-semibold">Status</th>
-                  <th className="px-5 py-3 font-semibold">Duration</th>
-                  <th className="px-5 py-3 font-semibold">Updated</th>
-                  <th className="px-5 py-3 text-right font-semibold">Actions</th>
+                  <th className="px-5 py-3 font-semibold">{t("teacher.examDirectory.thTitle")}</th>
+                  <th className="px-5 py-3 font-semibold">{t("teacher.examForm.associatedCourse")}</th>
+                  <th className="px-5 py-3 font-semibold">{t("teacher.examDetail.stats.questions")}</th>
+                  <th className="px-5 py-3 font-semibold">{t("teacher.examDirectory.thStatus")}</th>
+                  <th className="px-5 py-3 font-semibold">{t("teacher.examDetail.stats.duration")}</th>
+                  <th className="px-5 py-3 font-semibold">{t("teacher.examDirectory.thUpdated")}</th>
+                  <th className="px-5 py-3 text-right font-semibold">{t("teacher.examDirectory.thActions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant">
@@ -352,7 +356,7 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
                         {exam.title}
                       </Link>
                       <p className="mt-0.5 max-w-sm truncate text-xs text-on-surface-variant">
-                        {exam.description || "No description"}
+                        {exam.description || t("common.noDescription")}
                       </p>
                     </td>
                     <td className="px-5 py-4 text-xs font-medium text-secondary">
@@ -364,20 +368,31 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
                           {courseMap.get(exam.courseId)}
                         </Link>
                       ) : (
-                        <span className="text-outline">Unassigned</span>
+                        <span className="text-outline">{t("teacher.examDirectory.unassigned")}</span>
                       )}
                     </td>
                     <td className="px-5 py-4 text-on-surface-variant font-medium text-xs">
-                      {exam.questionCount} {exam.questionCount === 1 ? "q" : "questions"}
+                      {tn("common.questionCountLower", exam.questionCount)}
                     </td>
                     <td className="px-5 py-4">
-                      <StatusBadge status={exam.status} />
+                      <StatusBadge
+                      status={exam.status}
+                      label={exam.status === "draft" ? t("common.status.draft") : exam.status === "published" ? t("common.status.published") : t("common.status.archived")}
+                    />
                     </td>
                     <td className="px-5 py-4 text-xs text-on-surface-variant">
-                      {exam.durationMinutes ? `${exam.durationMinutes} mins` : "Untimed"}
+                      {exam.durationMinutes
+                        ? t("teacher.examCard.durationMinutes", {
+                            minutes: exam.durationMinutes,
+                          })
+                        : t("common.status.untimed")}
                     </td>
                     <td className="px-5 py-4 text-xs text-on-surface-variant">
-                      {new Date(exam.updatedAt).toLocaleDateString()}
+                      {new Intl.DateTimeFormat(locale === "bn" ? "bn-BD" : "en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }).format(new Date(exam.updatedAt))}
                     </td>
                     <td className="px-5 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -385,13 +400,15 @@ export function ExamDirectory({ exams, courses }: ExamDirectoryProps) {
                           href={`/teacher/exams/${exam.id}/builder`}
                           className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-on-primary shadow-2xs hover:bg-primary-container hover:text-on-primary-container transition-colors"
                         >
-                          {exam.status === "draft" ? "Builder" : "View"}
+                          {exam.status === "draft"
+                            ? t("teacher.examDirectory.builder")
+                            : t("teacher.examDirectory.view")}
                         </Link>
                         <Link
                           href={`/teacher/exams/${exam.id}`}
                           className="rounded-lg border border-outline-variant bg-surface-container-low px-2.5 py-1.5 text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-colors"
                         >
-                          Details
+                          {t("student.exam.details")}
                         </Link>
                       </div>
                     </td>

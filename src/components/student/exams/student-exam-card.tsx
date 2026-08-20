@@ -1,12 +1,14 @@
 import Link from "next/link";
 import type { StudentCourseExam } from "@/types/exam";
+import { getTranslator } from "@/i18n/server";
 
 interface StudentExamCardProps {
   exam: StudentCourseExam;
   courseId: string;
 }
 
-export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
+export async function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
+  const t = await getTranslator();
   const isInProgress = Boolean(exam.inProgressAttemptId);
   const isCompleted = exam.attemptsUsed > 0;
   const attemptsLeft =
@@ -25,7 +27,7 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
             {isInProgress ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-800">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
-                চলমান • In Progress
+                {t("student.exam.inProgressBadge")}
               </span>
             ) : isCompleted ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
@@ -42,19 +44,19 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Attempted ({exam.attemptsUsed}
-                {exam.maxAttempts ? `/${exam.maxAttempts}` : ""})
+                {t("student.exam.attemptedBadge", { used: exam.attemptsUsed })}
+                {exam.maxAttempts ? `/${exam.maxAttempts}` : ""}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full bg-surface-container-high px-2.5 py-0.5 text-xs font-semibold text-secondary">
-                Ready to Start
+                {t("student.exam.readyToStart")}
               </span>
             )}
           </div>
 
           {exam.bestPercentage != null && (
             <div className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
-              <span>Best Score:</span>
+              <span>{t("student.exam.bestScore")}</span>
               <span className="font-extrabold">{exam.bestPercentage}%</span>
             </div>
           )}
@@ -94,8 +96,7 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
               />
             </svg>
             <span>
-              {exam.questionCount}{" "}
-              {exam.questionCount === 1 ? "Question" : "Questions"}
+              {t.tn("student.exam.question", exam.questionCount)}
             </span>
           </div>
 
@@ -118,7 +119,7 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
                 d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
               />
             </svg>
-            <span>{exam.totalMarks} Total Marks</span>
+            <span>{t("student.exam.totalMarksLabel", { marks: exam.totalMarks })}</span>
           </div>
 
           <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-low px-2.5 py-1 text-on-surface">
@@ -136,7 +137,9 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
               />
             </svg>
             <span>
-              {exam.durationMinutes ? `${exam.durationMinutes} min` : "Untimed"}
+              {exam.durationMinutes
+                ? t("student.exam.durationShort", { minutes: exam.durationMinutes })
+                : t("common.status.untimed")}
             </span>
           </div>
 
@@ -144,8 +147,8 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
             <div className="flex items-center gap-1 rounded-lg bg-surface-container-low px-2.5 py-1 text-secondary">
               <span>
                 {attemptsLeft === 0
-                  ? "No attempts left"
-                  : `${attemptsLeft} attempt${attemptsLeft === 1 ? "" : "s"} left`}
+                  ? t("student.exam.noAttemptsLeft")
+                  : t.tn("student.exam.attemptsLeft", attemptsLeft ?? 0)}
               </span>
             </div>
           )}
@@ -159,7 +162,7 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
             href={`/student/courses/${courseId}/exams/${exam.id}?take=${exam.inProgressAttemptId}`}
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-amber-700"
           >
-            <span>Resume Attempt</span>
+            <span>{t("student.exam.resumeAttempt")}</span>
             <svg
               className="h-4 w-4"
               fill="none"
@@ -179,7 +182,7 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
             href={`/student/courses/${courseId}/exams/${exam.id}`}
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
           >
-            <span>{isCompleted ? "Retake Exam" : "Start Exam"}</span>
+            <span>{isCompleted ? t("student.exam.retake") : t("student.exam.startExam")}</span>
             <svg
               className="h-4 w-4"
               fill="none"
@@ -199,7 +202,7 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
             href={`/student/courses/${courseId}/exams/${exam.id}`}
             className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-on-surface transition-colors hover:bg-surface-container hover:text-primary"
           >
-            <span>View Results & History</span>
+            <span>{t("student.exam.viewResultsHistory")}</span>
           </Link>
         )}
 
@@ -207,7 +210,7 @@ export function StudentExamCard({ exam, courseId }: StudentExamCardProps) {
           href={`/student/courses/${courseId}/exams/${exam.id}`}
           className="inline-flex items-center justify-center rounded-xl border border-outline-variant bg-surface-container-low px-3.5 py-2.5 text-xs font-medium text-secondary transition-colors hover:bg-surface-container hover:text-on-surface"
         >
-          Details
+          {t("student.exam.details")}
         </Link>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { requireStudent } from "@/lib/permissions";
 import { getStudentCourseExams } from "@/services/exams";
 import { getLearningCourse } from "@/services/learning";
 import { StudentExamCard } from "@/components/student/exams/student-exam-card";
+import { getTranslator } from "@/i18n/server";
 
 interface ExamsListPageProps {
   params: Promise<{ courseId: string }>;
@@ -26,6 +27,7 @@ export async function generateMetadata({
 export default async function CourseExamsPage({ params }: ExamsListPageProps) {
   const { courseId } = await params;
   const user = await requireStudent();
+  const t = await getTranslator();
 
   const course = await getLearningCourse(user.id, courseId);
   if (!course) notFound();
@@ -42,7 +44,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
         <Link href="/student" className="hover:text-primary transition-colors">
-          Dashboard
+          {t("nav.student.dashboard")}
         </Link>
         <svg
           className="h-3 w-3 text-outline"
@@ -57,7 +59,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
           href="/student/courses"
           className="hover:text-primary transition-colors"
         >
-          My Courses
+          {t("nav.student.courses")}
         </Link>
         <svg
           className="h-3 w-3 text-outline"
@@ -83,7 +85,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-        <span className="text-on-surface font-semibold">Exams</span>
+        <span className="text-on-surface font-semibold">{t("student.exams.breadcrumb")}</span>
       </nav>
 
       {/* Header Banner */}
@@ -91,14 +93,14 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="rounded bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
-              পরীক্ষা পোর্টাল • Assessments
+              {t("student.exams.badge")}
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-            {course.title} — Examinations
+            {t("student.exams.title", { course: course.title })}
           </h1>
           <p className="text-sm text-on-surface-variant max-w-2xl">
-            Assess your understanding with official multiple-choice tests, timed quizzes, and midterm assessments.
+            {t("student.exams.subtitle")}
           </p>
         </div>
 
@@ -109,7 +111,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          <span>Return to Lessons</span>
+          <span>{t("student.exams.returnToLessons")}</span>
         </Link>
       </div>
 
@@ -117,21 +119,21 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-2xs text-center sm:text-left">
           <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-secondary">
-            Available Exams
+            {t("student.exams.summary.available")}
           </span>
           <p className="mt-1 text-2xl sm:text-3xl font-bold text-primary">{totalExams}</p>
         </div>
 
         <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 shadow-2xs text-center sm:text-left">
           <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-amber-800">
-            In Progress
+            {t("student.exams.summary.inProgress")}
           </span>
           <p className="mt-1 text-2xl sm:text-3xl font-bold text-amber-700">{inProgressExams}</p>
         </div>
 
         <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-2xs text-center sm:text-left">
           <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-emerald-800">
-            Attempted
+            {t("student.exams.summary.attempted")}
           </span>
           <p className="mt-1 text-2xl sm:text-3xl font-bold text-emerald-700">{completedExams}</p>
         </div>
@@ -156,16 +158,16 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
                 />
               </svg>
             </div>
-            <h3 className="text-base font-bold text-on-surface">No exams available yet</h3>
+            <h3 className="text-base font-bold text-on-surface">{t("student.exams.emptyTitle")}</h3>
             <p className="mx-auto max-w-sm text-xs text-secondary">
-              The instructor has not published any examinations for this course yet. Please check back later or continue with course lessons.
+              {t("student.exams.emptyDesc")}
             </p>
             <div className="pt-2">
               <Link
                 href={`/student/courses/${courseId}/learn`}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
               >
-                <span>Go to Course Curriculum</span>
+                <span>{t("student.exams.goToCurriculum")}</span>
               </Link>
             </div>
           </div>

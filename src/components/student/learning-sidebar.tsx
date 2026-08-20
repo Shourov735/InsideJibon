@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { LearningCourse } from "@/types/learning";
+import { getTranslator } from "@/i18n/server";
 
 interface LearningSidebarProps {
   course: LearningCourse;
@@ -12,14 +13,15 @@ interface LearningSidebarProps {
  * Curriculum navigation for the learning workspace. Server component — links
  * point at `/student/courses/[courseId]/learn?lesson=<id>`.
  */
-export function LearningSidebar({
+export async function LearningSidebar({
   course,
   courseId,
   activeLessonId,
 }: LearningSidebarProps) {
+  const t = await getTranslator();
   return (
     <nav
-      aria-label="Course curriculum"
+      aria-label={t("student.learn.curriculumAria")}
       className="flex h-full w-full flex-col bg-surface-container-lowest"
     >
       <div className="border-b border-outline-variant p-4">
@@ -27,8 +29,11 @@ export function LearningSidebar({
           {course.title}
         </h2>
         <p className="mt-1 text-xs text-secondary">
-          {course.progress.completed} of {course.progress.total} lessons ·{" "}
-          {course.progress.percent}%
+          {t("student.learn.sidebarProgress", {
+            completed: course.progress.completed,
+            total: course.progress.total,
+            percent: course.progress.percent,
+          })}
         </p>
       </div>
 
@@ -50,22 +55,25 @@ export function LearningSidebar({
               <path d="M9 11l3 3L22 4" />
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
             </svg>
-            <span>Course Examinations</span>
+            <span>{t("student.learn.courseExaminations")}</span>
           </div>
           <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
-            Tests
+            {t("student.learn.testsBadge")}
           </span>
         </Link>
         {course.modules.length === 0 ? (
           <p className="px-4 py-6 text-center text-xs text-secondary">
-            No lessons yet.
+            {t("student.learn.noLessons")}
           </p>
         ) : (
           course.modules.map((mod) => (
             <div key={mod.id} className="mb-2">
               <div className="flex items-center justify-between px-4 py-2">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-secondary">
-                  Module {mod.position}: {mod.title}
+                  {t("common.moduleLabelWithTitle", {
+                    position: mod.position,
+                    title: mod.title,
+                  })}
                 </h3>
               </div>
               <ul className="space-y-0.5">

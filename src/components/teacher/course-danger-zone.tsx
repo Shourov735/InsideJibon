@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { Course } from "@/db/schema";
+import { useTranslations } from "@/i18n/client";
 import {
   archiveCourseAction,
   deleteCourseAction,
@@ -16,13 +17,12 @@ interface CourseDangerZoneProps {
 
 export function CourseDangerZone({ course }: CourseDangerZoneProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleArchive = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to archive this course? It will be hidden from active course catalogs."
-    );
+    const confirmed = window.confirm(t("teacher.courseDangerZone.archiveConfirm"));
     if (!confirmed) return;
 
     setIsProcessing(true);
@@ -36,7 +36,7 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
       router.refresh();
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to archive course"
+        err instanceof Error ? err.message : t("teacher.courseDangerZone.failedArchive")
       );
     } finally {
       setIsProcessing(false);
@@ -55,7 +55,7 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
       router.refresh();
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to restore course"
+        err instanceof Error ? err.message : t("teacher.courseDangerZone.failedRestore")
       );
     } finally {
       setIsProcessing(false);
@@ -64,14 +64,12 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
 
   const handleDelete = async () => {
     if (course.status === "published") {
-      alert(
-        "Published courses cannot be permanently deleted. Please archive the course instead."
-      );
+      alert(t("teacher.courseDangerZone.publishedCannotDelete"));
       return;
     }
 
     const confirmed = window.confirm(
-      `Are you sure you want to permanently delete course "${course.title}"? This cannot be undone.`
+      t("teacher.courseDangerZone.deleteConfirm", { title: course.title })
     );
     if (!confirmed) return;
 
@@ -87,7 +85,7 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
       router.refresh();
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to delete course"
+        err instanceof Error ? err.message : t("teacher.courseDangerZone.failedDelete")
       );
     } finally {
       setIsProcessing(false);
@@ -97,9 +95,11 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
   return (
     <div className="rounded-2xl border border-error/30 bg-surface-container-lowest p-6 shadow-xs space-y-4">
       <div>
-        <h3 className="text-base font-bold text-error">Danger Zone</h3>
+        <h3 className="text-base font-bold text-error">
+          {t("teacher.courseDangerZone.title")}
+        </h3>
         <p className="text-xs text-secondary">
-          Actions related to course lifecycle and permanent data removal.
+          {t("teacher.courseDangerZone.desc")}
         </p>
       </div>
 
@@ -114,12 +114,14 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
         <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span className="font-bold text-on-surface">
-              {course.status === "archived" ? "Restore Course" : "Archive Course"}
+              {course.status === "archived"
+                ? t("teacher.courseDangerZone.restoreCourse")
+                : t("teacher.courseDangerZone.archiveCourse")}
             </span>
             <p className="text-[11px] text-secondary">
               {course.status === "archived"
-                ? "Restores this archived course back to draft status."
-                : "Archived courses are hidden from student discovery."}
+                ? t("teacher.courseDangerZone.restoreDesc")
+                : t("teacher.courseDangerZone.archiveDesc")}
             </p>
           </div>
 
@@ -130,7 +132,7 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
               disabled={isProcessing}
               className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 font-semibold text-primary hover:bg-surface-container transition-colors disabled:opacity-50"
             >
-              Restore to Draft
+              {t("teacher.courseDangerZone.restoreToDraft")}
             </button>
           ) : (
             <button
@@ -139,7 +141,7 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
               disabled={isProcessing}
               className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 font-semibold text-amber-800 hover:bg-amber-100 transition-colors disabled:opacity-50"
             >
-              Archive Course
+              {t("teacher.courseDangerZone.archiveCourse")}
             </button>
           )}
         </div>
@@ -147,11 +149,13 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
         {/* Delete Course */}
         <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <span className="font-bold text-error">Delete Course</span>
+            <span className="font-bold text-error">
+              {t("teacher.courseDangerZone.deleteCourse")}
+            </span>
             <p className="text-[11px] text-secondary">
               {course.status === "published"
-                ? "Published courses cannot be deleted. Archive the course first."
-                : "Permanently remove this draft/archived course and all its modules and lessons."}
+                ? t("teacher.courseDangerZone.deleteDescPublished")
+                : t("teacher.courseDangerZone.deleteDesc")}
             </p>
           </div>
 
@@ -161,7 +165,7 @@ export function CourseDangerZone({ course }: CourseDangerZoneProps) {
             disabled={isProcessing || course.status === "published"}
             className="rounded-lg border border-error/40 bg-error-container/20 px-3 py-1.5 font-semibold text-error hover:bg-error-container/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Delete Permanently
+            {t("teacher.courseDangerZone.deletePermanently")}
           </button>
         </div>
       </div>

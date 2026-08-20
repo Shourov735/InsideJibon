@@ -6,6 +6,7 @@ import { resolveCurrentUser } from "@/lib/auth";
 import { isStudentEnrolled } from "@/services/enrollments";
 import { getPublishedCourseBySlugWithTeacher } from "@/services/courses";
 import { EnrollButton } from "@/components/student/enroll-button";
+import { getTranslator } from "@/i18n/server";
 
 interface PublicCourseDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -44,6 +45,7 @@ export default async function PublicCourseDetailPage({
     notFound();
   }
 
+  const t = await getTranslator();
   const { user } = await resolveCurrentUser();
   const canEnroll = user?.role === "student";
   const enrolled = canEnroll
@@ -60,7 +62,7 @@ export default async function PublicCourseDetailPage({
   );
 
   const formattedPublished = course.publishedAt
-    ? new Intl.DateTimeFormat("en-US", {
+    ? new Intl.DateTimeFormat(t.locale === "bn" ? "bn-BD" : "en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
@@ -73,7 +75,7 @@ export default async function PublicCourseDetailPage({
         <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
           <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
             <Link href="/" className="hover:text-primary hover:underline">
-              Home
+              {t("marketing.home")}
             </Link>
             <svg
               className="h-3 w-3 text-outline"
@@ -85,7 +87,7 @@ export default async function PublicCourseDetailPage({
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
             <Link href="/courses" className="hover:text-primary hover:underline">
-              Courses
+              {t("marketing.header.courses")}
             </Link>
             <svg
               className="h-3 w-3 text-outline"
@@ -118,7 +120,7 @@ export default async function PublicCourseDetailPage({
                 {course.title}
               </h1>
               <p className="max-w-2xl text-sm leading-relaxed text-on-surface-variant sm:text-base">
-                {course.description || "A structured course from InsideJibon."}
+                {course.description || t("marketing.courseDetail.fallbackDescription")}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -132,13 +134,15 @@ export default async function PublicCourseDetailPage({
                     <p className="text-sm font-medium text-on-surface">
                       {course.teacher.name || "Tanvir Hasan Jibon"}
                     </p>
-                    <p className="text-xs text-secondary">Lead Educator · Botany</p>
+                    <p className="text-xs text-secondary">
+                      {t("marketing.courseDetail.leadEducator", { subject: "Botany" })}
+                    </p>
                   </div>
                 </div>
 
                 {formattedPublished && (
                   <span className="text-xs text-secondary">
-                    Published {formattedPublished}
+                    {t("common.publishedShort", { date: formattedPublished })}
                   </span>
                 )}
               </div>
@@ -148,7 +152,7 @@ export default async function PublicCourseDetailPage({
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
               <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                Modules
+                {t("marketing.courseDetail.modules")}
               </span>
               <p className="mt-1 text-2xl font-bold text-primary">
                 {course.moduleCount}
@@ -156,13 +160,13 @@ export default async function PublicCourseDetailPage({
             </div>
             <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
               <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                Lessons
+                {t("marketing.courseDetail.lessons")}
               </span>
               <p className="mt-1 text-2xl font-bold text-primary">{totalLessons}</p>
             </div>
             <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
               <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                Free Previews
+                {t("marketing.courseDetail.freePreviews")}
               </span>
               <p className="mt-1 text-2xl font-bold text-emerald-700">{freeLessons}</p>
             </div>
@@ -176,7 +180,7 @@ export default async function PublicCourseDetailPage({
             />
             {enrolled && (
               <span className="rounded border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                Enrolled
+                {t("marketing.courseDetail.enrolled")}
               </span>
             )}
           </div>
@@ -185,16 +189,16 @@ export default async function PublicCourseDetailPage({
 
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
         <h2 className="text-xl font-bold tracking-tight text-on-surface">
-          Curriculum
+          {t("marketing.courseDetail.curriculum")}
         </h2>
         <p className="mt-1 text-sm text-secondary">
-          A structured outline of the modules and lessons in this course.
+          {t("marketing.courseDetail.curriculumSubtitle")}
         </p>
 
         {course.modules.length === 0 ? (
           <div className="mt-6 rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
             <p className="text-sm text-secondary">
-              This course curriculum is being prepared.
+              {t("marketing.courseDetail.curriculumPreparing")}
             </p>
           </div>
         ) : (
@@ -208,7 +212,7 @@ export default async function PublicCourseDetailPage({
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="rounded bg-primary-container px-2 py-0.5 text-xs font-bold text-on-primary-container">
-                        Module {mod.position}
+                        {t("common.moduleLabel")} {mod.position}
                       </span>
                       <h3 className="text-sm font-bold text-on-surface">
                         {mod.title}
@@ -221,14 +225,14 @@ export default async function PublicCourseDetailPage({
                     )}
                   </div>
                   <span className="font-mono text-xs text-secondary">
-                    {mod.lessons.length} {mod.lessons.length === 1 ? "lesson" : "lessons"}
+                    {t.tn("common.lessonCountLower", mod.lessons.length)}
                   </span>
                 </div>
 
                 <div className="space-y-1.5 pl-2">
                   {mod.lessons.length === 0 ? (
                     <p className="text-xs text-outline italic">
-                      Lessons are being prepared for this module.
+                      {t("marketing.courseDetail.lessonsPreparing")}
                     </p>
                   ) : (
                     mod.lessons.map((lesson) => (
@@ -245,7 +249,7 @@ export default async function PublicCourseDetailPage({
                           </span>
                           {lesson.isFree && (
                             <span className="shrink-0 rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700">
-                              Free Preview
+                              {t("materials.freePreview")}
                             </span>
                           )}
                         </div>

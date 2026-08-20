@@ -7,6 +7,7 @@ import { getTeacherCourseById } from "@/services/courses";
 import { getTeacherExams } from "@/services/exams";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamCard } from "@/components/teacher/exams/exam-card";
+import { getTranslator } from "@/i18n/server";
 
 interface TeacherCourseExamsPageProps {
   params: Promise<{ courseId: string }>;
@@ -28,6 +29,7 @@ export default async function TeacherCourseExamsPage({
 }: TeacherCourseExamsPageProps) {
   const { courseId } = await params;
   const teacher = await requireTeacher();
+  const t = await getTranslator();
   const course = await getTeacherCourseById(teacher.id, courseId);
 
   if (!course) notFound();
@@ -42,7 +44,7 @@ export default async function TeacherCourseExamsPage({
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
           <Link href="/teacher/courses" className="hover:text-primary transition-colors">
-            Courses
+            {t("teacher.courseForm.breadcrumb.courses")}
           </Link>
           <svg className="h-3 w-3 text-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -53,7 +55,7 @@ export default async function TeacherCourseExamsPage({
           <svg className="h-3 w-3 text-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          <span className="text-on-surface font-semibold">Examinations</span>
+          <span className="text-on-surface font-semibold">{t("teacher.exams.title")}</span>
         </nav>
 
         {/* Header Section */}
@@ -61,14 +63,14 @@ export default async function TeacherCourseExamsPage({
           <div>
             <div className="flex items-center gap-2">
               <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
-                কোর্স মূল্যায়ন • Assessment Portal
+                {t("teacher.courseExams.badge")}
               </span>
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-              {course.title} — Examinations
+              {t("teacher.courseExams.title", { course: course.title })}
             </h1>
             <p className="mt-1 text-sm text-on-surface-variant max-w-2xl">
-              Create, configure, and manage examinations and quizzes for students enrolled in this course.
+              {t("teacher.courseExams.subtitle")}
             </p>
           </div>
 
@@ -79,7 +81,7 @@ export default async function TeacherCourseExamsPage({
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Create Exam for Course</span>
+            <span>{t("teacher.courseExams.create")}</span>
           </Link>
         </div>
 
@@ -91,16 +93,20 @@ export default async function TeacherCourseExamsPage({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h3 className="text-base font-bold text-on-surface">No exams created for this course yet</h3>
+            <h3 className="text-base font-bold text-on-surface">
+              {t("teacher.courseExams.emptyTitle")}
+            </h3>
             <p className="mx-auto max-w-md text-xs text-secondary">
-              Configure question papers with multiple choice questions, set time limits, and publish when ready for student attempts.
+              {t("teacher.courseExams.emptyDesc")}
             </p>
             <div className="pt-2">
               <Link
                 href={`/teacher/exams/new?courseId=${course.id}`}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-on-primary shadow-xs hover:bg-primary-container transition-colors"
               >
-                <span>+ Create Your First Exam for {course.title}</span>
+                <span>
+                  {t("teacher.courseExams.emptyCta", { course: course.title })}
+                </span>
               </Link>
             </div>
           </div>

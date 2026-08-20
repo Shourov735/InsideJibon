@@ -11,6 +11,8 @@ import {
 import * as examService from "@/services/exams";
 import type { ActionResult } from "@/types/course";
 import type { Exam } from "@/types/exam";
+import { getTranslator } from "@/i18n/server";
+import { localizeMessage } from "@/i18n/errors";
 
 const EXAM_PATHS = (examId: string) => [
   "/teacher/exams",
@@ -25,13 +27,14 @@ const EXAM_PATHS = (examId: string) => [
 export async function createExamAction(
   formData: unknown
 ): Promise<ActionResult<Exam>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = createExamSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed. Please check the form errors.",
+      error: localizeMessage("Validation failed. Please check the form errors.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -44,7 +47,7 @@ export async function createExamAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create exam.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to create exam.", t),
     };
   }
 }
@@ -55,13 +58,14 @@ export async function createExamAction(
 export async function updateExamAction(
   formData: unknown
 ): Promise<ActionResult<Exam>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = updateExamSchema.safeParse(formData);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Validation failed. Please check the form errors.",
+      error: localizeMessage("Validation failed. Please check the form errors.", t),
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -77,7 +81,7 @@ export async function updateExamAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update exam.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to update exam.", t),
     };
   }
 }
@@ -88,21 +92,22 @@ export async function updateExamAction(
 export async function publishExamAction(
   formData: unknown
 ): Promise<ActionResult<Exam>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = examActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid exam identifier." };
+    return { success: false, error: localizeMessage("Invalid exam identifier.", t) };
   }
 
   try {
-    const exam = await examService.publishExam(teacher.id, parsed.data.examId);
+    const exam = await examService.publishExam(teacher.id, parsed.data.examId, t);
     EXAM_PATHS(parsed.data.examId).forEach((p) => revalidatePath(p));
     return { success: true, data: exam };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to publish exam.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to publish exam.", t),
     };
   }
 }
@@ -113,11 +118,12 @@ export async function publishExamAction(
 export async function unpublishExamAction(
   formData: unknown
 ): Promise<ActionResult<Exam>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = examActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid exam identifier." };
+    return { success: false, error: localizeMessage("Invalid exam identifier.", t) };
   }
 
   try {
@@ -127,7 +133,7 @@ export async function unpublishExamAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to unpublish exam.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to unpublish exam.", t),
     };
   }
 }
@@ -138,11 +144,12 @@ export async function unpublishExamAction(
 export async function archiveExamAction(
   formData: unknown
 ): Promise<ActionResult<Exam>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = examActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid exam identifier." };
+    return { success: false, error: localizeMessage("Invalid exam identifier.", t) };
   }
 
   try {
@@ -152,7 +159,7 @@ export async function archiveExamAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to archive exam.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to archive exam.", t),
     };
   }
 }
@@ -163,11 +170,12 @@ export async function archiveExamAction(
 export async function restoreExamAction(
   formData: unknown
 ): Promise<ActionResult<Exam>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = examActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid exam identifier." };
+    return { success: false, error: localizeMessage("Invalid exam identifier.", t) };
   }
 
   try {
@@ -177,7 +185,7 @@ export async function restoreExamAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to restore exam.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to restore exam.", t),
     };
   }
 }
@@ -188,11 +196,12 @@ export async function restoreExamAction(
 export async function deleteExamAction(
   formData: unknown
 ): Promise<ActionResult<{ deleted: boolean }>> {
+  const t = await getTranslator();
   const teacher = await requireTeacher();
   const parsed = examActionByIdSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid exam identifier." };
+    return { success: false, error: localizeMessage("Invalid exam identifier.", t) };
   }
 
   try {
@@ -202,7 +211,7 @@ export async function deleteExamAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete exam.",
+      error: localizeMessage(error instanceof Error ? error.message : "Failed to delete exam.", t),
     };
   }
 }

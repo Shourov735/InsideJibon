@@ -4,11 +4,13 @@ import { requireStudent } from "@/lib/permissions";
 import { getStudentDashboard } from "@/services/learning";
 import { StudentCourseCard } from "@/components/student/student-course-card";
 import { ProgressBar } from "@/components/student/progress-bar";
+import { getTranslator } from "@/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function StudentDashboardPage() {
   const user = await requireStudent();
+  const t = await getTranslator();
   const courses = await getStudentDashboard(user.id);
 
   const sortedByAccess = [...courses].sort((a, b) => {
@@ -30,29 +32,31 @@ export default async function StudentDashboardPage() {
     <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-          শুভেচ্ছা, {user.name?.split(" ")[0] || "শিক্ষার্থী"} 👋
+          {t("student.dashboard.greeting", {
+            name: user.name?.split(" ")[0] || t("student.dashboard.learnerFallback"),
+          })}
         </h1>
         <p className="text-sm text-on-surface-variant">
-          Welcome back — here is where your learning lives.
+          {t("student.dashboard.subtitle")}
         </p>
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs">
           <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            Enrolled Courses
+            {t("student.dashboard.stats.enrolled")}
           </span>
           <p className="mt-1 text-3xl font-bold text-primary">{courses.length}</p>
         </div>
         <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs">
           <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            Completed Courses
+            {t("student.dashboard.stats.completed")}
           </span>
           <p className="mt-1 text-3xl font-bold text-primary">{completedCount}</p>
         </div>
         <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs">
           <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            Overall Progress
+            {t("student.dashboard.stats.progress")}
           </span>
           <p className="mt-1 text-3xl font-bold text-primary">
             {courses.length === 0
@@ -68,7 +72,7 @@ export default async function StudentDashboardPage() {
       {continueCourse ? (
         <section className="mt-10">
           <h2 className="text-lg font-bold tracking-tight text-on-surface">
-            Continue Learning
+            {t("student.dashboard.continueCourse")}
           </h2>
           <div className="mt-4 overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-xs">
             <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -92,8 +96,10 @@ export default async function StudentDashboardPage() {
                   </p>
                   <p className="mt-0.5 truncate text-sm text-secondary">
                     {continueCourse.lastLesson
-                      ? `Resume: ${continueCourse.lastLesson.title}`
-                      : "Start from the beginning"}
+                      ? t("student.dashboard.resumeLesson", {
+                          title: continueCourse.lastLesson.title,
+                        })
+                      : t("student.dashboard.startFromBeginning")}
                   </p>
                 </div>
               </div>
@@ -109,7 +115,7 @@ export default async function StudentDashboardPage() {
                     href={continueHref}
                     className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
                   >
-                    Continue
+                    {t("student.dashboard.continue")}
                     <svg
                       className="h-4 w-4"
                       fill="none"
@@ -130,17 +136,17 @@ export default async function StudentDashboardPage() {
       ) : (
         <section className="mt-10">
           <h2 className="text-lg font-bold tracking-tight text-on-surface">
-            Get Started
+            {t("student.dashboard.getStarted")}
           </h2>
           <div className="mt-4 rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-10 text-center">
             <p className="text-sm text-on-surface-variant">
-              You are not enrolled in any courses yet.
+              {t("student.dashboard.noEnrollments")}
             </p>
             <Link
               href="/courses"
               className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
             >
-              Browse Courses
+              {t("student.dashboard.browseCourses")}
               <svg
                 className="h-4 w-4"
                 fill="none"
@@ -160,14 +166,14 @@ export default async function StudentDashboardPage() {
       <section className="mt-10 pb-8">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold tracking-tight text-on-surface">
-            My Courses
+            {t("student.dashboard.myCourses")}
           </h2>
           {courses.length > 0 && (
             <Link
               href="/student/courses"
               className="text-sm font-medium text-primary hover:underline"
             >
-              View all
+              {t("student.dashboard.viewAll")}
             </Link>
           )}
         </div>

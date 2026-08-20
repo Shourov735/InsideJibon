@@ -9,6 +9,7 @@ import {
   createCourseAction,
   updateCourseAction,
 } from "@/app/teacher/courses/actions";
+import { useTranslations } from "@/i18n/client";
 
 interface CourseFormProps {
   initialCourse?: Course;
@@ -20,6 +21,7 @@ export function CourseForm({
   mode = "create",
 }: CourseFormProps) {
   const router = useRouter();
+  const { t } = useTranslations();
 
   const [title, setTitle] = useState(initialCourse?.title ?? "");
   const [slug, setSlug] = useState(initialCourse?.slug ?? "");
@@ -75,9 +77,7 @@ export function CourseForm({
           initialCourse.status === "published" &&
           initialCourse.slug !== slug
         ) {
-          const confirmed = window.confirm(
-            "Warning: This course is currently published. Changing its URL slug will break existing direct links. Do you want to proceed?"
-          );
+          const confirmed = window.confirm(t("teacher.courseForm.slugChangeWarning"));
           if (!confirmed) {
             setIsSubmitting(false);
             return;
@@ -103,7 +103,7 @@ export function CourseForm({
       }
     } catch (err) {
       setFormError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
+        err instanceof Error ? err.message : t("teacher.courseForm.unexpectedError")
       );
     } finally {
       setIsSubmitting(false);
@@ -127,7 +127,7 @@ export function CourseForm({
                 clipRule="evenodd"
               />
             </svg>
-            <span>Error</span>
+            <span>{t("common.error")}</span>
           </div>
           <p className="mt-1 whitespace-pre-line">{formError}</p>
         </div>
@@ -139,14 +139,14 @@ export function CourseForm({
           htmlFor="title"
           className="block text-sm font-semibold text-on-surface"
         >
-          Course Title <span className="text-error">*</span>
+          {t("teacher.courseForm.courseTitle")} <span className="text-error">*</span>
         </label>
         <input
           id="title"
           type="text"
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
-          placeholder="e.g. Higher Secondary Physics: Mechanics & Waves"
+          placeholder={t("teacher.courseForm.titlePlaceholder")}
           required
           className="mt-1.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-sm text-on-surface shadow-2xs transition-colors placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
@@ -162,10 +162,10 @@ export function CourseForm({
             htmlFor="slug"
             className="block text-sm font-semibold text-on-surface"
           >
-            URL Slug <span className="text-error">*</span>
+            {t("teacher.courseForm.slugLabel")} <span className="text-error">*</span>
           </label>
           <span className="text-xs text-secondary">
-            Unique address for this course
+            {t("teacher.courseForm.slugHint")}
           </span>
         </div>
         <div className="mt-1.5 flex rounded-lg border border-outline-variant bg-surface-container-lowest shadow-2xs focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
@@ -177,7 +177,7 @@ export function CourseForm({
             type="text"
             value={slug}
             onChange={(e) => handleSlugChange(e.target.value)}
-            placeholder="physics-mechanics-waves"
+            placeholder={t("teacher.courseForm.slugPlaceholder")}
             required
             className="w-full bg-transparent px-3 py-2.5 text-sm font-mono text-on-surface focus:outline-none"
           />
@@ -193,14 +193,14 @@ export function CourseForm({
           htmlFor="description"
           className="block text-sm font-semibold text-on-surface"
         >
-          Course Overview & Description
+          {t("teacher.courseForm.descriptionField")}
         </label>
         <textarea
           id="description"
           rows={4}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Provide a comprehensive summary of what students will learn in this course..."
+          placeholder={t("teacher.courseForm.descriptionPlaceholder")}
           className="mt-1.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-sm text-on-surface shadow-2xs transition-colors placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
         {fieldErrors.description && (
@@ -215,14 +215,14 @@ export function CourseForm({
             htmlFor="thumbnailUrl"
             className="block text-sm font-semibold text-on-surface"
           >
-            Thumbnail Image URL (Optional)
+            {t("teacher.courseForm.thumbnailField")}
           </label>
           <input
             id="thumbnailUrl"
             type="url"
             value={thumbnailUrl}
             onChange={(e) => setThumbnailUrl(e.target.value)}
-            placeholder="https://example.com/thumbnail.jpg"
+            placeholder={t("teacher.courseForm.thumbnailPlaceholder")}
             className="mt-1.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-sm text-on-surface shadow-2xs transition-colors placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           {fieldErrors.thumbnailUrl && (
@@ -241,7 +241,7 @@ export function CourseForm({
           disabled={isSubmitting}
           className="rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-sm font-medium text-secondary transition-colors hover:bg-surface-container hover:text-on-surface disabled:opacity-50"
         >
-          Cancel
+          {t("teacher.courseForm.cancel")}
         </button>
 
         <button
@@ -271,10 +271,18 @@ export function CourseForm({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <span>{mode === "create" ? "Creating Course..." : "Saving..."}</span>
+              <span>
+                {mode === "create"
+                  ? t("teacher.courseForm.creating")
+                  : t("teacher.courseForm.saving")}
+              </span>
             </>
           ) : (
-            <span>{mode === "create" ? "Continue to Curriculum Builder" : "Save Changes"}</span>
+            <span>
+              {mode === "create"
+                ? t("teacher.courseForm.continueToBuilder")
+                : t("teacher.courseForm.saveChanges")}
+            </span>
           )}
         </button>
       </div>

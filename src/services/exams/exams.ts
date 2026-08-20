@@ -27,6 +27,7 @@ import {
   verifyCourseOwnership,
   verifyExamOwnership,
 } from "./ownership";
+import type { Translator } from "@/i18n/core";
 
 /**
  * Teacher exam domain: lifecycle (draft → published → archived) and the
@@ -205,59 +206,86 @@ export async function updateExam(
  */
 export async function validateExamForPublishing(
   teacherId: string,
-  examId: string
+  examId: string,
+  t?: Translator
 ): Promise<ExamPublishValidationResult> {
   const examWithQuestions = await getTeacherExamWithQuestions(teacherId, examId);
   if (!examWithQuestions) {
     return {
       canPublish: false,
-      errors: ["Exam does not exist or you do not have permission."],
+      errors: t
+        ? [t("teacher.publishCheck.examNotFound")]
+        : ["Exam does not exist or you do not have permission."],
     };
   }
 
   const errors: string[] = [];
 
   if (!examWithQuestions.title || examWithQuestions.title.trim().length < 3) {
-    errors.push("Exam title must be at least 3 characters long.");
+    errors.push(
+      t
+        ? t("teacher.publishCheck.examTitleTooShort")
+        : "Exam title must be at least 3 characters long."
+    );
   }
 
   if (
     !examWithQuestions.description ||
     examWithQuestions.description.trim().length < 10
   ) {
-    errors.push("Exam description must be at least 10 characters long.");
+    errors.push(
+      t
+        ? t("teacher.publishCheck.examDescriptionTooShort")
+        : "Exam description must be at least 10 characters long."
+    );
   }
 
   if (examWithQuestions.questions.length === 0) {
-    errors.push("Exam must contain at least one question.");
+    errors.push(
+      t ? t("teacher.publishCheck.noQuestions") : "Exam must contain at least one question."
+    );
   } else {
     for (const q of examWithQuestions.questions) {
-      const label = `Question ${q.position}`;
+      const label = t
+        ? t("common.questionLabel", { position: q.position })
+        : `Question ${q.position}`;
       if (!q.questionText || q.questionText.trim().length < 2) {
-        errors.push(`${label} must have valid question text.`);
+        errors.push(
+          t ? t("teacher.publishCheck.questionText", { label }) : `${label} must have valid question text.`
+        );
       }
       if (q.marks < 1) {
-        errors.push(`${label} must have marks of at least 1.`);
+        errors.push(
+          t ? t("teacher.publishCheck.questionMarks", { label }) : `${label} must have marks of at least 1.`
+        );
       }
       if (q.options.length < 2) {
         errors.push(
-          `${label} must have at least two answer options.`
+          t ? t("teacher.publishCheck.questionOptions", { label }) : `${label} must have at least two answer options.`
         );
         continue;
       }
       const correctCount = q.options.filter((o) => o.isCorrect).length;
       if (correctCount === 0) {
         errors.push(
-          `${label} must have exactly one correct answer option (currently none are marked correct).`
+          t
+            ? t("teacher.publishCheck.noCorrectAnswer", { label })
+            : `${label} must have exactly one correct answer option (currently none are marked correct).`
         );
       } else if (correctCount > 1) {
         errors.push(
-          `${label} must have exactly one correct answer option (currently ${correctCount} are marked correct).`
+          t
+            ? t("teacher.publishCheck.manyCorrectAnswers", { label, count: correctCount })
+            : `${label} must have exactly one correct answer option (currently ${correctCount} are marked correct).`
         );
       }
       for (const opt of q.options) {
         if (!opt.optionText || opt.optionText.trim().length === 0) {
-          errors.push(`${label} has an answer option with empty text.`);
+          errors.push(
+            t
+              ? t("teacher.publishCheck.emptyOption", { label })
+              : `${label} has an answer option with empty text.`
+          );
           break;
         }
       }
@@ -273,16 +301,21 @@ export async function validateExamForPublishing(
  */
 export async function publishExam(
   teacherId: string,
-  examId: string
+  examId: string,
+  t?: Translator
 ): Promise<Exam> {
   // Ownership first: unauthorized access must behave like Not Found, never
   // run the (owner-scoped) publish validation.
   const resolved = await verifyExamOwnership(teacherId, examId);
   if (!resolved) throw new ExamNotFoundError();
 
-  const validation = await validateExamForPublishing(teacherId, examId);
+  const validation = await validateExamForPublishing(teacherId, examId, t);
   if (!validation.canPublish) {
-    throw new ExamPublishBlockedError(validation.errors);
+    throw new ExamPublishBlockedError(
+      `${
+        t ? t("teacher.publishCheck.cannotPublishExam") : "Cannot publish exam:"
+      }\n${validation.errors.map((e) => `• ${e}`).join("\n")}`
+    );
   }
 
   const db = getDb();

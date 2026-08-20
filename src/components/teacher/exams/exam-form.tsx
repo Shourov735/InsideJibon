@@ -10,6 +10,7 @@ import {
 } from "@/app/teacher/exams/actions";
 import type { Course, CourseWithCounts } from "@/types/course";
 import type { Exam } from "@/types/exam";
+import { useTranslations } from "@/i18n/client";
 
 interface ExamFormProps {
   mode: "create" | "edit";
@@ -37,6 +38,7 @@ export function ExamForm({
   initialCourseId,
 }: ExamFormProps) {
   const router = useRouter();
+  const { t, tn } = useTranslations();
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -57,12 +59,12 @@ export function ExamForm({
 
     // Basic client checks
     if (!title.trim() || title.trim().length < 3) {
-      setFieldErrors({ title: ["Exam title must be at least 3 characters."] });
+      setFieldErrors({ title: [t("teacher.examForm.titleTooShort")] });
       return;
     }
 
     if (mode === "create" && !selectedCourseId) {
-      setFieldErrors({ courseId: ["Please select a course for this exam."] });
+      setFieldErrors({ courseId: [t("teacher.examForm.courseRequiredClient")] });
       return;
     }
 
@@ -103,7 +105,7 @@ export function ExamForm({
       }
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
+      setError(err instanceof Error ? err.message : t("teacher.examForm.unexpectedError"));
     } finally {
       setSubmitting(false);
     }
@@ -127,7 +129,9 @@ export function ExamForm({
             />
           </svg>
           <div>
-            <p className="font-semibold">Unable to save exam settings</p>
+            <p className="font-semibold">
+              {t("teacher.examForm.saveErrorTitle")}
+            </p>
             <p className="mt-0.5 text-xs text-on-error-container/90">{error}</p>
           </div>
         </div>
@@ -140,10 +144,10 @@ export function ExamForm({
             htmlFor="courseId"
             className="block text-sm font-semibold text-on-surface"
           >
-            Associated Course <span className="text-error">*</span>
+            {t("teacher.examForm.associatedCourse")} <span className="text-error">*</span>
           </label>
           <p className="text-xs text-on-surface-variant">
-            Select the course this exam belongs to.
+            {t("teacher.examForm.selectCourseHint")}
           </p>
           <div className="relative mt-1">
             <select
@@ -158,13 +162,11 @@ export function ExamForm({
                   : "border-outline-variant"
               }`}
             >
-              <option value="">Choose a course…</option>
+              <option value="">{t("teacher.examForm.chooseCourse")}</option>
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
                   {course.title}
-                  {"lessonCount" in course
-                    ? ` (${course.lessonCount} ${course.lessonCount === 1 ? "lesson" : "lessons"})`
-                    : ""}
+                  {"lessonCount" in course ? ` (${tn("common.lessonCountLower", course.lessonCount)})` : ""}
                 </option>
               ))}
             </select>
@@ -178,13 +180,13 @@ export function ExamForm({
       ) : (
         <div className="rounded-xl border border-outline-variant bg-surface-container-low p-4">
           <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            Associated Course
+            {t("teacher.examForm.associatedCourse")}
           </span>
           <p className="mt-1 font-semibold text-sm text-on-surface">
             {associatedCourse?.title ?? "Course " + exam?.courseId}
           </p>
           <p className="mt-0.5 text-xs text-on-surface-variant">
-            Course association cannot be changed after creation.
+            {t("teacher.examForm.associationFixed")}
           </p>
         </div>
       )}
@@ -196,12 +198,12 @@ export function ExamForm({
             htmlFor="title"
             className="block text-sm font-semibold text-on-surface"
           >
-            Exam Title <span className="text-error">*</span>
+            {t("teacher.examForm.examTitle")} <span className="text-error">*</span>
           </label>
           <span className="text-xs text-outline">{title.length}/120</span>
         </div>
         <p className="text-xs text-on-surface-variant">
-          Give your exam a descriptive title (e.g. &ldquo;Physics Midterm: Chapters 1–4&rdquo; or &ldquo;রসায়ন ১ম অধ্যায় মূল্যায়ন&rdquo;).
+          {t("teacher.examForm.titleHint")}
         </p>
         <input
           id="title"
@@ -212,7 +214,7 @@ export function ExamForm({
           maxLength={120}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g. Midterm Assessment: Optics & Thermodynamics"
+          placeholder={t("teacher.examForm.titlePlaceholder")}
           className={`w-full rounded-xl border bg-surface-container-lowest px-4 py-3 text-sm text-on-surface outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 ${
             fieldErrors.title
               ? "border-error focus:border-error focus:ring-error/20"
@@ -233,12 +235,12 @@ export function ExamForm({
             htmlFor="description"
             className="block text-sm font-semibold text-on-surface"
           >
-            Exam Description & Instructions
+            {t("teacher.examForm.descriptionField")}
           </label>
           <span className="text-xs text-outline">{description.length}/2000</span>
         </div>
         <p className="text-xs text-on-surface-variant">
-          Provide syllabus coverage, guidelines, or instructions for students.
+          {t("teacher.examForm.descriptionHint")}
         </p>
         <textarea
           id="description"
@@ -247,7 +249,7 @@ export function ExamForm({
           maxLength={2000}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="e.g. This exam evaluates concepts covered in Modules 1 through 3. Answer all multiple-choice questions carefully."
+          placeholder={t("teacher.examForm.descriptionPlaceholder")}
           className={`w-full rounded-xl border bg-surface-container-lowest px-4 py-3 text-sm text-on-surface outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 ${
             fieldErrors.description
               ? "border-error focus:border-error focus:ring-error/20"
@@ -268,12 +270,12 @@ export function ExamForm({
             htmlFor="durationMinutes"
             className="block text-sm font-semibold text-on-surface"
           >
-            Duration (Minutes)
+            {t("teacher.examForm.durationField")}
           </label>
-          <span className="text-xs text-secondary">Optional time limit</span>
+          <span className="text-xs text-secondary">{t("teacher.examForm.optionalTimeLimit")}</span>
         </div>
         <p className="text-xs text-on-surface-variant">
-          Specifies the allocated time for students once they start this exam. Leave blank for untimed exams.
+          {t("teacher.examForm.durationHint")}
         </p>
 
         {/* Quick Presets */}
@@ -309,7 +311,7 @@ export function ExamForm({
             max={600}
             value={durationMinutes}
             onChange={(e) => setDurationMinutes(e.target.value)}
-            placeholder="Custom duration in minutes (e.g. 75)"
+            placeholder={t("teacher.examForm.customDurationPlaceholder")}
             className={`w-full rounded-xl border bg-surface-container-lowest px-4 py-3 text-sm text-on-surface outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 ${
               fieldErrors.durationMinutes
                 ? "border-error focus:border-error focus:ring-error/20"
@@ -352,10 +354,18 @@ export function ExamForm({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <span>{mode === "create" ? "Creating Exam…" : "Saving Changes…"}</span>
+              <span>
+                {mode === "create"
+                  ? t("teacher.examForm.creating")
+                  : t("teacher.examForm.saving")}
+              </span>
             </>
           ) : (
-            <span>{mode === "create" ? "Create Exam & Open Builder" : "Save Changes"}</span>
+            <span>
+              {mode === "create"
+                ? t("teacher.examForm.createAndOpen")
+                : t("teacher.examForm.saveChanges")}
+            </span>
           )}
         </button>
 
@@ -363,7 +373,7 @@ export function ExamForm({
           href={mode === "create" ? "/teacher/exams" : `/teacher/exams/${exam?.id}`}
           className="rounded-xl border border-outline-variant bg-surface-container-low px-5 py-3 text-sm font-semibold text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
         >
-          Cancel
+          {t("teacher.examForm.cancel")}
         </Link>
       </div>
     </form>

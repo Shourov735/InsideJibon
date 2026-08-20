@@ -1,13 +1,15 @@
 import Link from "next/link";
 
 import { ProgressBar } from "@/components/student/progress-bar";
+import { getTranslator } from "@/i18n/server";
 import type { StudentCourseSummary } from "@/types/learning";
 
 interface StudentCourseCardProps {
   course: StudentCourseSummary;
 }
 
-export function StudentCourseCard({ course }: StudentCourseCardProps) {
+export async function StudentCourseCard({ course }: StudentCourseCardProps) {
+  const t = await getTranslator();
   const learnHref = `/student/courses/${course.courseId}/learn`;
   const resumeHref = course.lastLesson
     ? `${learnHref}?lesson=${course.lastLesson.id}`
@@ -49,7 +51,7 @@ export function StudentCourseCard({ course }: StudentCourseCardProps) {
           <p className="font-mono text-[11px] text-secondary">/{course.slug}</p>
           {course.completedAt && (
             <span className="rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-700">
-              Completed
+              {t("common.status.completed")}
             </span>
           )}
         </div>
@@ -57,13 +59,17 @@ export function StudentCourseCard({ course }: StudentCourseCardProps) {
           {course.title}
         </h3>
         <p className="mt-2 line-clamp-2 text-sm text-on-surface-variant">
-          {course.description || "A structured course from InsideJibon."}
+          {course.description || t("marketing.courseDetail.fallbackDescription")}
         </p>
 
         <div className="mt-4">
           <div className="flex items-center justify-between text-xs">
             <span className="font-medium text-secondary">
-              {course.progress.completed} of {course.progress.total} lessons
+              {t("student.learn.sidebarProgress", {
+                completed: course.progress.completed,
+                total: course.progress.total,
+                percent: course.progress.percent,
+              })}
             </span>
             <span className="font-bold text-primary">
               {course.progress.percent}%
@@ -74,10 +80,10 @@ export function StudentCourseCard({ course }: StudentCourseCardProps) {
 
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-outline-variant pt-4">
           <span className="min-w-0 truncate text-xs font-medium text-on-surface">
-            {course.teacherName ?? "InsideJibon Teacher"}
+            {course.teacherName ?? t("student.courseCard.teacherFallback")}
           </span>
           <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary">
-            {course.lastLesson ? "Continue" : "Start learning"}
+            {course.lastLesson ? t("student.courseCard.continue") : t("student.courseCard.startLearning")}
             <svg
               className="h-3.5 w-3.5"
               fill="none"
