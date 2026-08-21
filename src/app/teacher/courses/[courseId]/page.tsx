@@ -5,8 +5,10 @@ import { requireTeacher } from "@/lib/permissions";
 import { getTeacherCourseWithCurriculum } from "@/services/courses";
 import { getTeacherCourseMaterials } from "@/services/materials";
 import { getTeacherExams } from "@/services/exams";
+import { getTeacherAssignments } from "@/services/assignments";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { StatusBadge } from "@/components/teacher/status-badge";
+import { AssignmentStatusBadge } from "@/components/assignments/assignment-status-badge";
 import { getTranslator } from "@/i18n/server";
 
 interface CourseOverviewPageProps {
@@ -38,9 +40,10 @@ export default async function CourseOverviewPage({
     notFound();
   }
 
-  const [materials, courseExams] = await Promise.all([
+  const [materials, courseExams, courseAssignments] = await Promise.all([
     getTeacherCourseMaterials(teacher.id, course.id),
     getTeacherExams(teacher.id, course.id),
+    getTeacherAssignments(teacher.id, course.id),
   ]);
 
   const totalLessons = course.modules.reduce(
@@ -177,7 +180,7 @@ export default async function CourseOverviewPage({
         </div>
 
         {/* Metrics Grid */}
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("teacher.courseOverview.stats.modules")}
@@ -202,6 +205,15 @@ export default async function CourseOverviewPage({
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {courseExams.length}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
+            <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              {t("teacher.assignments.title")}
+            </span>
+            <p className="mt-1 text-2xl font-bold text-primary">
+              {courseAssignments.length}
             </p>
           </div>
 
@@ -452,6 +464,112 @@ export default async function CourseOverviewPage({
                     >
                       {t("teacher.courseOverview.overview")}
                     </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Course Assignments Section */}
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-on-surface">
+                {t("teacher.courseAssignments.badge")}
+              </h2>
+              <p className="text-xs text-secondary mt-0.5">
+                {t("teacher.courseAssignments.subtitle")}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/teacher/courses/${course.id}/assignments`}
+                className="text-xs font-semibold text-primary hover:underline"
+              >
+                {t("teacher.assignments.viewSubmissions")} →
+              </Link>
+              <Link
+                href={`/teacher/courses/${course.id}/assignments/new`}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container hover:text-on-primary-container transition-colors"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>{t("teacher.assignments.create")}</span>
+              </Link>
+            </div>
+          </div>
+
+          {courseAssignments.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center space-y-2">
+              <p className="text-sm text-secondary">
+                {t("teacher.courseAssignments.emptyTitle")}
+              </p>
+              <div>
+                <Link
+                  href={`/teacher/courses/${course.id}/assignments/new`}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                >
+                  {t("teacher.courseAssignments.emptyCta", { course: course.title })}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {courseAssignments.slice(0, 6).map((asg) => (
+                <div
+                  key={asg.id}
+                  className="flex flex-col justify-between rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs space-y-3"
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-bold text-sm text-on-surface line-clamp-1">
+                        <Link
+                          href={`/teacher/assignments/${asg.id}`}
+                          className="hover:text-primary transition-colors"
+                        >
+                          {asg.title}
+                        </Link>
+                      </h3>
+                      <AssignmentStatusBadge
+                        status={asg.status}
+                        size="sm"
+                      />
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-xs text-on-surface-variant">
+                      {asg.instructions}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-medium text-secondary">
+                      <span>{t("teacher.assignments.pointsCount", { points: asg.maxPoints })}</span>
+                      <span>•</span>
+                      <span>
+                        {t("teacher.assignments.submissionRatio", {
+                          submitted: asg.submissionCount,
+                          graded: asg.gradedCount,
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 border-t border-outline-variant pt-3">
+                    <Link
+                      href={`/teacher/assignments/${asg.id}`}
+                      className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-on-primary shadow-2xs hover:bg-primary-container transition-colors"
+                    >
+                      {asg.submissionCount > 0
+                        ? t("teacher.assignments.viewSubmissions")
+                        : t("teacher.assignments.details")}
+                    </Link>
+                    {asg.status === "draft" && (
+                      <Link
+                        href={`/teacher/assignments/${asg.id}/edit`}
+                        className="rounded-lg border border-outline-variant bg-surface-container-low px-2.5 py-1.5 text-xs font-medium text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
+                      >
+                        {t("teacher.assignments.editAssignment")}
+                      </Link>
+                    )}
                   </div>
                 </div>
               ))}

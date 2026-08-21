@@ -7,7 +7,7 @@ import { getTranslator } from "@/i18n/server";
 
 interface TeacherNavProps {
   user: CurrentUser;
-  activeSection?: "dashboard" | "courses" | "exams" | "new";
+  activeSection?: "dashboard" | "courses" | "exams" | "assignments" | "new";
 }
 
 export async function TeacherNav({ user, activeSection = "courses" }: TeacherNavProps) {
@@ -73,6 +73,16 @@ export async function TeacherNav({ user, activeSection = "courses" }: TeacherNav
               }`}
             >
               {t("nav.teacher.exams")}
+            </Link>
+            <Link
+              href="/teacher/assignments"
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                activeSection === "assignments"
+                  ? "bg-surface-container-low text-primary font-semibold"
+                  : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
+              }`}
+            >
+              {t("nav.teacher.assignments")}
             </Link>
           </nav>
         </div>
