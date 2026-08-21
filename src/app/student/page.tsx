@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { requireStudent } from "@/lib/permissions";
 import { getStudentDashboard } from "@/services/learning";
+import { getUpcomingSessionsForStudent } from "@/services/classes/classes";
+import { UpcomingSessionsList } from "@/components/student/classes/upcoming-sessions-list";
 import { StudentCourseCard } from "@/components/student/student-course-card";
 import { ProgressBar } from "@/components/student/progress-bar";
 import { getTranslator } from "@/i18n/server";
@@ -11,7 +13,10 @@ export const dynamic = "force-dynamic";
 export default async function StudentDashboardPage() {
   const user = await requireStudent();
   const t = await getTranslator();
-  const courses = await getStudentDashboard(user.id);
+  const [courses, upcomingSessions] = await Promise.all([
+    getStudentDashboard(user.id),
+    getUpcomingSessionsForStudent(user.id)
+  ]);
 
   const sortedByAccess = [...courses].sort((a, b) => {
     const ta = a.lastLesson?.lastAccessedAt?.getTime() ?? 0;
@@ -162,6 +167,13 @@ export default async function StudentDashboardPage() {
           </div>
         </section>
       )}
+
+      <section className="mt-10">
+        <h2 className="mb-4 text-lg font-bold tracking-tight text-on-surface">
+          {t("student.classes.upcomingClasses")}
+        </h2>
+        <UpcomingSessionsList sessions={upcomingSessions} />
+      </section>
 
       <section className="mt-10 pb-8">
         <div className="flex items-center justify-between">

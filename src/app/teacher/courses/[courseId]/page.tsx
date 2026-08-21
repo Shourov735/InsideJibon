@@ -6,6 +6,8 @@ import { getTeacherCourseWithCurriculum } from "@/services/courses";
 import { getTeacherCourseMaterials } from "@/services/materials";
 import { getTeacherExams } from "@/services/exams";
 import { getTeacherAssignments } from "@/services/assignments";
+import { getTeacherSessionsForCourse } from "@/services/classes";
+import { getTeacherAnnouncementsForCourse } from "@/services/announcements";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { StatusBadge } from "@/components/teacher/status-badge";
 import { AssignmentStatusBadge } from "@/components/assignments/assignment-status-badge";
@@ -40,10 +42,12 @@ export default async function CourseOverviewPage({
     notFound();
   }
 
-  const [materials, courseExams, courseAssignments] = await Promise.all([
+  const [materials, courseExams, courseAssignments, courseClasses, courseAnnouncements] = await Promise.all([
     getTeacherCourseMaterials(teacher.id, course.id),
     getTeacherExams(teacher.id, course.id),
     getTeacherAssignments(teacher.id, course.id),
+    getTeacherSessionsForCourse(teacher.id, course.id),
+    getTeacherAnnouncementsForCourse(teacher.id, course.id),
   ]);
 
   const totalLessons = course.modules.reduce(
@@ -180,7 +184,7 @@ export default async function CourseOverviewPage({
         </div>
 
         {/* Metrics Grid */}
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("teacher.courseOverview.stats.modules")}
@@ -214,6 +218,24 @@ export default async function CourseOverviewPage({
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
               {courseAssignments.length}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
+            <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              {t("teacher.classes.title")}
+            </span>
+            <p className="mt-1 text-2xl font-bold text-primary">
+              {courseClasses.length}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
+            <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              {t("teacher.announcements.title")}
+            </span>
+            <p className="mt-1 text-2xl font-bold text-primary">
+              {courseAnnouncements.length}
             </p>
           </div>
 
@@ -575,6 +597,80 @@ export default async function CourseOverviewPage({
               ))}
             </div>
           )}
+        </div>
+
+        {/* Classes Section */}
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-on-surface">
+                {t("teacher.classes.title")}
+              </h2>
+            </div>
+            <Link
+              href={`/teacher/courses/${course.id}/classes`}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              {t("student.classes.viewAll")} →
+            </Link>
+          </div>
+          
+          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
+            {courseClasses.length === 0 ? (
+              <p className="text-sm text-secondary text-center py-4">
+                {t("teacher.classes.noSessions")}
+              </p>
+            ) : (
+              <div className="flex items-center gap-4 text-sm font-medium">
+                <span className="text-on-surface">
+                  {courseClasses.length} {t("teacher.classes.stat.total")}
+                </span>
+                <span className="text-secondary">•</span>
+                <span className="text-green-600">
+                  {courseClasses.filter(c => c.status === "upcoming").length} {t("teacher.classes.stat.upcoming")}
+                </span>
+                <span className="text-secondary">•</span>
+                <span className="text-on-surface-variant">
+                  {courseClasses.filter(c => c.status === "completed").length} {t("teacher.classes.stat.completed")}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Announcements Section */}
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-on-surface">
+                {t("teacher.announcements.title")}
+              </h2>
+            </div>
+            <Link
+              href={`/teacher/courses/${course.id}/announcements`}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              {t("student.classes.viewAll")} →
+            </Link>
+          </div>
+          
+          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
+            {courseAnnouncements.length === 0 ? (
+              <p className="text-sm text-secondary text-center py-4">
+                {t("teacher.announcements.noAnnouncements")}
+              </p>
+            ) : (
+              <div className="flex items-center gap-4 text-sm font-medium">
+                <span className="text-on-surface">
+                  {courseAnnouncements.length} {t("teacher.announcements.title")}
+                </span>
+                <span className="text-secondary">•</span>
+                <span className="text-primary">
+                  {courseAnnouncements.filter(a => a.isPinned).length} {t("teacher.announcements.pinned")}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>

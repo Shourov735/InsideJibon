@@ -57,6 +57,13 @@
       "when": 1787336941375,
       "tag": "0007_volatile_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787347620325,
+      "tag": "0008_modern_dust",
+      "breakpoints": true
     }
   ]
 }

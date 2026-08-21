@@ -57,7 +57,7 @@ export function AssignmentPublishModal({
   const isTitleValid = assignment.title.trim().length >= 3;
   const isInstructionsValid = assignment.instructions.trim().length >= 10;
   const isPointsValid = assignment.maxPoints >= 1;
-  const isDueDateValid = !assignment.dueAt || new Date(assignment.dueAt).getTime() > Date.now();
+  const isDueDateValid = !validation.errors.some((e) => e.toLowerCase().includes("due"));
 
   return (
     <div

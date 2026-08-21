@@ -30,3 +30,5 @@ export * from "./learning";
 export * from "./materials";
 export * from "./exams";
 export * from "./assignments";
+export * from "./classes";
+export * from "./announcements";
