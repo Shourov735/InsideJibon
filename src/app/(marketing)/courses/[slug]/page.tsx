@@ -135,7 +135,7 @@ export default async function PublicCourseDetailPage({
                       {course.teacher.name || "Tanvir Hasan Jibon"}
                     </p>
                     <p className="text-xs text-secondary">
-                      {t("marketing.courseDetail.leadEducator", { subject: "Botany" })}
+                      {t("marketing.courseDetail.leadEducator", { subject: "Physics, Chemistry, Biology & Math" })}
                     </p>
                   </div>
                 </div>

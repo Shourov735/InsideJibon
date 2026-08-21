@@ -84,17 +84,29 @@ export default async function HomePage() {
                   <span className="rounded bg-primary-container px-2 py-0.5 text-[10px] font-bold text-on-primary-container uppercase">
                     {t("marketing.leadEducator")}
                   </span>
-                  <h3 className="mt-1 text-sm font-bold text-on-surface">
+                  <h3 className="mt-1 text-base font-bold text-on-surface">
                     তানভীর হাসান জীবন
                   </h3>
                   <p className="text-xs text-secondary">
-                    Govt. Titumir College
+                    Dhaka Central University
+                  </p>
+                  <p className="text-[11px] text-on-surface-variant/80">
+                    (Govt. Titumir College)
                   </p>
                 </div>
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-on-surface-variant border-t border-outline-variant/60 pt-3">
-                উদ্ভিদবিজ্ঞান ও জীববিজ্ঞানের জটিল বিষয়গুলোর স্পষ্ট ও কাঠামোগত পাঠদান।
-              </p>
+
+              <div className="mt-4 border-t border-outline-variant/60 pt-3">
+                <div className="flex flex-wrap gap-1.5 mb-2.5">
+                  <span className="rounded-md bg-surface-container-high px-2 py-0.5 text-[11px] font-medium text-primary">পদার্থবিজ্ঞান</span>
+                  <span className="rounded-md bg-surface-container-high px-2 py-0.5 text-[11px] font-medium text-primary">রসায়ন</span>
+                  <span className="rounded-md bg-surface-container-high px-2 py-0.5 text-[11px] font-medium text-primary">জীববিজ্ঞান</span>
+                  <span className="rounded-md bg-surface-container-high px-2 py-0.5 text-[11px] font-medium text-primary">গণিত</span>
+                </div>
+                <p className="text-xs leading-relaxed text-on-surface-variant">
+                  পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান ও গণিতের মৌলিক ধারণা এবং বোর্ড পরীক্ষার সুশৃঙ্খল পাঠদান।
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -149,7 +161,7 @@ export default async function HomePage() {
       >
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <div className="rounded-3xl border border-outline-variant bg-surface-container-low p-6 sm:p-10 lg:p-12 shadow-xs">
-            <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
+            <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
               {/* Photo Column */}
               <div className="lg:col-span-4">
                 <div className="relative mx-auto aspect-[4/5] max-w-xs overflow-hidden rounded-2xl border-2 border-outline-variant bg-surface-container-high shadow-md">
@@ -158,37 +170,140 @@ export default async function HomePage() {
                     alt="Tanvir Hasan Jibon - InsideJibon Educator"
                     className="h-full w-full object-cover object-top"
                   />
-                  <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-surface-container-lowest/90 px-3 py-2 text-center backdrop-blur-xs border border-outline-variant">
+                  <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-surface-container-lowest/95 px-3.5 py-2.5 text-center backdrop-blur-xs border border-outline-variant shadow-xs">
                     <p className="text-xs font-bold text-primary">
                       Tanvir Hasan Jibon
                     </p>
-                    <p className="text-[10px] text-secondary">
-                      Department of Botany
+                    <p className="text-[10px] font-medium text-secondary">
+                      Dhaka Central University
+                    </p>
+                    <p className="text-[9px] text-on-surface-variant">
+                      (Govt. Titumir College)
                     </p>
                   </div>
+                </div>
+
+                {/* Direct Channel & Social Cards */}
+                <div className="mt-4 space-y-2.5 max-w-xs mx-auto">
+                  <a
+                    href="https://youtube.com/@tanvirhasanjibon5827"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest p-3 text-xs font-medium text-on-surface transition-all hover:border-red-500/50 hover:bg-surface hover:shadow-xs group"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                      <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-on-surface truncate">YouTube Channel</p>
+                      <p className="text-[11px] text-secondary truncate">@tanvirhasanjibon5827</p>
+                    </div>
+                    <svg className="h-4 w-4 text-outline shrink-0 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+
+                  <a
+                    href="https://facebook.com/mdtanvirhasan.jibon"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest p-3 text-xs font-medium text-on-surface transition-all hover:border-blue-500/50 hover:bg-surface hover:shadow-xs group"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                      <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-on-surface truncate">Facebook Profile</p>
+                      <p className="text-[11px] text-secondary truncate">mdtanvirhasan.jibon</p>
+                    </div>
+                    <svg className="h-4 w-4 text-outline shrink-0 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
                 </div>
               </div>
 
               {/* Bio & Details Column */}
-              <div className="space-y-4 lg:col-span-8">
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1 text-xs font-semibold text-primary">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                  <span>শিক্ষক পরিচিতি · Meet Your Instructor</span>
+              <div className="space-y-5 lg:col-span-8">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1 text-xs font-semibold text-primary">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    <span>শিক্ষক পরিচিতি · Meet Your Instructor</span>
+                  </div>
+
+                  <h2 className="mt-3 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
+                    তানভীর হাসান জীবন (Tanvir Hasan Jibon)
+                  </h2>
+                  <p className="mt-1 text-sm font-semibold text-primary sm:text-base">
+                    শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — ঢাকা সেন্ট্রাল ইউনিভার্সিটি (সরকারি তিতুমীর কলেজ)
+                  </p>
+                  <p className="text-xs text-secondary mt-0.5">
+                    বিজ্ঞান ও গণিত শিক্ষক · Physics, Chemistry, Biology & Mathematics Educator
+                  </p>
                 </div>
 
-                <h2 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-                  তানভীর হাসান জীবন
-                </h2>
-                <p className="text-sm font-semibold text-secondary sm:text-base">
-                  শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — সরকারি তিতুমীর কলেজ, ঢাকা
-                </p>
-
                 <p className="text-sm leading-relaxed text-on-surface-variant sm:text-base">
-                  InsideJibon প্ল্যাটফর্মে শিক্ষার্থীদের বিজ্ঞান ও জীববিজ্ঞানের গভীর বিষয়সমূহ সহজ ও আকর্ষণীয়ভাবে শেখানো হয়। প্রতিটি ক্লাসে তাত্ত্বিক ধারণার পাশাপাশি পর্যাপ্ত চিত্র, নোটস ও অনুশীলনী প্রদান করা হয় যাতে শিক্ষার্থীরা বোর্ড এবং ভর্তি পরীক্ষায় সেরা ফলাফল করতে পারে।
+                  তানভীর হাসান জীবন ঢাকা সেন্ট্রাল ইউনিভার্সিটির (সরকারি তিতুমীর কলেজ) শিক্ষার্থী এবং একজন একনিষ্ঠ বিজ্ঞান শিক্ষক। তিনি মাধ্যমিক ও উচ্চ মাধ্যমিক (SSC & HSC) পর্যায়ের শিক্ষার্থীদের <strong>পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান এবং গণিত (Physics, Chemistry, Biology & Math)</strong> অত্যন্ত যত্ন ও কাঠামোগত পদ্ধতিতে পাঠদান করান।
                 </p>
 
-                {/* Highlights */}
-                <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                <p className="text-sm leading-relaxed text-on-surface-variant">
+                  InsideJibon প্ল্যাটফর্মে বিজ্ঞান শিক্ষার প্রতিটি অধ্যায় তাত্ত্বিক বিশ্লেষণ, অ্যানিমেশন ও চিত্রনির্ভর ব্যাখ্যা, এক্সক্লুসিভ নোটস এবং স্ট্যান্ডার্ড পরীক্ষার সমন্বয়ে সাজানো হয়েছে — যাতে শিক্ষার্থীরা প্রতিটি ধারণার গভীরে পৌঁছাতে পারে এবং যেকোনো পরীক্ষায় সেরা ফলাফল অর্জন করতে পারে।
+                </p>
+
+                {/* 4 Subjects Taught Grid */}
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-secondary mb-3">
+                    পাঠদানের বিষয়সমূহ · Subjects Taught
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                    <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-3.5 shadow-2xs">
+                      <div className="flex items-center gap-2 font-bold text-sm text-on-surface">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-100 text-blue-800 text-xs">⚛️</span>
+                        <span>পদার্থবিজ্ঞান (Physics)</span>
+                      </div>
+                      <p className="mt-1 text-xs text-on-surface-variant">
+                        গতিবিদ্যা, বলবিদ্যা, কাজ-শক্তি, তড়িৎ ও গাণিতিক সমস্যার সুস্পষ্ট সমাধান।
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-3.5 shadow-2xs">
+                      <div className="flex items-center gap-2 font-bold text-sm text-on-surface">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-100 text-amber-800 text-xs">🧪</span>
+                        <span>রসায়ন (Chemistry)</span>
+                      </div>
+                      <p className="mt-1 text-xs text-on-surface-variant">
+                        মৌলের পর্যায়বৃত্ত ধর্ম, রাসায়নিক গণনা, বিক্রিয়ার কৌশল ও জৈব রসায়ন।
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-3.5 shadow-2xs">
+                      <div className="flex items-center gap-2 font-bold text-sm text-on-surface">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-100 text-emerald-800 text-xs">🧬</span>
+                        <span>জীববিজ্ঞান (Biology)</span>
+                      </div>
+                      <p className="mt-1 text-xs text-on-surface-variant">
+                        উদ্ভিদবিজ্ঞান, প্রাণিবিজ্ঞান ও সচিত্র শারীরিক প্রক্রিয়ার বোধগম্য উপস্থাপন।
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-3.5 shadow-2xs">
+                      <div className="flex items-center gap-2 font-bold text-sm text-on-surface">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-purple-100 text-purple-800 text-xs">📐</span>
+                        <span>গণিত (Mathematics)</span>
+                      </div>
+                      <p className="mt-1 text-xs text-on-surface-variant">
+                        বীজগণিত, ত্রিকোণমিতি, জ্যামিতি ও উচ্চতর গণিতের শর্টকাট ও বেসিক ধারণা।
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Highlights / Key Features */}
+                <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
                   <div className="flex items-center gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest p-3 shadow-2xs">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-container text-on-primary-container">
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -197,8 +312,8 @@ export default async function HomePage() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-on-surface">উদ্ভিদবিজ্ঞান বিভাগ</p>
-                      <p className="text-[11px] text-secondary">সরকারি তিতুমীর কলেজ</p>
+                      <p className="text-xs font-bold text-on-surface">ঢাকা সেন্ট্রাল ইউনিভার্সিটি</p>
+                      <p className="text-[11px] text-secondary">সরকারি তিতুমীর কলেজ · উদ্ভিদবিজ্ঞান</p>
                     </div>
                   </div>
 
@@ -209,47 +324,21 @@ export default async function HomePage() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-on-surface">পরিকল্পিত পাঠদান</p>
-                      <p className="text-[11px] text-secondary">নোটস, শিট ও পরীক্ষা</p>
+                      <p className="text-xs font-bold text-on-surface">পরিকল্পিত পাঠদান ও পরীক্ষা</p>
+                      <p className="text-[11px] text-secondary">লেকচার শিট, হ্যান্ডনোট ও মূল্যায়ন</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Social & Channel Links (Extensible Placeholders) */}
-                <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-outline-variant">
-                  <span className="text-xs font-medium text-secondary">
-                    সংযুক্ত থাকুন:
+                {/* Footer Navigation within Instructor Section */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-outline-variant">
+                  <span className="text-xs text-secondary">
+                    বিজ্ঞান শিক্ষার সহজ ও সঠিক পথ — InsideJibon
                   </span>
-
-                  {/* YouTube Channel Link/Placeholder */}
-                  <a
-                    href="https://youtube.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs font-medium text-on-surface transition-colors hover:border-red-500/40 hover:text-red-600 shadow-2xs"
-                  >
-                    <svg className="h-4 w-4 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    <span>YouTube Channel</span>
-                  </a>
-
-                  {/* Facebook Profile/Page Link/Placeholder */}
-                  <a
-                    href="https://facebook.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs font-medium text-on-surface transition-colors hover:border-blue-500/40 hover:text-blue-600 shadow-2xs"
-                  >
-                    <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                    <span>Facebook</span>
-                  </a>
 
                   <Link
                     href="/courses"
-                    className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-2xs"
                   >
                     <span>সকল কোর্স দেখুন</span>
                     <span>→</span>
