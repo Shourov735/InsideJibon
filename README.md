@@ -7,8 +7,17 @@ Educational platform — courses, exams, assignments, and student progress track
 - **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4
 - **Auth:** Clerk
 - **Database:** PostgreSQL on Neon (via Drizzle ORM, HTTP driver)
-- **Storage:** Backblaze B2 (planned, behind a storage service interface)
+- **Storage:** Cloudflare R2 (`MATERIALS_BUCKET` binding via modular storage interface)
 - **Hosting:** Cloudflare Workers (OpenNext adapter)
+
+## Documentation & Roadmap
+
+- **Master Implementation Roadmap & Prompts:** [`docs/MASTER_ROADMAP.md`](./docs/MASTER_ROADMAP.md)
+- **Phase 2 (Enrollment & Learning):** [`docs/phase-2-student-enrollment-learning.md`](./docs/phase-2-student-enrollment-learning.md)
+- **Phase 3/3A (Materials & Exams Domain):** [`docs/phase-3a-teacher-examinations.md`](./docs/phase-3a-teacher-examinations.md)
+- **Phase 4 (Student Exams & Grading):** [`docs/phase-4-student-exams.md`](./docs/phase-4-student-exams.md)
+- **Phase 4.5 / 6 (Assignments & Grading):** [`docs/phase-6-assignments.md`](./docs/phase-6-assignments.md)
+- **Phase 5 (Classes, Announcements & Admin):** [`docs/phase-5-classes-announcements-admin.md`](./docs/phase-5-classes-announcements-admin.md)
 
 ## Scripts
 
