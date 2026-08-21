@@ -29,3 +29,4 @@ export * from "./courses";
 export * from "./learning";
 export * from "./materials";
 export * from "./exams";
+export * from "./assignments";

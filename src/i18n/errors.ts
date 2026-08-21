@@ -54,6 +54,21 @@ export const ERROR_CATALOG: Record<string, TranslationKey> = {
   "Validation failed for lesson data.": "errors.validationFailedLesson",
   "Validation failed for question data.": "errors.validationFailedQuestion",
   "Validation failed for option data.": "errors.validationFailedOption",
+  "Assignment not found.": "errors.assignmentNotFound",
+  "Invalid assignment identifier.": "errors.assignmentNotFound",
+  "Assignments can only be edited while in draft status. Unpublish or reopen the assignment first.":
+    "errors.assignmentNotEditable",
+  "Published assignments cannot be permanently deleted. Unpublish or close the assignment instead.":
+    "errors.assignmentCannotDelete",
+  "This assignment is closed and no longer accepts submissions.":
+    "errors.assignmentClosed",
+  "Submission not found.": "errors.submissionNotFound",
+  "This submission has already been graded.": "errors.submissionAlreadyGraded",
+  "Late submissions are not allowed for this assignment.": "errors.lateSubmissionsNotAllowed",
+  "Only submitted work can be graded.": "errors.submissionNotGradeable",
+  "Points are outside the allowed range for this assignment.": "errors.invalidPointsRange",
+  "This file exceeds the maximum size allowed for this assignment.": "errors.assignmentFileTooLarge",
+  "This file type is not allowed for this assignment.": "errors.assignmentFileTypeNotAllowed",
 };
 
 export function localizeMessage(message: string, t: Translator): string {
