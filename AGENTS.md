@@ -67,5 +67,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - **Webhook discipline:** the Clerk webhook route must never 400 on permanent
   conditions (missing email, bad shape) — acknowledge with 200 to stop retries.
   All payloads are zod-validated.
-- **Deploy:** `npm run deploy` (build + wrangler deploy). Verify with the README
-  post-deploy smoke checklist.
+- **Deploy & Push Workflow:** after successfully implementing and verifying any feature, agents must commit and push all changes to GitHub (`git push`). Cloudflare should automatically build and deploy every push to `main` via CI/CD / Workers Builds. If auto-deploy is not configured in Cloudflare Dashboard / GitHub Actions, agents should run `npm run deploy` and verify with the README post-deploy smoke checklist.
