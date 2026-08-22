@@ -1,7 +1,9 @@
 import { requireAdmin } from "@/lib/permissions";
 import { getTranslator } from "@/i18n/server";
 import { getPlatformStats, getAllUsers, getAllCoursesOverview } from "@/services/admin/admin";
+import { getAllPendingRequests } from "@/services/enrollments";
 import { UserDirectory } from "@/components/admin/user-directory";
+import { PendingRequestsList } from "@/components/shared/pending-requests-list";
 import Link from "next/link";
 
 export const metadata = {
@@ -12,10 +14,11 @@ export default async function AdminDashboardPage() {
   const admin = await requireAdmin();
   const t = await getTranslator();
   
-  const [stats, users, coursesOverview] = await Promise.all([
+  const [stats, users, coursesOverview, pendingRequests] = await Promise.all([
     getPlatformStats(),
     getAllUsers(),
-    getAllCoursesOverview()
+    getAllCoursesOverview(),
+    getAllPendingRequests(),
   ]);
 
   return (
@@ -71,6 +74,18 @@ export default async function AdminDashboardPage() {
           </span>
           <p className="mt-2 text-3xl font-bold text-primary">{stats.totalEnrollments}</p>
         </div>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-lg font-bold tracking-tight text-on-surface">
+            {t("enrollment.requests.title")}
+          </h2>
+          <p className="text-xs text-on-surface-variant">
+            {t("enrollment.requests.adminSubtitle")}
+          </p>
+        </div>
+        <PendingRequestsList requests={pendingRequests} />
       </div>
 
       <div className="space-y-4">

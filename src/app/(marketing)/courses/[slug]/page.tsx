@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { resolveCurrentUser } from "@/lib/auth";
-import { isStudentEnrolled } from "@/services/enrollments";
+import { getStudentEnrollment } from "@/services/enrollments";
 import { getPublishedCourseBySlugWithTeacher } from "@/services/courses";
 import { EnrollButton } from "@/components/student/enroll-button";
 import { getTranslator } from "@/i18n/server";
@@ -48,9 +48,10 @@ export default async function PublicCourseDetailPage({
   const t = await getTranslator();
   const { user } = await resolveCurrentUser();
   const canEnroll = user?.role === "student";
-  const enrolled = canEnroll
-    ? await isStudentEnrolled(user.id, course.id)
-    : false;
+  // Enrollment is a request flow — the button reflects the request state.
+  const enrollmentStatus = canEnroll
+    ? ((await getStudentEnrollment(user.id, course.id))?.status ?? "none")
+    : "none";
 
   const totalLessons = course.modules.reduce(
     (acc, mod) => acc + mod.lessons.length,
@@ -176,9 +177,9 @@ export default async function PublicCourseDetailPage({
             <EnrollButton
               courseId={course.id}
               canEnroll={canEnroll}
-              enrolled={enrolled}
+              enrollmentStatus={enrollmentStatus}
             />
-            {enrolled && (
+            {enrollmentStatus === "active" && (
               <span className="rounded border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                 {t("marketing.courseDetail.enrolled")}
               </span>

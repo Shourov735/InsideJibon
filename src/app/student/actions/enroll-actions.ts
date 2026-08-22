@@ -13,12 +13,12 @@ import { localizeMessage } from "@/i18n/errors";
 export interface EnrollActionResultData {
   enrollment: Enrollment;
   courseSlug: string;
-  alreadyEnrolled: boolean;
+  alreadyRequested: boolean;
 }
 
 /**
- * Enrolls the authenticated student in a course. Idempotent — a repeated
- * submission returns the existing enrollment with alreadyEnrolled: true.
+ * Requests enrollment in a published course. Creates (or re-opens) a
+ * `pending` request; teacher/admin approval grants course access.
  * The studentId always comes from the verified session, never the client.
  */
 export async function enrollInCourseAction(
@@ -42,14 +42,14 @@ export async function enrollInCourseAction(
     revalidatePath(`/courses/${result.course.slug}`);
     revalidatePath("/student");
     revalidatePath("/student/courses");
-    revalidatePath(`/student/courses/${parsed.data.courseId}/learn`);
+    revalidatePath("/admin");
 
     return {
       success: true,
       data: {
         enrollment: result.enrollment,
         courseSlug: result.course.slug,
-        alreadyEnrolled: result.alreadyEnrolled,
+        alreadyRequested: result.alreadyRequested,
       },
     };
   } catch (error) {

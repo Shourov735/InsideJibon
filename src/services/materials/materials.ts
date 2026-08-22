@@ -136,6 +136,7 @@ async function resolveMaterialForStudent(
       and(
         eq(materials.id, materialId),
         eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
         eq(courses.status, "published")
       )
     )
@@ -160,6 +161,7 @@ async function verifyLessonAccessForStudent(
       and(
         eq(lessons.id, lessonId),
         eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
         eq(courses.status, "published")
       )
     )

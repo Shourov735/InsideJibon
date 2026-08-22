@@ -144,7 +144,7 @@ async function runTests() {
     // ── 1. Enrollment in published course ──────────────────────────────────
     console.log("\n2. Enrolling Student A in published course...");
     const enrollRes = await enrollmentService.enrollStudent(studentAId, courseA.id);
-    if (enrollRes.alreadyEnrolled) throw new Error("Fresh enrollment should not be 'already enrolled'");
+    if (enrollRes.enrollment.status !== "pending") throw new Error("Fresh enrollment should be pending approval");
     console.log(`✓ Student A enrolled: ${enrollRes.enrollment.id}`);
 
     // ── 2. Enrollment in draft course → BLOCKED ────────────────────────────
@@ -168,7 +168,7 @@ async function runTests() {
     // ── 4. Duplicate enrollment → idempotent, no duplicate row ─────────────
     console.log("\n5. Duplicate enrollment...");
     const dupRes = await enrollmentService.enrollStudent(studentAId, courseA.id);
-    if (!dupRes.alreadyEnrolled) throw new Error("Second enrollment should report alreadyEnrolled");
+    if (!dupRes.alreadyRequested) throw new Error("Duplicate request should report alreadyRequested");
     if (dupRes.enrollment.id !== enrollRes.enrollment.id) {
       throw new Error("Duplicate enrollment created a different row!");
     }

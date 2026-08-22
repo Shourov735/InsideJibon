@@ -14,6 +14,8 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "exam_published",
   "assignment_published",
   "assignment_graded",
+  "enrollment_request",
+  "enrollment_decision",
   "class_session",
   "system",
 ]);

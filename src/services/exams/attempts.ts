@@ -90,7 +90,8 @@ export async function verifyStudentExamAccess(
         eq(exams.id, examId),
         eq(exams.status, "published"),
         eq(courses.status, "published"),
-        eq(enrollments.studentId, studentId)
+        eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active")
       )
     )
     .limit(1);
@@ -117,6 +118,7 @@ export async function getStudentCourseExams(
     .where(
       and(
         eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
         eq(courses.id, courseId),
         eq(courses.status, "published")
       )

@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useTranslations } from "@/i18n/client";
-import { SignInButton, Show, UserButton } from "@clerk/nextjs";
+import { SignInButton, Show, UserButton, useAuth } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BrandLogo } from "@/components/shared/brand-logo";
 
@@ -18,7 +18,25 @@ const DASHBOARD_PATH: Record<Exclude<HeaderRole, null>, string> = {
 export function MarketingHeader({ role = null }: { role?: HeaderRole }) {
   const { t } = useTranslations();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const dashboardHref = role ? DASHBOARD_PATH[role] : "/student";
+  const { isSignedIn } = useAuth();
+  // The server-provided role can be stale after a modal sign-in (the RSC
+  // payload was rendered while signed out). Re-fetch it whenever Clerk
+  // reports an active session so the dashboard link is always correct.
+  const [liveRole, setLiveRole] = useState<HeaderRole>(role);
+  useEffect(() => {
+    if (!isSignedIn) return;
+    let cancelled = false;
+    fetch("/api/me", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.role) setLiveRole(data.role as HeaderRole);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn]);
+  const dashboardHref = liveRole ? DASHBOARD_PATH[liveRole] : "/student";
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-outline-variant bg-surface/95 backdrop-blur-md transition-all">

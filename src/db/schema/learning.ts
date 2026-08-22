@@ -2,6 +2,7 @@ import {
   boolean,
   index,
   integer,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -10,6 +11,17 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { courses, lessons, users } from "./index";
+
+/**
+ * Enrollment lifecycle: a student request starts as `pending`, gains
+ * course access when a teacher/admin sets it to `active`, and must
+ * re-request after a `rejected` decision.
+ */
+export const enrollmentStatusEnum = pgEnum("enrollment_status", [
+  "pending",
+  "active",
+  "rejected",
+]);
 
 /**
  * Student enrollment in a published course. One row per (student, course).
@@ -26,6 +38,11 @@ export const enrollments = pgTable(
     courseId: uuid("course_id")
       .notNull()
       .references(() => courses.id, { onDelete: "cascade" }),
+    status: enrollmentStatusEnum("status").notNull().default("pending"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decidedBy: text("decided_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
     enrolledAt: timestamp("enrolled_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -36,6 +53,7 @@ export const enrollments = pgTable(
       table.studentId,
       table.courseId
     ),
+    index("enrollments_status_idx").on(table.status),
   ]
 );
 

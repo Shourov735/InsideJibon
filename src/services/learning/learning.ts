@@ -64,6 +64,7 @@ async function verifyLessonAccess(studentId: string, lessonId: string) {
       and(
         eq(lessons.id, lessonId),
         eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
         eq(courses.status, "published")
       )
     )
@@ -180,6 +181,7 @@ export async function getLearningCourse(
     .where(
       and(
         eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
         eq(courses.id, courseId),
         eq(courses.status, "published")
       )

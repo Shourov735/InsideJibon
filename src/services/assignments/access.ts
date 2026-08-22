@@ -160,7 +160,8 @@ export async function verifyStudentAssignmentAccess(
         eq(assignments.id, assignmentId),
         inArray(assignments.status, ["published", "closed"]),
         eq(courses.status, "published"),
-        eq(enrollments.studentId, studentId)
+        eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active")
       )
     )
     .limit(1);

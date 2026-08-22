@@ -152,7 +152,8 @@ export async function getStudentSessionsForCourse(
       and(
         eq(classSessions.courseId, courseId),
         eq(courses.status, "published"),
-        eq(enrollments.studentId, studentId)
+        eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active")
       )
     )
     .orderBy(desc(classSessions.scheduledAt));
@@ -174,6 +175,7 @@ export async function getUpcomingSessionsForStudent(
     .where(
       and(
         eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
         eq(courses.status, "published"),
         eq(classSessions.status, "upcoming"),
         gte(classSessions.scheduledAt, now)

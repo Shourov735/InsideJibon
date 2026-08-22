@@ -8,9 +8,11 @@ import { getTeacherExams } from "@/services/exams";
 import { getTeacherAssignments } from "@/services/assignments";
 import { getTeacherSessionsForCourse } from "@/services/classes";
 import { getTeacherAnnouncementsForCourse } from "@/services/announcements";
+import { getPendingRequestsForCourses } from "@/services/enrollments";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { StatusBadge } from "@/components/teacher/status-badge";
 import { AssignmentStatusBadge } from "@/components/assignments/assignment-status-badge";
+import { PendingRequestsList } from "@/components/shared/pending-requests-list";
 import { getTranslator } from "@/i18n/server";
 
 interface CourseOverviewPageProps {
@@ -42,12 +44,13 @@ export default async function CourseOverviewPage({
     notFound();
   }
 
-  const [materials, courseExams, courseAssignments, courseClasses, courseAnnouncements] = await Promise.all([
+  const [materials, courseExams, courseAssignments, courseClasses, courseAnnouncements, pendingRequests] = await Promise.all([
     getTeacherCourseMaterials(teacher.id, course.id),
     getTeacherExams(teacher.id, course.id),
     getTeacherAssignments(teacher.id, course.id),
     getTeacherSessionsForCourse(teacher.id, course.id),
     getTeacherAnnouncementsForCourse(teacher.id, course.id),
+    getPendingRequestsForCourses([course.id]),
   ]);
 
   const totalLessons = course.modules.reduce(
@@ -98,6 +101,14 @@ export default async function CourseOverviewPage({
           </svg>
           <span className="text-on-surface truncate">{course.title}</span>
         </div>
+
+        {/* Pending Enrollment Requests */}
+        <section className="mt-6">
+          <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-secondary">
+            {t("enrollment.requests.title")}
+          </h2>
+          <PendingRequestsList requests={pendingRequests} />
+        </section>
 
         {/* Course Header Banner */}
         <div className="mt-4 flex flex-col gap-6 rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between shadow-xs">

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getTranslator } from "@/i18n/server";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { dashboardPathForRole, type AppRole } from "@/lib/dashboard";
 
-export async function MarketingFooter() {
+export async function MarketingFooter({ role = null }: { role?: AppRole | null }) {
   const t = await getTranslator();
   return (
     <footer className="border-t border-outline-variant bg-surface">
@@ -46,7 +47,9 @@ export async function MarketingFooter() {
               {[
                 { label: t("nav.courses"), href: "/courses" },
                 { label: t("nav.instructor"), href: "#instructor" },
-                { label: t("nav.signIn"), href: "/sign-in" },
+                ...(role
+                  ? [{ label: t("nav.dashboard"), href: dashboardPathForRole(role) }]
+                  : [{ label: t("nav.signIn"), href: "/sign-in" }]),
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm text-secondary hover:text-primary transition-colors">
