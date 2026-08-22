@@ -27,9 +27,12 @@ export const metadata: Metadata = {
   description:
     "InsideJibon — structured academic learning, exams, assignments and progress tracking for Physics, Chemistry, Biology, ICT & Mathematics.",
   icons: {
-    icon: "/images/logo-icon.jpg",
-    shortcut: "/images/logo-icon.jpg",
-    apple: "/images/logo-icon.jpg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "InsideJibon | Academic Excellence",
