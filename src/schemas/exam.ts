@@ -49,6 +49,7 @@ export const examActionByIdSchema = z.object({
 
 export const createQuestionSchema = z.object({
   examId: z.string().uuid("Invalid exam ID"),
+  questionType: z.enum(["multiple_choice", "true_false"]).optional().default("multiple_choice"),
   questionText: z
     .string()
     .trim()

@@ -5,22 +5,54 @@ import { getTeacherCourses } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseCard } from "@/components/teacher/course-card";
 import { getTranslator } from "@/i18n/server";
+import { SearchFilterBar } from "@/components/shared/search-filter-bar";
+import { COURSE_CATEGORIES } from "@/schemas/course";
+import type { CourseStatus, CourseCategory } from "@/db/schema";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "My Courses | InsideJibon Educator",
   description: "Manage your courses, curriculum, modules, and lessons.",
 };
 
-export default async function TeacherCoursesPage() {
+interface PageProps {
+  searchParams: Promise<{ q?: string; status?: string; category?: string }>;
+}
+
+export default async function TeacherCoursesPage({ searchParams }: PageProps) {
   const teacher = await requireTeacher();
   const t = await getTranslator();
-  const coursesList = await getTeacherCourses(teacher.id);
+  const params = await searchParams;
 
-  const publishedCount = coursesList.filter(
-    (c) => c.status === "published"
-  ).length;
-  const draftCount = coursesList.filter((c) => c.status === "draft").length;
-  const archivedCount = coursesList.filter((c) => c.status === "archived").length;
+  const q = params.q ?? "";
+  const status = params.status as CourseStatus | undefined;
+  const category = params.category as CourseCategory | undefined;
+
+  const coursesList = await getTeacherCourses(teacher.id, {
+    q: q || undefined,
+    status: status || undefined,
+    category: category || undefined,
+  });
+
+  // Always fetch all for stats (no filter)
+  const allCourses = await getTeacherCourses(teacher.id);
+  const publishedCount = allCourses.filter((c) => c.status === "published").length;
+  const draftCount = allCourses.filter((c) => c.status === "draft").length;
+  const archivedCount = allCourses.filter((c) => c.status === "archived").length;
+
+  const statusOptions = [
+    { value: "draft", label: t("common.status.draft") },
+    { value: "published", label: t("common.status.published") },
+    { value: "archived", label: t("common.status.archived") },
+  ];
+
+  const categoryOptions = COURSE_CATEGORIES.map((cat) => ({
+    value: cat,
+    label: t(`course.category.${cat}` as Parameters<typeof t>[0]),
+  }));
+
+  const isFiltered = !!(q || status || category);
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
@@ -62,7 +94,7 @@ export default async function TeacherCoursesPage() {
               {t("teacher.dashboard.stats.totalCourses")}
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
-              {coursesList.length}
+              {allCourses.length}
             </p>
           </div>
 
@@ -94,6 +126,27 @@ export default async function TeacherCoursesPage() {
           </div>
         </div>
 
+        {/* Search & Filter */}
+        <div className="mt-6">
+          <SearchFilterBar
+            searchPlaceholder={t("teacher.courses.search.placeholder")}
+            filters={[
+              {
+                param: "status",
+                label: t("common.allStatuses"),
+                allLabel: t("common.allStatuses"),
+                options: statusOptions,
+              },
+              {
+                param: "category",
+                label: t("common.allCategories"),
+                allLabel: t("common.allCategories"),
+                options: categoryOptions,
+              },
+            ]}
+          />
+        </div>
+
         {/* Courses Grid / Empty State */}
         <div className="mt-8">
           {coursesList.length === 0 ? (
@@ -110,28 +163,30 @@ export default async function TeacherCoursesPage() {
                 </svg>
               </div>
               <h3 className="mt-4 text-lg font-bold text-on-surface">
-                {t("teacher.courses.emptyTitle")}
+                {isFiltered ? t("common.noResultsFound") : t("teacher.courses.emptyTitle")}
               </h3>
               <p className="mt-1 text-sm text-secondary">
-                {t("teacher.courses.emptyDesc")}
+                {isFiltered ? t("common.noResultsFoundDesc") : t("teacher.courses.emptyDesc")}
               </p>
-              <div className="mt-6">
-                <Link
-                  href="/teacher/courses/new"
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
+              {!isFiltered && (
+                <div className="mt-6">
+                  <Link
+                    href="/teacher/courses/new"
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>{t("teacher.courses.emptyCta")}</span>
-                </Link>
-              </div>
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>{t("teacher.courses.emptyCta")}</span>
+                  </Link>
+                </div>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import {
@@ -8,6 +8,7 @@ import {
   assignments,
   courses,
   type Assignment,
+  type AssignmentStatus,
 } from "@/db/schema";
 import { getDefaultStorage } from "@/lib/storage";
 import { ALLOWED_ASSIGNMENT_MIME_TYPES } from "@/schemas/assignment";
@@ -24,6 +25,8 @@ import {
   verifyAssignmentOwnership,
   verifyCourseOwnership,
 } from "./access";
+
+export type { AssignmentStatus };
 
 /**
  * Teacher assignment domain: lifecycle (draft → published → closed) and the
@@ -65,24 +68,42 @@ export async function createAssignment(
   return assignment;
 }
 
+export interface TeacherAssignmentsFilter {
+  q?: string;
+  status?: AssignmentStatus;
+  courseId?: string;
+}
+
 /**
  * Lists the teacher's assignments, optionally scoped to one of their courses.
+ * Supports optional search query and status filter.
  */
 export async function getTeacherAssignments(
   teacherId: string,
-  courseId?: string
+  filter?: TeacherAssignmentsFilter | string
 ): Promise<AssignmentWithCounts[]> {
   const db = getDb();
 
-  const whereClause = courseId
-    ? and(eq(courses.id, courseId), eq(courses.teacherId, teacherId))
-    : eq(courses.teacherId, teacherId);
+  // Backwards-compatible: accept a raw courseId string or a filter object
+  const resolvedFilter: TeacherAssignmentsFilter =
+    typeof filter === "string" ? { courseId: filter } : (filter ?? {});
+
+  const conditions = [eq(courses.teacherId, teacherId)];
+  if (resolvedFilter.courseId) {
+    conditions.push(eq(courses.id, resolvedFilter.courseId));
+  }
+  if (resolvedFilter.status) {
+    conditions.push(eq(assignments.status, resolvedFilter.status));
+  }
+  if (resolvedFilter.q) {
+    conditions.push(ilike(assignments.title, `%${resolvedFilter.q}%`));
+  }
 
   const rows = await db
     .select({ assignment: assignments })
     .from(assignments)
     .innerJoin(courses, eq(assignments.courseId, courses.id))
-    .where(whereClause)
+    .where(and(...conditions))
     .orderBy(desc(assignments.createdAt));
 
   const assignmentIds = rows.map((r) => r.assignment.id);

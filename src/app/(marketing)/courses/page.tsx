@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { getPublishedCourses } from "@/services/courses";
 import { PublicCourseCard } from "@/components/public/course-card";
 import { getTranslator } from "@/i18n/server";
+import { SearchFilterBar } from "@/components/shared/search-filter-bar";
+import { COURSE_CATEGORIES } from "@/schemas/course";
+import type { CourseCategory } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +20,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function PublicCoursesPage() {
+interface PublicCoursesPageProps {
+  searchParams: Promise<{ q?: string; category?: string }>;
+}
+
+export default async function PublicCoursesPage({ searchParams }: PublicCoursesPageProps) {
   const t = await getTranslator();
-  const coursesList = await getPublishedCourses();
+  const params = await searchParams;
+  const q = params.q ?? "";
+  const category = params.category as CourseCategory | undefined;
+
+  const coursesList = await getPublishedCourses({
+    q: q || undefined,
+    category: category || undefined,
+  });
+
+  const categoryOptions = COURSE_CATEGORIES.map((cat) => ({
+    value: cat,
+    label: t(`course.category.${cat}` as Parameters<typeof t>[0]),
+  }));
+
+  const isFiltered = Boolean(q || category);
 
   return (
     <div>
@@ -35,12 +56,26 @@ export default async function PublicCoursesPage() {
           <p className="mt-4 max-w-xl text-base leading-relaxed text-on-surface-variant">
             {t("marketing.coursesDescription")}
             {coursesList.length > 0 &&
-              t.tn("marketing.showingCourses", coursesList.length)}
+              ` ${t.tn("marketing.showingCourses", coursesList.length)}`}
           </p>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+      <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+        <div className="mb-8">
+          <SearchFilterBar
+            searchPlaceholder={t("marketing.courses.search.placeholder")}
+            filters={[
+              {
+                param: "category",
+                label: t("common.allCategories"),
+                allLabel: t("common.allCategories"),
+                options: categoryOptions,
+              },
+            ]}
+          />
+        </div>
+
         {coursesList.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-high text-primary">
@@ -59,10 +94,10 @@ export default async function PublicCoursesPage() {
               </svg>
             </div>
             <h2 className="mt-4 text-lg font-bold text-on-surface">
-              {t("marketing.coursesEmptyTitle")}
+              {isFiltered ? t("common.noResultsFound") : t("marketing.coursesEmptyTitle")}
             </h2>
             <p className="mt-1 text-sm text-secondary">
-              {t("marketing.coursesEmptyDesc")}
+              {isFiltered ? t("common.noResultsFoundDesc") : t("marketing.coursesEmptyDesc")}
             </p>
           </div>
         ) : (

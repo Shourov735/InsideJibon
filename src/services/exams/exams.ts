@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import {
@@ -9,6 +9,7 @@ import {
   questionOptions,
   questions,
   type Exam,
+  type ExamStatus,
 } from "@/db/schema";
 import type {
   CreateExamInput,
@@ -28,6 +29,8 @@ import {
   verifyExamOwnership,
 } from "./ownership";
 import type { Translator } from "@/i18n/core";
+
+export type { ExamStatus };
 
 /**
  * Teacher exam domain: lifecycle (draft → published → archived) and the
@@ -67,23 +70,42 @@ export async function createExam(
   return exam;
 }
 
+export interface TeacherExamsFilter {
+  q?: string;
+  status?: ExamStatus;
+  courseId?: string;
+}
+
 /**
  * Lists the teacher's exams, optionally scoped to one of their courses.
+ * Supports optional search query and status filter.
  */
 export async function getTeacherExams(
   teacherId: string,
-  courseId?: string
+  filter?: TeacherExamsFilter | string
 ): Promise<ExamWithQuestionCount[]> {
   const db = getDb();
+
+  // Backwards-compatible: accept a raw courseId string or a filter object
+  const resolvedFilter: TeacherExamsFilter =
+    typeof filter === "string" ? { courseId: filter } : (filter ?? {});
+
+  const conditions = [eq(courses.teacherId, teacherId)];
+  if (resolvedFilter.courseId) {
+    conditions.push(eq(courses.id, resolvedFilter.courseId));
+  }
+  if (resolvedFilter.status) {
+    conditions.push(eq(exams.status, resolvedFilter.status));
+  }
+  if (resolvedFilter.q) {
+    conditions.push(ilike(exams.title, `%${resolvedFilter.q}%`));
+  }
+
   const rows = await db
     .select({ exam: exams })
     .from(exams)
     .innerJoin(courses, eq(exams.courseId, courses.id))
-    .where(
-      courseId
-        ? and(eq(courses.id, courseId), eq(courses.teacherId, teacherId))
-        : eq(courses.teacherId, teacherId)
-    )
+    .where(and(...conditions))
     .orderBy(desc(exams.createdAt));
 
   return withQuestionCounts(rows.map((r) => r.exam));

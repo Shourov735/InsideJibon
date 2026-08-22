@@ -20,7 +20,7 @@ export const examStatusEnum = pgEnum("exam_status", [
   "archived",
 ]);
 
-export const questionTypeEnum = pgEnum("question_type", ["multiple_choice"]);
+export const questionTypeEnum = pgEnum("question_type", ["multiple_choice", "true_false"]);
 
 /**
  * A teacher-authored examination attached to one of their courses.

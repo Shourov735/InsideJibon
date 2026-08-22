@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { slugify } from "@/schemas/course";
+import { slugify, COURSE_CATEGORIES } from "@/schemas/course";
 import type { Course } from "@/db/schema";
 import {
   createCourseAction,
@@ -31,6 +31,9 @@ export function CourseForm({
   );
   const [thumbnailUrl, setThumbnailUrl] = useState(
     initialCourse?.thumbnailUrl ?? ""
+  );
+  const [category, setCategory] = useState<string>(
+    initialCourse?.category ?? ""
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +64,7 @@ export function CourseForm({
           title,
           slug: slug || undefined,
           description: description || undefined,
+          category: category || undefined,
         });
 
         if (!res.success) {
@@ -90,6 +94,7 @@ export function CourseForm({
           slug,
           description: description || null,
           thumbnailUrl: thumbnailUrl || null,
+          category: category || null,
         });
 
         if (!res.success) {
@@ -232,6 +237,32 @@ export function CourseForm({
           )}
         </div>
       )}
+
+      {/* Subject Category */}
+      <div>
+        <label
+          htmlFor="category"
+          className="block text-sm font-semibold text-on-surface"
+        >
+          {t("teacher.courseForm.categoryLabel")}
+        </label>
+        <select
+          id="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="mt-1.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-sm text-on-surface shadow-2xs transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+        >
+          <option value="">{t("teacher.courseForm.categoryPlaceholder")}</option>
+          {COURSE_CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {t(`course.category.${cat}` as Parameters<typeof t>[0])}
+            </option>
+          ))}
+        </select>
+        {fieldErrors.category && (
+          <p className="mt-1 text-xs text-error">{fieldErrors.category[0]}</p>
+        )}
+      </div>
 
       {/* Buttons */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant">

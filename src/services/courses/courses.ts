@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, ne, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import {
@@ -7,6 +7,8 @@ import {
   courses,
   lessons,
   type Course,
+  type CourseCategory,
+  type CourseStatus,
 } from "@/db/schema";
 import { slugify, type CreateCourseInput, type UpdateCourseInput } from "@/schemas/course";
 import { getDefaultStorage } from "@/lib/storage";
@@ -17,6 +19,8 @@ import type {
   PublishValidationResult,
 } from "@/types/course";
 import type { Translator } from "@/i18n/core";
+
+export type { CourseCategory, CourseStatus };
 
 /**
  * Generates a guaranteed unique slug for a course.
@@ -68,6 +72,7 @@ export async function createCourse(
       title: input.title.trim(),
       slug: uniqueSlug,
       description: input.description?.trim() || null,
+      category: input.category ?? null,
       status: "draft",
     })
     .returning();
@@ -75,18 +80,42 @@ export async function createCourse(
   return course;
 }
 
+export interface TeacherCoursesFilter {
+  q?: string;
+  status?: CourseStatus;
+  category?: CourseCategory;
+}
+
 /**
  * Fetches all courses owned by a teacher with module and lesson counts.
+ * Supports optional search query, status filter, and category filter.
  */
 export async function getTeacherCourses(
-  teacherId: string
+  teacherId: string,
+  filter?: TeacherCoursesFilter
 ): Promise<CourseWithCounts[]> {
   const db = getDb();
+
+  const conditions = [eq(courses.teacherId, teacherId)];
+  if (filter?.q) {
+    conditions.push(
+      or(
+        ilike(courses.title, `%${filter.q}%`),
+        ilike(courses.description, `%${filter.q}%`)
+      )!
+    );
+  }
+  if (filter?.status) {
+    conditions.push(eq(courses.status, filter.status));
+  }
+  if (filter?.category) {
+    conditions.push(eq(courses.category, filter.category));
+  }
 
   const teacherCourses = await db
     .select()
     .from(courses)
-    .where(eq(courses.teacherId, teacherId))
+    .where(and(...conditions))
     .orderBy(desc(courses.createdAt));
 
   if (teacherCourses.length === 0) return [];
@@ -202,6 +231,7 @@ export async function updateCourse(
       slug: finalSlug,
       description: input.description?.trim() || null,
       thumbnailUrl: input.thumbnailUrl?.trim() || null,
+      category: input.category ?? null,
       updatedAt: new Date(),
     })
     .where(and(eq(courses.id, courseId), eq(courses.teacherId, teacherId)))

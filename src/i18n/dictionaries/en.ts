@@ -1378,7 +1378,48 @@ export const en = {
   "teacher.announcements.noAnnouncements": "No announcements posted yet.",
   "teacher.announcements.deleteConfirm": "Are you sure you want to delete this announcement?",
   "teacher.announcements.content": "Announcement Content",
-  "common.loading": "Loading..."
+  "common.loading": "Loading...",
+
+  "common.search": "Search",
+  "common.searchPlaceholder": "Search…",
+  "common.filter": "Filter",
+  "common.allCategories": "All Categories",
+  "common.allStatuses": "All Statuses",
+  "common.allCourses": "All Courses",
+  "common.clearFilters": "Clear filters",
+  "common.noResultsFound": "No results found",
+  "common.noResultsFoundDesc": "Try adjusting your search or filter to find what you're looking for.",
+
+  "course.category.physics": "Physics",
+  "course.category.chemistry": "Chemistry",
+  "course.category.biology": "Biology",
+  "course.category.mathematics": "Mathematics",
+  "course.category.english": "English",
+  "course.category.bangla": "Bangla",
+  "course.category.general_science": "General Science",
+  "course.category.ict": "ICT",
+  "course.category.other": "Other",
+
+  "teacher.courseForm.categoryLabel": "Subject Category",
+  "teacher.courseForm.categoryPlaceholder": "Select a category",
+
+  "teacher.courses.search.placeholder": "Search courses…",
+  "teacher.exams.search.placeholder": "Search exams…",
+  "teacher.assignments.search.placeholder": "Search assignments…",
+  "student.courses.search.placeholder": "Search my courses…",
+  "marketing.courses.search.placeholder": "Search courses…",
+
+  "teacher.exams.filter.byCourse": "Filter by course",
+  "teacher.assignments.filter.byCourse": "Filter by course",
+
+  "exam.questionType.multipleChoice": "Multiple Choice",
+  "exam.questionType.trueFalse": "True / False",
+  "exam.questionType.label": "Question Type",
+  "exam.trueFalse.true": "True",
+  "exam.trueFalse.false": "False",
+  "exam.builder.addTrueFalseQuestion": "Add True/False Question",
+  "exam.builder.addMcqQuestion": "Add MCQ Question",
+  "exam.builder.questionTypeHint": "True/False questions automatically get two options. Select which is correct."
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

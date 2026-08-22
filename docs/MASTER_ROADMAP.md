@@ -30,7 +30,7 @@ InsideJibon is a completely free personal educational platform. Key conventions 
 | **Phase 4** | Student Exams & Grading | ✅ **Completed** | Content snapshot immutability, countdown timer, auto-grading, results breakdown |
 | **Phase 4.5** | Assignments System | ✅ **Completed** | File submissions, deadlines, late policy, teacher grading drawer, R2 file streaming |
 | **Phase 5** | Classes, Announcements & Admin | ✅ **Completed** | Live/recorded class sessions, course announcements, admin user directory & role switcher, loading UI |
-| **Phase 6** | Search, Categories & True/False | ⏳ **Ready** | Public/teacher search & filter, course subject categories, true/false question format |
+| **Phase 6** | Search, Categories & True/False | ✅ **Completed** | Public/teacher search & filter, course subject categories, true/false question format |
 | **Phase 7** | Notifications & Analytics | 📋 **Queued** | In-app notification bell & unread counts, teacher per-course progress & grade analytics |
 | **Phase 8** | Profile, Export & Discussion | 📋 **Queued** | User profile view, CSV export of grades/rosters, optional lesson-level discussion |
 | **Phase 9** | Production Hardening & PWA | 📋 **Queued** | PWA manifest, accessibility audit (ARIA/keyboard), rate limiting, performance audit |

@@ -4,6 +4,7 @@ import type {
   AssignmentSubmission,
   SubmissionStatus,
   Course,
+  CourseCategory,
   CourseModule,
   CourseStatus,
   Lesson,
@@ -20,6 +21,7 @@ export type {
   AssignmentSubmission,
   SubmissionStatus,
   Course,
+  CourseCategory,
   CourseModule,
   CourseStatus,
   Lesson,
@@ -70,6 +72,7 @@ export interface PublicCourseSummary {
   title: string;
   description: string | null;
   thumbnailUrl: string | null;
+  category: CourseCategory;
   publishedAt: Date | null;
   teacher: PublicTeacher;
   moduleCount: number;

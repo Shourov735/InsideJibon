@@ -2,6 +2,20 @@ import { z } from "zod";
 
 export const courseSlugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+export const COURSE_CATEGORIES = [
+  "physics",
+  "chemistry",
+  "biology",
+  "mathematics",
+  "english",
+  "bangla",
+  "general_science",
+  "ict",
+  "other",
+] as const;
+
+export type CourseCategoryValue = (typeof COURSE_CATEGORIES)[number];
+
 export function slugify(text: string): string {
   return text
     .toString()
@@ -36,6 +50,7 @@ export const createCourseSchema = z.object({
     )
     .optional()
     .or(z.literal("")),
+  category: z.enum(COURSE_CATEGORIES).optional().nullable(),
 });
 
 export const updateCourseSchema = z.object({
@@ -66,6 +81,7 @@ export const updateCourseSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal("")),
+  category: z.enum(COURSE_CATEGORIES).optional().nullable(),
 });
 
 export const deleteCourseSchema = z.object({

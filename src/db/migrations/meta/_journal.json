@@ -64,6 +64,13 @@
       "when": 1787347620325,
       "tag": "0008_modern_dust",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787383440484,
+      "tag": "0009_nice_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }

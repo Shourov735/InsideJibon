@@ -18,6 +18,18 @@ export const courseStatusEnum = pgEnum("course_status", [
   "archived",
 ]);
 
+export const courseCategoryEnum = pgEnum("course_category", [
+  "physics",
+  "chemistry",
+  "biology",
+  "mathematics",
+  "english",
+  "bangla",
+  "general_science",
+  "ict",
+  "other",
+]);
+
 export const courses = pgTable(
   "courses",
   {
@@ -29,6 +41,7 @@ export const courses = pgTable(
     slug: text("slug").notNull(),
     description: text("description"),
     thumbnailUrl: text("thumbnail_url"),
+    category: courseCategoryEnum("category"),
     status: courseStatusEnum("status").notNull().default("draft"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -43,6 +56,7 @@ export const courses = pgTable(
     index("courses_teacher_id_idx").on(table.teacherId),
     index("courses_status_idx").on(table.status),
     index("courses_teacher_status_idx").on(table.teacherId, table.status),
+    index("courses_category_idx").on(table.category),
   ]
 );
 
@@ -98,6 +112,7 @@ export const lessons = pgTable(
 export type Course = typeof courses.$inferSelect;
 export type NewCourse = typeof courses.$inferInsert;
 export type CourseStatus = Course["status"];
+export type CourseCategory = Course["category"];
 
 export type CourseModule = typeof courseModules.$inferSelect;
 export type NewCourseModule = typeof courseModules.$inferInsert;

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { courseModules, courses, lessons, users } from "@/db/schema";
@@ -10,6 +10,9 @@ import type {
   PublicModule,
   PublicTeacher,
 } from "@/types/course";
+import type { CourseCategory } from "@/db/schema";
+
+export type { CourseCategory };
 
 /**
  * Public, read-only course queries. These are a separate concern from the
@@ -39,12 +42,31 @@ function toPublicTeacher(
   return { id, name, imageUrl };
 }
 
+export interface PublicCoursesFilter {
+  q?: string;
+  category?: CourseCategory;
+}
+
 /**
  * Lists all published courses with module/lesson counts and teacher
  * information, ordered by most recently published first.
+ * Supports optional search query and category filter.
  */
-export async function getPublishedCourses(): Promise<PublicCourseSummary[]> {
+export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise<PublicCourseSummary[]> {
   const db = getDb();
+
+  const conditions = [eq(courses.status, "published")];
+  if (filter?.q) {
+    conditions.push(
+      or(
+        ilike(courses.title, `%${filter.q}%`),
+        ilike(courses.description, `%${filter.q}%`)
+      )!
+    );
+  }
+  if (filter?.category) {
+    conditions.push(eq(courses.category, filter.category));
+  }
 
   const rows = await db
     .select({
@@ -53,6 +75,7 @@ export async function getPublishedCourses(): Promise<PublicCourseSummary[]> {
       title: courses.title,
       description: courses.description,
       thumbnailUrl: courses.thumbnailUrl,
+      category: courses.category,
       publishedAt: courses.publishedAt,
       teacherId: users.id,
       teacherName: users.name,
@@ -62,7 +85,7 @@ export async function getPublishedCourses(): Promise<PublicCourseSummary[]> {
     })
     .from(courses)
     .innerJoin(users, eq(courses.teacherId, users.id))
-    .where(eq(courses.status, "published"))
+    .where(and(...conditions))
     .orderBy(desc(courses.publishedAt), desc(courses.updatedAt));
 
   return rows.map((row) => ({
@@ -71,6 +94,7 @@ export async function getPublishedCourses(): Promise<PublicCourseSummary[]> {
     title: row.title,
     description: row.description,
     thumbnailUrl: row.thumbnailUrl,
+    category: row.category,
     publishedAt: row.publishedAt,
     teacher: toPublicTeacher(row.teacherId, row.teacherName, row.teacherImageUrl),
     moduleCount: row.moduleCount ?? 0,
@@ -94,6 +118,7 @@ export async function getPublishedCourseBySlugWithTeacher(
       title: courses.title,
       description: courses.description,
       thumbnailUrl: courses.thumbnailUrl,
+      category: courses.category,
       publishedAt: courses.publishedAt,
       teacherId: users.id,
       teacherName: users.name,
@@ -159,6 +184,7 @@ export async function getPublishedCourseBySlugWithTeacher(
     title: row.title,
     description: row.description,
     thumbnailUrl: row.thumbnailUrl,
+    category: row.category,
     publishedAt: row.publishedAt,
     teacher: toPublicTeacher(row.teacherId, row.teacherName, row.teacherImageUrl),
     moduleCount: modules.length,

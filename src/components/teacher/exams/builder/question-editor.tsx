@@ -87,8 +87,10 @@ export function QuestionEditor({
                 })}
               </h2>
               <span className="text-[11px] text-secondary">
-                {t("student.exam.multipleChoice")} •{" "}
-                {tn("common.optionCountLower", question.options.length)}
+                {question.questionType === "true_false"
+                  ? t("exam.questionType.trueFalse")
+                  : t("student.exam.multipleChoice")}{" "}
+                • {tn("common.optionCountLower", question.options.length)}
               </span>
             </div>
           </div>
@@ -170,7 +172,9 @@ export function QuestionEditor({
               {t("teacher.examBuilder.answerOptions")}
             </h3>
             <p className="text-xs text-on-surface-variant">
-              {t("teacher.examBuilder.answerOptionsHint")}
+              {question.questionType === "true_false"
+                ? t("exam.builder.questionTypeHint")
+                : t("teacher.examBuilder.answerOptionsHint")}
             </p>
           </div>
 
@@ -188,6 +192,8 @@ export function QuestionEditor({
           ) : (
             question.options.map((option) => {
               const letter = String.fromCharCode(64 + option.position);
+              const isTrueFalse = question.questionType === "true_false";
+
               return (
                 <div
                   key={option.id}
@@ -243,14 +249,14 @@ export function QuestionEditor({
                           e.currentTarget.blur();
                         }
                       }}
-                      disabled={!editable}
+                      disabled={!editable || isTrueFalse}
                       maxLength={500}
                       placeholder={t("teacher.examBuilder.enterOptionText", { letter })}
                       className={`w-full rounded-lg border bg-transparent px-3 py-1.5 text-sm text-on-surface outline-none transition-colors focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 ${
                         option.isCorrect
                           ? "border-emerald-300 font-medium"
                           : "border-outline-variant/60"
-                      } disabled:opacity-60`}
+                      } disabled:opacity-80`}
                     />
                   </div>
 
@@ -272,7 +278,7 @@ export function QuestionEditor({
                       )
                     )}
 
-                    {editable && (
+                    {editable && !isTrueFalse && (
                       <button
                         type="button"
                         onClick={() => onDeleteOption(option.id)}
@@ -292,7 +298,7 @@ export function QuestionEditor({
         </div>
 
         {/* Add Option Form */}
-        {editable && (
+        {editable && question.questionType !== "true_false" && (
           <form onSubmit={handleAddOptionSubmit} className="flex items-center gap-2.5 pt-2">
             <input
               type="text"

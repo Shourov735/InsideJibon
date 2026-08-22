@@ -55,6 +55,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
   const [newQuestionFormText, setNewQuestionFormText] = useState("");
   const [newQuestionFormMarks, setNewQuestionFormMarks] = useState("1");
+  const [newQuestionFormType, setNewQuestionFormType] = useState<"multiple_choice" | "true_false">("multiple_choice");
 
   const runAction = async (fn: () => Promise<unknown>) => {
     setErrorMessage(null);
@@ -77,6 +78,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
     await runAction(async () => {
       const res = await createQuestionAction({
         examId: exam.id,
+        questionType: newQuestionFormType,
         questionText: newQuestionFormText.trim(),
         marks: Number(newQuestionFormMarks) || 1,
         explanation: null,
@@ -86,13 +88,14 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
 
       setNewQuestionFormText("");
       setNewQuestionFormMarks("1");
+      setNewQuestionFormType("multiple_choice");
       setIsAddingQuestion(false);
       setSelectedQuestionId(res.data.id);
       setMobileTab("editor");
     });
   };
 
-  // Quick Add Question
+  // Quick Add MCQ Question
   const handleQuickAddQuestion = async () => {
     await runAction(async () => {
       const defaultText = t("common.questionLabel", {
@@ -100,6 +103,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
       });
       const res = await createQuestionAction({
         examId: exam.id,
+        questionType: "multiple_choice",
         questionText: defaultText,
         marks: 1,
         explanation: null,
@@ -116,6 +120,27 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
         { questionId: res.data.id, optionText: t("teacher.qe.option", { position: 2 }), isCorrect: false },
         exam.id
       );
+
+      setSelectedQuestionId(res.data.id);
+      setMobileTab("editor");
+    });
+  };
+
+  // Quick Add True/False Question
+  const handleQuickAddTrueFalseQuestion = async () => {
+    await runAction(async () => {
+      const defaultText = t("common.questionLabel", {
+        position: exam.questions.length + 1,
+      });
+      const res = await createQuestionAction({
+        examId: exam.id,
+        questionType: "true_false",
+        questionText: defaultText,
+        marks: 1,
+        explanation: null,
+      });
+
+      if (!res.success) throw new Error(res.error);
 
       setSelectedQuestionId(res.data.id);
       setMobileTab("editor");
@@ -425,27 +450,36 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             </div>
 
             {editable && (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleQuickAddQuestion}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container hover:text-on-primary-container transition-colors cursor-pointer"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>{t("teacher.examBuilder.quickAddQuestion")}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsAddingQuestion(!isAddingQuestion)}
-                  title={t("teacher.examBuilder.addWithCustomText")}
-                  className="rounded-xl border border-outline-variant bg-surface-container-lowest p-2 text-secondary hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleQuickAddQuestion}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container hover:text-on-primary-container transition-colors cursor-pointer"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>{t("exam.builder.addMcqQuestion")}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleQuickAddTrueFalseQuestion}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+                  >
+                    <span>{t("exam.builder.addTrueFalseQuestion")}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingQuestion(!isAddingQuestion)}
+                    title={t("teacher.examBuilder.addWithCustomText")}
+                    className="rounded-xl border border-outline-variant bg-surface-container-lowest p-2 text-secondary hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             )}
 
@@ -455,7 +489,17 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                 onSubmit={handleCreateQuestion}
                 className="mt-2 rounded-xl border border-outline-variant bg-surface-container-lowest p-3 space-y-2.5 shadow-xs"
               >
-                <p className="text-xs font-bold text-on-surface">{t("teacher.examBuilder.newQuestion")}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-on-surface">{t("teacher.examBuilder.newQuestion")}</p>
+                  <select
+                    value={newQuestionFormType}
+                    onChange={(e) => setNewQuestionFormType(e.target.value as "multiple_choice" | "true_false")}
+                    className="rounded-lg border border-outline-variant bg-surface-container-low px-2 py-1 text-[11px] text-on-surface outline-none"
+                  >
+                    <option value="multiple_choice">{t("exam.questionType.multipleChoice")}</option>
+                    <option value="true_false">{t("exam.questionType.trueFalse")}</option>
+                  </select>
+                </div>
                 <textarea
                   value={newQuestionFormText}
                   onChange={(e) => setNewQuestionFormText(e.target.value)}
@@ -649,16 +693,25 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                 {t("teacher.examBuilder.noQuestionSelectedDesc")}
               </p>
               {editable && (
-                <button
-                  type="button"
-                  onClick={handleQuickAddQuestion}
-                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container transition-colors cursor-pointer"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>{t("teacher.examBuilder.createFirstQuestion")}</span>
-                </button>
+                <div className="mt-5 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleQuickAddQuestion}
+                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container transition-colors cursor-pointer"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>{t("exam.builder.addMcqQuestion")}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleQuickAddTrueFalseQuestion}
+                    className="inline-flex items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+                  >
+                    <span>{t("exam.builder.addTrueFalseQuestion")}</span>
+                  </button>
+                </div>
               )}
             </div>
           ) : (

@@ -1380,5 +1380,46 @@ export const bn: Dictionary = {
   "teacher.announcements.noAnnouncements": "এখনো কোনো ঘোষণা দেওয়া হয়নি।",
   "teacher.announcements.deleteConfirm": "আপনি কি নিশ্চিত যে আপনি এই ঘোষণাটি মুছতে চান?",
   "teacher.announcements.content": "ঘোষণার বিষয়বস্তু",
-  "common.loading": "লোড হচ্ছে..."
+  "common.loading": "লোড হচ্ছে...",
+
+  "common.search": "অনুসন্ধান",
+  "common.searchPlaceholder": "অনুসন্ধান করুন…",
+  "common.filter": "ফিল্টার",
+  "common.allCategories": "সব বিষয়",
+  "common.allStatuses": "সব স্ট্যাটাস",
+  "common.allCourses": "সব কোর্স",
+  "common.clearFilters": "ফিল্টার মুছুন",
+  "common.noResultsFound": "কোনো ফলাফল পাওয়া যায়নি",
+  "common.noResultsFoundDesc": "অনুসন্ধান বা ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।",
+
+  "course.category.physics": "পদার্থবিজ্ঞান",
+  "course.category.chemistry": "রসায়ন",
+  "course.category.biology": "জীববিজ্ঞান",
+  "course.category.mathematics": "গণিত",
+  "course.category.english": "ইংরেজি",
+  "course.category.bangla": "বাংলা",
+  "course.category.general_science": "সাধারণ বিজ্ঞান",
+  "course.category.ict": "তথ্য ও যোগাযোগ প্রযুক্তি",
+  "course.category.other": "অন্যান্য",
+
+  "teacher.courseForm.categoryLabel": "বিষয় ক্যাটাগরি",
+  "teacher.courseForm.categoryPlaceholder": "ক্যাটাগরি বেছে নিন",
+
+  "teacher.courses.search.placeholder": "কোর্স খুঁজুন…",
+  "teacher.exams.search.placeholder": "পরীক্ষা খুঁজুন…",
+  "teacher.assignments.search.placeholder": "অ্যাসাইনমেন্ট খুঁজুন…",
+  "student.courses.search.placeholder": "আমার কোর্স খুঁজুন…",
+  "marketing.courses.search.placeholder": "কোর্স খুঁজুন…",
+
+  "teacher.exams.filter.byCourse": "কোর্স অনুযায়ী ফিল্টার",
+  "teacher.assignments.filter.byCourse": "কোর্স অনুযায়ী ফিল্টার",
+
+  "exam.questionType.multipleChoice": "বহুনির্বাচনি",
+  "exam.questionType.trueFalse": "সত্য / মিথ্যা",
+  "exam.questionType.label": "প্রশ্নের ধরন",
+  "exam.trueFalse.true": "সত্য",
+  "exam.trueFalse.false": "মিথ্যা",
+  "exam.builder.addTrueFalseQuestion": "সত্য/মিথ্যা প্রশ্ন যোগ করুন",
+  "exam.builder.addMcqQuestion": "MCQ প্রশ্ন যোগ করুন",
+  "exam.builder.questionTypeHint": "সত্য/মিথ্যা প্রশ্নে স্বয়ংক্রিয়ভাবে দুটি অপশন তৈরি হয়। কোনটি সঠিক তা নির্বাচন করুন।"
 };

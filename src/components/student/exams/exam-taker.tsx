@@ -280,6 +280,11 @@ export function ExamTaker({
                       total: totalQuestions,
                     })}
                   </span>
+                  {currentQuestion.questionType === "true_false" && (
+                    <span className="rounded bg-surface-container-high px-2 py-0.5 text-[10px] font-semibold text-secondary">
+                      {t("exam.questionType.trueFalse")}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">

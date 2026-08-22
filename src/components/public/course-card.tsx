@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { PublicCourseSummary } from "@/types/course";
+import { CategoryBadge } from "@/components/shared/category-badge";
 
 interface PublicCourseCardProps {
   course: PublicCourseSummary;
@@ -60,7 +61,10 @@ export function PublicCourseCard({ course }: PublicCourseCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <p className="font-mono text-[11px] text-secondary">/{course.slug}</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-mono text-[11px] text-secondary">/{course.slug}</p>
+          {course.category && <CategoryBadge category={course.category} />}
+        </div>
         <h3 className="mt-1 line-clamp-1 text-lg font-bold tracking-tight text-on-surface group-hover:text-primary">
           {course.title}
         </h3>

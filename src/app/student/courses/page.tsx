@@ -4,13 +4,31 @@ import { requireStudent } from "@/lib/permissions";
 import { getStudentDashboard } from "@/services/learning";
 import { StudentCourseCard } from "@/components/student/student-course-card";
 import { getTranslator } from "@/i18n/server";
+import { SearchFilterBar } from "@/components/shared/search-filter-bar";
 
 export const dynamic = "force-dynamic";
 
-export default async function StudentCoursesPage() {
+interface StudentCoursesPageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function StudentCoursesPage({ searchParams }: StudentCoursesPageProps) {
   const user = await requireStudent();
   const t = await getTranslator();
-  const courses = await getStudentDashboard(user.id);
+  const params = await searchParams;
+  const q = (params.q ?? "").trim().toLowerCase();
+
+  const allCourses = await getStudentDashboard(user.id);
+  const courses = q
+    ? allCourses.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) ||
+          (c.description && c.description.toLowerCase().includes(q)) ||
+          (c.teacherName && c.teacherName.toLowerCase().includes(q))
+      )
+    : allCourses;
+
+  const isFiltered = Boolean(q);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
@@ -23,8 +41,14 @@ export default async function StudentCoursesPage() {
         </p>
       </div>
 
+      {allCourses.length > 0 && (
+        <div className="mt-6">
+          <SearchFilterBar searchPlaceholder={t("student.courses.search.placeholder")} />
+        </div>
+      )}
+
       {courses.length === 0 ? (
-        <div className="mt-10 rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center">
+        <div className="mt-8 rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-high text-primary">
             <svg
               className="h-7 w-7"
@@ -41,28 +65,30 @@ export default async function StudentCoursesPage() {
             </svg>
           </div>
           <h2 className="mt-4 text-lg font-bold text-on-surface">
-            {t("student.courses.emptyTitle")}
+            {isFiltered ? t("common.noResultsFound") : t("student.courses.emptyTitle")}
           </h2>
           <p className="mt-1 text-sm text-secondary">
-            {t("student.courses.emptyDesc")}
+            {isFiltered ? t("common.noResultsFoundDesc") : t("student.courses.emptyDesc")}
           </p>
-          <Link
-            href="/courses"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
-          >
-            {t("student.courses.emptyCta")}
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {!isFiltered && (
+            <Link
+              href="/courses"
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
             >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
+              {t("student.courses.emptyCta")}
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          )}
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -2,7 +2,7 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { examQuestions, questions, type Question } from "@/db/schema";
+import { examQuestions, questionOptions, questions, type Question } from "@/db/schema";
 import type {
   CreateQuestionInput,
   UpdateQuestionInput,
@@ -26,6 +26,7 @@ import {
 /**
  * Creates a question at the end of the exam's question sequence. The marks
  * default to 1 and live on the exam_questions link.
+ * For true_false questions, the two options (True/False) are auto-created.
  */
 export async function createQuestion(
   teacherId: string,
@@ -43,10 +44,12 @@ export async function createQuestion(
 
   const nextPosition = (maxPos?.max ?? 0) + 1;
   const marks = input.marks == null ? 1 : Number(input.marks);
+  const questionType = input.questionType ?? "multiple_choice";
 
   const [question] = await db
     .insert(questions)
     .values({
+      questionType,
       questionText: input.questionText.trim(),
       explanation: input.explanation?.trim() || null,
     })
@@ -59,9 +62,23 @@ export async function createQuestion(
     marks,
   });
 
+  // Auto-create True/False options for true_false question type
+  let options: typeof questionOptions.$inferSelect[] = [];
+  if (questionType === "true_false") {
+    const [trueOpt] = await db
+      .insert(questionOptions)
+      .values({ questionId: question.id, optionText: "True", isCorrect: false, position: 1 })
+      .returning();
+    const [falseOpt] = await db
+      .insert(questionOptions)
+      .values({ questionId: question.id, optionText: "False", isCorrect: false, position: 2 })
+      .returning();
+    options = [trueOpt, falseOpt];
+  }
+
   await touchExam(input.examId);
 
-  return { ...question, position: nextPosition, marks, options: [] };
+  return { ...question, position: nextPosition, marks, options };
 }
 
 /**

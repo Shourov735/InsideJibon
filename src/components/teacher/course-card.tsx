@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { CourseWithCounts } from "@/types/course";
 import { StatusBadge } from "./status-badge";
+import { CategoryBadge } from "@/components/shared/category-badge";
 import { getTranslator } from "@/i18n/server";
 
 interface CourseCardProps {
@@ -35,6 +36,12 @@ export async function CourseCard({ course }: CourseCardProps) {
         <p className="mt-2 line-clamp-2 text-sm text-on-surface-variant">
           {course.description || t("teacher.courseCard.noDescription")}
         </p>
+
+        {course.category && (
+          <div className="mt-2">
+            <CategoryBadge category={course.category} />
+          </div>
+        )}
 
         <div className="mt-4 flex items-center gap-4 text-xs font-medium text-secondary">
           <div className="flex items-center gap-1.5">
