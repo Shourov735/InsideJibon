@@ -4,6 +4,15 @@ import { lessonComments, enrollments } from "@/db/schema/learning";
 import { courses, lessons, courseModules } from "@/db/schema/courses";
 import { users } from "@/db/schema";
 
+export interface LessonCommentItem {
+  id: string;
+  content: string;
+  createdAt: Date;
+  userId: string;
+  userName: string | null;
+  userImage: string | null;
+}
+
 export async function getLessonComments(lessonId: string, userId: string) {
   // Check if user is enrolled or teacher
   const lessonData = await getDb()

@@ -58,6 +58,12 @@ export const en = {
   "common.error": "Error",
   "common.questionLabel": "Question {position}",
 
+  "nav.courses": "Courses",
+  "nav.dashboard": "Dashboard",
+  "nav.getStarted": "Get Started",
+  "nav.home": "Home",
+  "nav.instructor": "Instructor",
+  "nav.signIn": "Sign In",
   "nav.student.dashboard": "Dashboard",
   "nav.student.courses": "My Courses",
   "nav.student.browseCourses": "Browse Courses",
@@ -68,6 +74,12 @@ export const en = {
   "nav.teacher.createCourse": "Create Course",
   "nav.teacher.createExam": "Create Exam",
   "nav.teacher.educatorBadge": "Educator",
+
+  "footer.madeWith": "Made with ❤️ by",
+  "footer.platform": "Platform",
+  "footer.rights": "All rights reserved.",
+  "footer.subjects": "Subjects",
+  "footer.tagline": "A free structured educational platform for SSC, HSC & University Admission preparation in Physics, Chemistry, Biology, and Mathematics.",
 
   "marketing.heroBadge": "Learn · Practice · Perform",
   "marketing.heroTitleA": "Inside knowledge,",

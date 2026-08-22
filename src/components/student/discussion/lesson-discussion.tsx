@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addCommentAction, deleteCommentAction } from "@/app/student/actions/comment-actions";
+import type { LessonCommentItem } from "@/services/learning/comments";
 
 export function LessonDiscussion({ 
   lessonId, 
@@ -11,7 +12,7 @@ export function LessonDiscussion({
 }: { 
   lessonId: string;
   courseId: string;
-  comments: any[];
+  comments: LessonCommentItem[];
   currentUserId: string;
 }) {
   const [loading, setLoading] = useState(false);
@@ -65,10 +66,10 @@ export function LessonDiscussion({
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                  {(comment.authorName || comment.userName || "U").charAt(0)}
+                  {(comment.userName || "U").charAt(0)}
                 </div>
                 <div>
-                  <div className="font-semibold text-sm">{comment.authorName || comment.userName || "User"}</div>
+                  <div className="font-semibold text-sm">{comment.userName || "User"}</div>
                   <div className="text-xs text-secondary">
                     {new Date(comment.createdAt).toLocaleDateString()}
                   </div>

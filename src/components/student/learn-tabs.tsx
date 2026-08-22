@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils";
 import { CourseSessionsList } from "./classes/course-sessions-list";
 import { CourseAnnouncementsList } from "./announcements/course-announcements-list";
 import { LessonDiscussion } from "./discussion/lesson-discussion";
+import type { LessonCommentItem } from "@/services/learning/comments";
 
 interface LearnPageTabsProps {
   sessions: ClassSession[];
   announcements: Announcement[];
-  comments?: any[];
+  comments?: LessonCommentItem[];
   lessonId?: string;
   courseId?: string;
   currentUserId?: string;

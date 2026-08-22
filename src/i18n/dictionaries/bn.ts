@@ -60,6 +60,12 @@ export const bn: Dictionary = {
   "common.error": "ত্রুটি",
   "common.questionLabel": "প্রশ্ন {position}",
 
+  "nav.courses": "কোর্সসমূহ",
+  "nav.dashboard": "ড্যাশবোর্ড",
+  "nav.getStarted": "শুরু করুন",
+  "nav.home": "হোম",
+  "nav.instructor": "শিক্ষক",
+  "nav.signIn": "লগইন",
   "nav.student.dashboard": "ড্যাশবোর্ড",
   "nav.student.courses": "আমার কোর্স",
   "nav.student.browseCourses": "কোর্স দেখুন",
@@ -70,6 +76,12 @@ export const bn: Dictionary = {
   "nav.teacher.createCourse": "কোর্স তৈরি করুন",
   "nav.teacher.createExam": "পরীক্ষা তৈরি করুন",
   "nav.teacher.educatorBadge": "শিক্ষক",
+
+  "footer.madeWith": "তৈরি করেছেন",
+  "footer.platform": "প্ল্যাটফর্ম",
+  "footer.rights": "সর্বস্বত্ব সংরক্ষিত।",
+  "footer.subjects": "বিষয়সমূহ",
+  "footer.tagline": "এসএসসি, এইচএসসি ও বিশ্ববিদ্যালয় ভর্তি প্রস্তুতির জন্য বিনামূল্যে পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান ও গণিতের কাঠামোগত শিক্ষামূলক প্ল্যাটফর্ম।",
 
   "marketing.heroBadge": "শিখুন · অনুশীলন করুন · পারফর্ম করুন",
   "marketing.heroTitleA": "জ্ঞানের ভেতরে,",

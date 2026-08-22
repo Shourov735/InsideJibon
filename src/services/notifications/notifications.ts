@@ -3,7 +3,7 @@ import { notifications, Notification, enrollments } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { count } from "drizzle-orm";
 
-export async function createNotification(userId: string, input: { type: any, title: string, body: string, link?: string }): Promise<Notification> {
+export async function createNotification(userId: string, input: { type: Notification["type"], title: string, body: string, link?: string }): Promise<Notification> {
   const db = getDb();
   const [notification] = await db.insert(notifications).values({
     userId,
@@ -15,7 +15,7 @@ export async function createNotification(userId: string, input: { type: any, tit
   return notification;
 }
 
-export async function createCourseNotifications(courseId: string, input: { type: any, title: string, body: string, link?: string }): Promise<void> {
+export async function createCourseNotifications(courseId: string, input: { type: Notification["type"], title: string, body: string, link?: string }): Promise<void> {
   const db = getDb();
   const students = await db.select().from(enrollments).where(eq(enrollments.courseId, courseId));
   for (const student of students) {
