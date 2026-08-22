@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  images: {
+    // Clerk profile photos are served from img.clerk.com and rendered
+    // through next/image (e.g. the admin user directory avatars).
+    remotePatterns: [{ protocol: "https", hostname: "img.clerk.com" }],
+  },
   async headers() {
     return [
       {

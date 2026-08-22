@@ -15,10 +15,10 @@ export async function requireUser(): Promise<CurrentUser> {
   if (user) return user;
 
   // The session token is valid but the user has not been synced into the
-  // users table yet (webhook pending). Send them to the homepage instead
-  // of the sign-in page so signed-in users are not bounced into a
-  // sign-in loop while the webhook catches up.
-  if (status === "not-synced") redirect("/");
+  // users table yet (webhook pending). Send them to an explanatory page
+  // instead of the sign-in page or homepage so signed-in users are not
+  // bounced into a sign-in loop while the webhook catches up.
+  if (status === "not-synced") redirect("/account-pending");
 
   redirect("/sign-in");
 }

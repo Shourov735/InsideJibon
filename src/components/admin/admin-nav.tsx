@@ -5,6 +5,8 @@ import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import type { CurrentUser } from "@/lib/auth";
 import { getTranslator } from "@/i18n/server";
 
+import { BrandLogo } from "@/components/shared/brand-logo";
+
 interface AdminNavProps {
   user: CurrentUser;
   activeSection?: "dashboard" | "users";
@@ -16,32 +18,7 @@ export async function AdminNav({ user, activeSection = "dashboard" }: AdminNavPr
     <header className="sticky top-0 z-40 w-full border-b border-outline-variant bg-surface-container-lowest text-on-surface shadow-xs">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8">
-          <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-on-primary shadow-xs">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-                <path d="M6 6h10" />
-                <path d="M6 10h10" />
-              </svg>
-            </div>
-            <div>
-              <span className="text-lg font-bold tracking-tight text-primary">
-                {t("brand.name")}
-              </span>
-              <span className="ml-2 rounded bg-surface-container-high px-1.5 py-0.5 text-[10px] font-semibold text-secondary uppercase">
-                {t("admin.nav.badge", { defaultValue: "Admin" })}
-              </span>
-            </div>
-          </Link>
+          <BrandLogo href="/admin" badge="ADMIN" />
 
           <nav className="hidden items-center gap-1 md:flex">
             <Link

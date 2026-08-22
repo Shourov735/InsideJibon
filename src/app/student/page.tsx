@@ -120,22 +120,29 @@ export default async function StudentDashboardPage() {
               </div>
             </section>
           ) : (
-            <section className="bento-card-static p-8 text-center border-dashed">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+            <section className="bento-card overflow-hidden">
+              <div className="relative aspect-[21/9] w-full overflow-hidden bg-surface-container-high">
+                <img
+                  src="/images/learning-banner.jpg"
+                  alt="Start Learning"
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex items-end p-6 sm:p-8">
+                  <div className="text-white">
+                    <span className="text-xs font-semibold text-cyan-300 uppercase tracking-wider">Start Your Journey</span>
+                    <h3 className="font-display text-xl sm:text-2xl font-bold mt-0.5">{t("student.dashboard.getStarted")}</h3>
+                    <p className="text-xs sm:text-sm text-gray-200 mt-1 max-w-md">
+                      {t("student.dashboard.noEnrollments")}
+                    </p>
+                    <Link
+                      href="/courses"
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-xs font-bold text-primary shadow-sm hover:bg-gray-100 transition-colors"
+                    >
+                      {t("student.dashboard.browseCourses")} →
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <h3 className="font-display text-base font-bold text-on-surface">{t("student.dashboard.getStarted")}</h3>
-              <p className="mt-1 text-sm text-secondary max-w-sm mx-auto">
-                {t("student.dashboard.noEnrollments")}
-              </p>
-              <Link
-                href="/courses"
-                className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-on-primary shadow-sm hover:bg-primary-container transition-colors"
-              >
-                {t("student.dashboard.browseCourses")} →
-              </Link>
             </section>
           )}
 

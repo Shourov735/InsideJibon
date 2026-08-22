@@ -5,22 +5,26 @@ import { SignInButton, Show, UserButton } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useState } from "react";
 
-export function MarketingHeader() {
+import { BrandLogo } from "@/components/shared/brand-logo";
+
+type HeaderRole = "student" | "teacher" | "admin" | null;
+
+const DASHBOARD_PATH: Record<Exclude<HeaderRole, null>, string> = {
+  student: "/student",
+  teacher: "/teacher",
+  admin: "/admin",
+};
+
+export function MarketingHeader({ role = null }: { role?: HeaderRole }) {
   const { t } = useTranslations();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const dashboardHref = role ? DASHBOARD_PATH[role] : "/student";
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-outline-variant bg-surface/95 backdrop-blur-md transition-all">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary text-xs font-bold shadow-sm">
-            IJ
-          </div>
-          <span className="font-display text-lg font-bold tracking-tight text-primary">
-            InsideJibon
-          </span>
-        </Link>
+        <BrandLogo href="/" />
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
@@ -47,7 +51,7 @@ export function MarketingHeader() {
           </Show>
           <Show when="signed-in">
             <Link
-              href="/student"
+              href={dashboardHref}
               className="hidden md:inline-flex text-sm font-semibold text-primary hover:underline"
             >
               {t("nav.dashboard")}
@@ -79,7 +83,7 @@ export function MarketingHeader() {
             <Link href="/sign-up" onClick={() => setMobileOpen(false)} className="block rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary text-center">{t("nav.getStarted")}</Link>
           </Show>
           <Show when="signed-in">
-            <Link href="/student" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.dashboard")}</Link>
+            <Link href={dashboardHref} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.dashboard")}</Link>
           </Show>
         </div>
       )}

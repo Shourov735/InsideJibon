@@ -21,11 +21,32 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "InsideJibon",
+    default: "InsideJibon | Academic Excellence",
     template: "%s | InsideJibon",
   },
   description:
-    "InsideJibon — an educational platform for courses, exams, assignments and student progress tracking.",
+    "InsideJibon — structured academic learning, exams, assignments and progress tracking for Physics, Chemistry, Biology, ICT & Mathematics.",
+  icons: {
+    icon: "/images/logo-icon.jpg",
+    shortcut: "/images/logo-icon.jpg",
+    apple: "/images/logo-icon.jpg",
+  },
+  openGraph: {
+    title: "InsideJibon | Academic Excellence",
+    description: "Structured academic learning, exams and assignments for Physics, Chemistry, Biology, ICT & Mathematics.",
+    url: "https://insidejibon.com",
+    siteName: "InsideJibon",
+    images: [
+      {
+        url: "/images/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "InsideJibon Platform Banner",
+      },
+    ],
+    locale: "bn_BD",
+    type: "website",
+  },
 };
 
 export default async function RootLayout({
@@ -33,7 +54,10 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInFallbackRedirectUrl="/continue"
+      signUpFallbackRedirectUrl="/continue"
+    >
       <html
         lang={locale}
         className={`${jakartaSans.variable} ${inter.variable} h-full antialiased`}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslator } from "@/i18n/server";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 export async function MarketingFooter() {
   const t = await getTranslator();
@@ -9,11 +10,8 @@ export async function MarketingFooter() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand Column */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary text-xs font-bold">
-                IJ
-              </div>
-              <span className="font-display text-lg font-bold tracking-tight text-primary">InsideJibon</span>
+            <div className="mb-4">
+              <BrandLogo href="/" size="md" />
             </div>
             <p className="text-sm text-on-surface-variant leading-relaxed max-w-sm">
               {t("footer.tagline")}
@@ -63,8 +61,18 @@ export async function MarketingFooter() {
           <div>
             <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-primary">{t("footer.subjects")}</h3>
             <ul className="space-y-2">
-              {["পদার্থবিজ্ঞান (Physics)", "রসায়ন (Chemistry)", "জীববিজ্ঞান (Biology)", "গণিত (Mathematics)"].map((s) => (
-                <li key={s}><Link href="/courses" className="text-sm text-secondary hover:text-primary transition-colors">{s}</Link></li>
+              {[
+                { name: "পদার্থবিজ্ঞান (Physics)", slug: "physics" },
+                { name: "রসায়ন (Chemistry)", slug: "chemistry" },
+                { name: "জীববিজ্ঞান (Biology)", slug: "biology" },
+                { name: "তথ্য ও যোগাযোগ প্রযুক্তি (ICT)", slug: "ict" },
+                { name: "উচ্চতর গণিত (Mathematics)", slug: "mathematics" },
+              ].map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/courses?category=${s.slug}`} className="text-sm text-secondary hover:text-primary transition-colors">
+                    {s.name}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>

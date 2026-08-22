@@ -7,6 +7,8 @@ import { useState, ReactNode } from "react";
 import { useTranslations } from "@/i18n/client";
 import type { CurrentUser } from "@/lib/auth";
 
+import { BrandLogo } from "@/components/shared/brand-logo";
+
 interface StudentNavClientProps {
   user: CurrentUser;
   activeSection?: "dashboard" | "courses" | "profile";
@@ -21,17 +23,7 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
     <header className="sticky top-0 z-40 w-full border-b border-outline-variant bg-surface/95 backdrop-blur-md transition-all text-on-surface">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-6">
-          <Link href="/student" className="flex items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary text-xs font-bold shadow-sm">
-              IJ
-            </div>
-            <span className="hidden sm:inline-block font-display text-lg font-bold tracking-tight text-primary">
-              InsideJibon
-            </span>
-            <span className="ml-1 rounded-full bg-primary-container px-2 py-0.5 text-[10px] font-bold text-on-primary-container tracking-wider">
-              STUDENT
-            </span>
-          </Link>
+          <BrandLogo href="/student" badge="STUDENT" />
 
           <nav className="hidden md:flex items-center gap-1">
             <Link
