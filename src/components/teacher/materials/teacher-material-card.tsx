@@ -29,7 +29,7 @@ export function TeacherMaterialCard({
   onDeleted,
   onUpdated,
 }: TeacherMaterialCardProps) {
-  const { t, tn, locale } = useTranslations();
+  const { t, locale } = useTranslations();
 
   // Rename state
   const [isEditing, setIsEditing] = useState(false);

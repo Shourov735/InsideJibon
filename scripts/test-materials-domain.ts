@@ -11,7 +11,6 @@ try {
 
 import {
   courses,
-  courseModules,
   lessons,
   materials,
   users,
@@ -26,7 +25,7 @@ import {
   validateMaterialFile,
   MAX_MATERIAL_SIZE_BYTES,
 } from "../src/schemas/material";
-import { MemoryStorage, type Storage } from "../src/lib/storage";
+import { MemoryStorage } from "../src/lib/storage";
 
 const db = drizzle(neon(process.env.DATABASE_URL!));
 
@@ -121,7 +120,7 @@ async function runTests() {
       courseId: courseB.id,
       title: "Module B",
     });
-    const lessonB1 = await courseService.createLesson(teacherBId, {
+    await courseService.createLesson(teacherBId, {
       moduleId: moduleB.id,
       title: "Foreign Lesson",
     });

@@ -8,7 +8,6 @@ import {
   updateAssignmentAction,
 } from "@/app/teacher/assignments/actions";
 import {
-  ASSIGNMENT_FILE_TYPES,
   MAX_ASSIGNMENT_TITLE_LENGTH,
   MAX_ASSIGNMENT_INSTRUCTIONS_LENGTH,
   MAX_POINTS,
@@ -50,7 +49,7 @@ export function AssignmentForm({
   courseLessons = [],
 }: AssignmentFormProps) {
   const router = useRouter();
-  const { t, locale } = useTranslations();
+  const { t } = useTranslations();
   const isEditing = Boolean(initialData);
 
   const titleId = useId();

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useState } from "react";
-import { useTranslations } from "@/i18n/client";
+
 import type { CurrentUser } from "@/lib/auth";
 
 interface TeacherNavClientProps {
@@ -13,7 +13,6 @@ interface TeacherNavClientProps {
 }
 
 export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherNavClientProps) {
-  const { t } = useTranslations();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (

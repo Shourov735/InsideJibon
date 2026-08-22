@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherCourses, getTeacherCourseWithCurriculum } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";

@@ -1,7 +1,9 @@
 import { eq, and, desc } from "drizzle-orm";
+import "server-only";
 import { getDb } from "@/db";
-import { lessonComments, enrollments } from "@/db/schema/learning";
-import { courses, lessons, courseModules } from "@/db/schema/courses";
+import { lessonComments } from "@/db/schema/learning";
+import { lessons, courseModules } from "@/db/schema/courses";
+import { isStudentEnrolled } from "@/services/enrollments/enrollments";
 import { users } from "@/db/schema";
 
 export interface LessonCommentItem {
@@ -13,16 +15,26 @@ export interface LessonCommentItem {
   userImage: string | null;
 }
 
-export async function getLessonComments(lessonId: string, userId: string) {
-  // Check if user is enrolled or teacher
-  const lessonData = await getDb()
+/**
+ * Resolves the owning course of a lesson and verifies the student is
+ * enrolled in it. Returns false when the lesson does not exist or the
+ * student has no active enrollment.
+ */
+async function canAccessLesson(userId: string, lessonId: string): Promise<boolean> {
+  const rows = await getDb()
     .select({ courseId: courseModules.courseId })
     .from(lessons)
     .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
     .where(eq(lessons.id, lessonId))
     .limit(1);
 
-  if (!lessonData.length) return [];
+  if (!rows.length) return false;
+
+  return isStudentEnrolled(userId, rows[0].courseId);
+}
+
+export async function getLessonComments(lessonId: string, userId: string) {
+  if (!(await canAccessLesson(userId, lessonId))) return [];
 
   const comments = await getDb()
     .select({
@@ -42,6 +54,10 @@ export async function getLessonComments(lessonId: string, userId: string) {
 }
 
 export async function createLessonComment(lessonId: string, userId: string, content: string) {
+  if (!(await canAccessLesson(userId, lessonId))) {
+    throw new Error("You are not enrolled in this course.");
+  }
+
   const [comment] = await getDb()
     .insert(lessonComments)
     .values({
@@ -55,7 +71,7 @@ export async function createLessonComment(lessonId: string, userId: string, cont
 }
 
 export async function deleteLessonComment(commentId: string, userId: string) {
-  // Only author or admin/teacher can delete, for now only author
+  // Only the author may delete their own comment.
   await getDb()
     .delete(lessonComments)
     .where(and(eq(lessonComments.id, commentId), eq(lessonComments.userId, userId)));

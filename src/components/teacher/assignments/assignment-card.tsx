@@ -12,7 +12,7 @@ interface AssignmentCardProps {
 }
 
 export function AssignmentCard({ assignment, courseTitle }: AssignmentCardProps) {
-  const { t, tn, locale } = useTranslations();
+  const { t, locale } = useTranslations();
 
   const formattedDate = new Intl.DateTimeFormat(
     locale === "bn" ? "bn-BD" : "en-US",

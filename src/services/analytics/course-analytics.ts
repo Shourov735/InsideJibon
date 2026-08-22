@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
-import { enrollments, assignmentSubmissions, courses } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
-import { count, sum } from "drizzle-orm";
+import { enrollments, assignmentSubmissions } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { count } from "drizzle-orm";
 import { getTeacherCourseById } from "@/services/courses";
 
 export async function getCourseAnalytics(teacherId: string, courseId: string) {

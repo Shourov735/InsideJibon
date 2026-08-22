@@ -1,4 +1,4 @@
-import { eq, count, and } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 import { getDb } from "@/db";
 import { courses } from "@/db/schema/courses";
 import { enrollments } from "@/db/schema/learning";

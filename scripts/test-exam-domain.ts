@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { and, eq, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 // Load environment
 try {
@@ -11,7 +11,6 @@ try {
 
 import {
   courses,
-  examQuestions,
   exams,
   questionOptions,
   questions,
@@ -25,7 +24,6 @@ import {
   createQuestionSchema,
   examActionByIdSchema,
   updateExamSchema,
-  updateOptionSchema,
   updateQuestionSchema,
 } from "../src/schemas/exam";
 import { isUuid } from "../src/lib/utils";

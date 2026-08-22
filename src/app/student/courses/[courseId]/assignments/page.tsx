@@ -1,11 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { requireStudent } from "@/lib/permissions";
 import { getStudentCourseAssignmentsWithStatus } from "@/services/assignments";
 import { getLearningCourse } from "@/services/learning";
 import { StudentAssignmentList } from "@/components/student/assignments";
-import { getTranslator } from "@/i18n/server";
 
 interface CourseAssignmentsListPageProps {
   params: Promise<{ courseId: string }>;
@@ -30,7 +28,6 @@ export default async function StudentCourseAssignmentsPage({
   if (!UUID_RE.test(courseId)) notFound();
 
   const user = await requireStudent();
-  const t = await getTranslator();
 
   const [course, assignmentsList] = await Promise.all([
     getLearningCourse(user.id, courseId),

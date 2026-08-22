@@ -20,7 +20,7 @@ export function AssignmentDirectory({
   courses,
   scopedCourseId,
 }: AssignmentDirectoryProps) {
-  const { t, tn, locale } = useTranslations();
+  const { t } = useTranslations();
   const [activeTab, setActiveTab] = useState<"all" | "draft" | "published" | "closed">("all");
   const [selectedCourseId, setSelectedCourseId] = useState<string>(scopedCourseId ?? "all");
   const [searchQuery, setSearchQuery] = useState("");

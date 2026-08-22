@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { getTranslator } from "@/i18n/server";
 import type { StudentCourseSummary } from "@/types/learning";
 
 interface StudentCourseCardProps {
@@ -7,7 +6,6 @@ interface StudentCourseCardProps {
 }
 
 export async function StudentCourseCard({ course }: StudentCourseCardProps) {
-  const t = await getTranslator();
   const learnHref = `/student/courses/${course.courseId}/learn`;
   const resumeHref = course.lastLesson
     ? `${learnHref}?lesson=${course.lastLesson.id}`

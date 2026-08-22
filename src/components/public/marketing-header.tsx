@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useTranslations } from "@/i18n/client";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignInButton, Show, UserButton } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useState } from "react";
 
@@ -32,7 +32,7 @@ export function MarketingHeader() {
         {/* Actions */}
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
-          <SignedOut>
+          <Show when="signed-out">
             <SignInButton mode="modal">
               <button className="hidden md:inline-flex text-sm font-semibold text-primary hover:underline px-2">
                 {t("nav.signIn")}
@@ -44,8 +44,8 @@ export function MarketingHeader() {
             >
               {t("nav.getStarted")}
             </Link>
-          </SignedOut>
-          <SignedIn>
+          </Show>
+          <Show when="signed-in">
             <Link
               href="/student"
               className="hidden md:inline-flex text-sm font-semibold text-primary hover:underline"
@@ -53,7 +53,7 @@ export function MarketingHeader() {
               {t("nav.dashboard")}
             </Link>
             <UserButton />
-          </SignedIn>
+          </Show>
           {/* Mobile toggle */}
           <button
             className="md:hidden p-2 text-secondary hover:text-primary"
@@ -75,12 +75,12 @@ export function MarketingHeader() {
           <Link href="/" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.home")}</Link>
           <Link href="/courses" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.courses")}</Link>
           <a href="#instructor" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.instructor")}</a>
-          <SignedOut>
+          <Show when="signed-out">
             <Link href="/sign-up" onClick={() => setMobileOpen(false)} className="block rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary text-center">{t("nav.getStarted")}</Link>
-          </SignedOut>
-          <SignedIn>
+          </Show>
+          <Show when="signed-in">
             <Link href="/student" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.dashboard")}</Link>
-          </SignedIn>
+          </Show>
         </div>
       )}
     </header>
