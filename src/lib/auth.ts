@@ -1,6 +1,5 @@
 import "server-only";
 import { verifyToken } from "@clerk/backend";
-import { parsePublishableKey } from "@clerk/shared/keys";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
@@ -24,6 +23,12 @@ export type ResolvedSession =
  * Clerk's middleware (which normally provides auth context) cannot run
  * on Cloudflare Workers (Next.js 16 proxy runs on the Node runtime).
  *
+ * NOTE: no `azp`/authorized-party check. Signature verification already
+ * binds the token to this Clerk instance; browser-minted tokens carry an
+ * `azp` equal to the app origin (not the Frontend API), so comparing it
+ * to the publishable key's frontendApi rejected every real browser
+ * session while API-minted test tokens (no azp) passed.
+ *
  * Result statuses:
  * - "authenticated": token verified and the user exists in the users table.
  * - "not-synced": token verified, but no user row yet (webhook pending).
@@ -39,19 +44,6 @@ export async function resolveCurrentUser(): Promise<ResolvedSession> {
     const claims = await verifyToken(sessionToken, {
       secretKey: env.CLERK_SECRET_KEY,
     });
-
-    // Authorized-party check: only enforce when the token carries an azp
-    // claim, so tokens minted without one (e.g. backend-context tokens)
-    // keep working. The signature check already binds tokens to this
-    // Clerk instance; azp adds defense against token reuse elsewhere.
-    const parties = getAuthorizedParties();
-    if (parties && claims.azp && !parties.includes(claims.azp)) {
-      console.warn(
-        "Clerk session token rejected: azp claim does not match the publishable key's frontend API.",
-      );
-      return { status: "unknown-token", user: null };
-    }
-
     subject = claims.sub;
   } catch (error) {
     // Expected for expired, malformed or otherwise invalid tokens —
@@ -75,21 +67,4 @@ export async function resolveCurrentUser(): Promise<ResolvedSession> {
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const { user } = await resolveCurrentUser();
   return user;
-}
-
-let cachedAuthorizedParties: string[] | null | undefined;
-
-function getAuthorizedParties(): string[] | null {
-  if (cachedAuthorizedParties !== undefined) return cachedAuthorizedParties;
-
-  // NEXT_PUBLIC vars are inlined at build time, so this is safe to read
-  // even though the worker environment does not carry it as a secret.
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  if (!publishableKey) return (cachedAuthorizedParties = null);
-
-  const { frontendApi } = parsePublishableKey(publishableKey) ?? {};
-  cachedAuthorizedParties = frontendApi
-    ? [`https://${frontendApi}`]
-    : null;
-  return cachedAuthorizedParties;
 }

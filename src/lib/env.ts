@@ -5,9 +5,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   CLERK_SECRET_KEY: z.string().min(1, "CLERK_SECRET_KEY is required"),
   // Build-time inlined by Next.js into client/server bundles. It is NOT a
-  // Workers runtime binding, so it must stay optional here — code that
-  // needs it reads process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY directly
-  // and handles absence (see getAuthorizedParties in lib/auth.ts).
+  // Workers runtime binding, so it must stay optional here — only
+  // client-side Clerk components consume it (inlined at build time).
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
   // Required for Clerk webhook user sync in deployed environments.
   CLERK_WEBHOOK_SECRET: z.string().optional(),
