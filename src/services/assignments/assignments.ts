@@ -12,6 +12,7 @@ import {
 } from "@/db/schema";
 import { getDefaultStorage } from "@/lib/storage";
 import { ALLOWED_ASSIGNMENT_MIME_TYPES } from "@/schemas/assignment";
+import { createCourseNotifications } from "@/services/notifications";
 import type {
   CreateAssignmentInput,
   UpdateAssignmentInput,
@@ -265,6 +266,13 @@ export async function publishAssignment(
     })
     .where(eq(assignments.id, assignmentId))
     .returning();
+
+  await createCourseNotifications(updated.courseId, {
+    type: "assignment_published",
+    title: `New Assignment: ${updated.title}`,
+    body: "A new assignment is available.",
+    link: "/student/notifications"
+  });
 
   return updated;
 }

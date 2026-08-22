@@ -13,6 +13,7 @@ import type {
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
 } from "@/schemas/announcement";
+import { createCourseNotifications } from "@/services/notifications";
 
 export class AnnouncementNotFoundError extends Error {
   constructor() {
@@ -69,6 +70,13 @@ export async function createAnnouncement(
       isPinned: input.isPinned,
     })
     .returning();
+
+  await createCourseNotifications(input.courseId, { 
+    type: "announcement", 
+    title: `New Announcement: ${announcement.title}`, 
+    body: input.content.slice(0, 120), 
+    link: "/student/notifications" 
+  });
 
   return announcement;
 }

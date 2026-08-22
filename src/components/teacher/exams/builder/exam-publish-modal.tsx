@@ -125,7 +125,7 @@ export function ExamPublishModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="exam-publish-modal-title">
       <div className="w-full max-w-lg rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-outline-variant pb-4 shrink-0">
@@ -140,7 +140,7 @@ export function ExamPublishModal({
                 • {t("teacher.examDetail.lifecycleControl")}
               </span>
             </div>
-            <h3 className="mt-1 text-lg font-bold text-on-surface">
+            <h3 id="exam-publish-modal-title" className="mt-1 text-lg font-bold text-on-surface">
               {exam.status === "published"
                 ? t("teacher.examPublish.titlePublished")
                 : t("teacher.examPublish.titleDraft")}

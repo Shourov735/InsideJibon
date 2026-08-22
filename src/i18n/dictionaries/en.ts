@@ -1419,7 +1419,80 @@ export const en = {
   "exam.trueFalse.false": "False",
   "exam.builder.addTrueFalseQuestion": "Add True/False Question",
   "exam.builder.addMcqQuestion": "Add MCQ Question",
-  "exam.builder.questionTypeHint": "True/False questions automatically get two options. Select which is correct."
+  "exam.builder.questionTypeHint": "True/False questions automatically get two options. Select which is correct.",
+
+  // Notifications
+  "nav.student.notifications": "Notifications",
+  "student.notifications.title": "Notifications",
+  "student.notifications.empty": "No notifications yet",
+  "student.notifications.emptyDesc": "You'll be notified when teachers post announcements, publish exams or assignments, and grade your work.",
+  "student.notifications.markAllRead": "Mark All Read",
+  "student.notifications.markRead": "Mark as Read",
+  "student.notifications.delete": "Delete",
+  "student.notifications.unread": "Unread",
+  "student.notifications.all": "All",
+  "student.notifications.type.announcement": "Announcement",
+  "student.notifications.type.exam_published": "Exam Published",
+  "student.notifications.type.assignment_published": "Assignment Published",
+  "student.notifications.type.assignment_graded": "Assignment Graded",
+  "student.notifications.type.class_session": "Class Session",
+  "student.notifications.type.system": "System",
+
+  // Analytics
+  "teacher.analytics.title": "Course Analytics",
+  "teacher.analytics.enrollment": "Enrollment",
+  "teacher.analytics.totalEnrolled": "Total Enrolled",
+  "teacher.analytics.completedCount": "Completed Course",
+  "teacher.analytics.completionRate": "Completion Rate",
+  "teacher.analytics.exams": "Exam Performance",
+  "teacher.analytics.attempts": "Attempts",
+  "teacher.analytics.uniqueStudents": "Unique Students",
+  "teacher.analytics.averageScore": "Average Score",
+  "teacher.analytics.passRate": "Pass Rate",
+  "teacher.analytics.assignments": "Assignment Submissions",
+  "teacher.analytics.submitted": "Submitted",
+  "teacher.analytics.graded": "Graded",
+  "teacher.analytics.late": "Late",
+  "teacher.analytics.averagePoints": "Average Points",
+  "teacher.analytics.noExams": "No published exams for this course.",
+  "teacher.analytics.noAssignments": "No published assignments for this course.",
+  "teacher.analytics.viewAnalytics": "Analytics",
+  "teacher.analytics.downloadRoster": "Download Roster CSV",
+
+  // Profile
+  "student.profile.title": "My Profile",
+  "student.profile.joinedDate": "Joined {date}",
+  "student.profile.stats.enrolled": "Courses Enrolled",
+  "student.profile.stats.completed": "Courses Completed",
+  "student.profile.stats.lessons": "Lessons Completed",
+  "student.profile.stats.assignments": "Assignments Submitted",
+  "student.profile.stats.exams": "Exam Attempts",
+  "teacher.profile.title": "My Profile",
+  "teacher.profile.stats.courses": "Total Courses",
+  "teacher.profile.stats.published": "Published Courses",
+  "teacher.profile.stats.students": "Total Students",
+  "teacher.profile.stats.lessons": "Total Lessons",
+  "teacher.profile.stats.exams": "Total Exams",
+  "teacher.profile.stats.assignments": "Total Assignments",
+  "nav.student.profile": "Profile",
+  "nav.teacher.profile": "Profile",
+
+  // Export
+  "teacher.export.downloadResults": "Download Results CSV",
+  "teacher.export.downloadGrades": "Download Grades CSV",
+  "teacher.export.downloadRoster": "Download Roster CSV",
+
+  // Discussion
+  "student.discussion.tab": "Discussion",
+  "student.discussion.empty": "No comments yet. Be the first to start the discussion!",
+  "student.discussion.placeholder": "Write a comment...",
+  "student.discussion.submit": "Post Comment",
+  "student.discussion.delete": "Delete",
+  "student.discussion.confirmDelete": "Delete this comment?",
+  "student.discussion.teacher": "Teacher",
+  "student.discussion.student": "Student",
+  "student.discussion.charLimit": "Max 1000 characters",
+  "student.discussion.tooShort": "Comment must be at least 2 characters"
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

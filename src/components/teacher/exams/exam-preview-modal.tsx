@@ -21,7 +21,7 @@ export function ExamPreviewModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="exam-preview-modal-title">
       <div className="flex max-h-[92vh] w-full max-w-3xl flex-col rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-2xl overflow-hidden">
         {/* Top bar */}
         <div className="flex items-center justify-between border-b border-outline-variant bg-surface-container-low px-6 py-4 shrink-0">
@@ -29,7 +29,7 @@ export function ExamPreviewModal({
             <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">
               {t("teacher.examPreview.title")}
             </span>
-            <h3 className="text-base font-bold text-on-surface">
+            <h3 id="exam-preview-modal-title" className="text-base font-bold text-on-surface">
               {t("teacher.examPreview.badge")}
             </h3>
             <StatusBadge

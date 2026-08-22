@@ -1,5 +1,6 @@
 import {
   boolean,
+  index,
   integer,
   pgTable,
   text,
@@ -72,3 +73,30 @@ export type NewEnrollment = typeof enrollments.$inferInsert;
 
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type NewLessonProgress = typeof lessonProgress.$inferInsert;
+export const lessonComments = pgTable(
+  "lesson_comments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    lessonId: uuid("lesson_id")
+      .notNull()
+      .references(() => lessons.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("lesson_comments_lesson_id_idx").on(table.lessonId),
+    index("lesson_comments_lesson_created_idx").on(table.lessonId, table.createdAt),
+    index("lesson_comments_user_id_idx").on(table.userId),
+  ]
+);
+
+export type LessonComment = typeof lessonComments.$inferSelect;
+export type NewLessonComment = typeof lessonComments.$inferInsert;

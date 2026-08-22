@@ -71,6 +71,13 @@
       "when": 1787383440484,
       "tag": "0009_nice_major_mapleleaf",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787385657935,
+      "tag": "0010_freezing_devos",
+      "breakpoints": true
     }
   ]
 }

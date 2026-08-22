@@ -59,7 +59,7 @@ export async function GET(
     "Content-Type": object.contentType,
     "Content-Length": String(object.contentLength),
     "Content-Disposition": `attachment; filename="${dispositionFilename}"`,
-    "Cache-Control": "no-store",
+    "Cache-Control": "no-store, private",
     "X-Content-Type-Options": "nosniff",
   });
   if (object.etag) headers.set("ETag", object.etag);

@@ -81,10 +81,10 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="publish-modal-title">
       <div className="w-full max-w-lg rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xl">
         <div className="flex items-center justify-between border-b border-outline-variant pb-4">
-          <h3 className="text-lg font-bold text-on-surface">
+          <h3 id="publish-modal-title" className="text-lg font-bold text-on-surface">
             {course.status === "published"
               ? t("teacher.builder.publishingStatus")
               : t("teacher.builder.publishCourse")}

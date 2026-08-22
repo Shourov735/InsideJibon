@@ -65,9 +65,9 @@ export function AnnouncementForm({ courseId, announcement, onClose }: Announceme
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="announcement-form-title">
       <div className="w-full max-w-lg rounded-2xl bg-surface p-6 shadow-xl border border-outline-variant max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold text-on-surface mb-6">
+        <h2 id="announcement-form-title" className="text-xl font-bold text-on-surface mb-6">
           {announcement ? t("teacher.announcements.editAnnouncement") : t("teacher.announcements.createAnnouncement")}
         </h2>
 

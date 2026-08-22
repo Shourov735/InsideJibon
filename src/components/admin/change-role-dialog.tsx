@@ -26,9 +26,9 @@ export function ChangeRoleDialog({
   const roles = ["student", "teacher", "admin"] as const;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="change-role-dialog-title">
       <div className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl">
-        <h3 className="text-lg font-bold text-on-surface">
+        <h3 id="change-role-dialog-title" className="text-lg font-bold text-on-surface">
           {t("admin.users.changeRole")}
         </h3>
         <p className="mt-2 text-sm text-on-surface-variant">

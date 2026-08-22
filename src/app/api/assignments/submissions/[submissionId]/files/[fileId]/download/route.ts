@@ -56,7 +56,7 @@ export async function GET(
     "Content-Type": file.mimeType,
     "Content-Length": String(object.contentLength),
     "Content-Disposition": `attachment; filename="${dispositionFilename}"; filename*=UTF-8''${encodeURIComponent(dispositionFilename)}`,
-    "Cache-Control": "no-store",
+    "Cache-Control": "no-store, private",
     "X-Content-Type-Options": "nosniff",
   });
   if (object.etag) headers.set("ETag", object.etag);

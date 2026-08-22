@@ -9,6 +9,7 @@ import {
   getLessonForStudent,
 } from "@/services/learning";
 import { getLessonMaterialsForStudent } from "@/services/materials";
+import { getLessonComments } from "@/services/learning/comments";
 import { getStudentSessionsForCourse } from "@/services/classes/classes";
 import { getStudentAnnouncementsForCourse } from "@/services/announcements/announcements";
 import { LearningSidebar } from "@/components/student/learning-sidebar";
@@ -85,10 +86,11 @@ export default async function LearnPage({
   const lesson = await getLessonForStudent(user.id, activeLessonId);
   if (!lesson) notFound();
 
-  const [materials, sessions, announcements] = await Promise.all([
+  const [materials, sessions, announcements, comments] = await Promise.all([
     getLessonMaterialsForStudent(user.id, activeLessonId),
     getStudentSessionsForCourse(user.id, courseId),
-    getStudentAnnouncementsForCourse(user.id, courseId)
+    getStudentAnnouncementsForCourse(user.id, courseId),
+    getLessonComments(activeLessonId, user.id)
   ]);
 
   const lessonHref = (lessonId: string) =>
@@ -243,7 +245,14 @@ export default async function LearnPage({
           <LessonResources materials={materials} className="mt-8" />
 
           {/* Classes & Announcements Tabs */}
-          <LearnPageTabs sessions={sessions} announcements={announcements} />
+          <LearnPageTabs 
+            sessions={sessions} 
+            announcements={announcements} 
+            comments={comments}
+            lessonId={activeLessonId}
+            courseId={courseId}
+            currentUserId={user.id}
+          />
 
           <div className="mt-8 flex items-center justify-between gap-3 border-t border-outline-variant pt-6 pb-2">
             {lesson.prevLessonId ? (

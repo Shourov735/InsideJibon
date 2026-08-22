@@ -9,6 +9,7 @@ import {
   type ClassSession,
 } from "@/db/schema";
 import { isUuid } from "@/lib/utils";
+import { createCourseNotifications } from "@/services/notifications";
 import type {
   CreateClassSessionInput,
   UpdateClassSessionInput,
@@ -73,6 +74,13 @@ export async function createClassSession(
       status: "upcoming",
     })
     .returning();
+
+  await createCourseNotifications(input.courseId, {
+    type: "class_session",
+    title: `New Class Session: ${session.title}`,
+    body: session.scheduledAt ? `Scheduled for ${session.scheduledAt.toISOString().split("T")[0]}` : "Check the classes section for details.",
+    link: "/student/notifications"
+  });
 
   return session;
 }

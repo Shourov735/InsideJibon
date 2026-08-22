@@ -10,6 +10,7 @@ import {
   type AssignmentSubmissionFile,
 } from "@/db/schema";
 import { isUuid } from "@/lib/utils";
+import { createNotification } from "@/services/notifications";
 import {
   AssignmentNotFoundError,
   SubmissionNotFoundError,
@@ -214,6 +215,14 @@ export async function gradeSubmission(
     .returning();
 
   if (updatedRows.length === 0) throw new SubmissionNotGradeableError();
+
+  await createNotification(submission.studentId, {
+    type: "assignment_graded",
+    title: `Assignment Graded: ${assignment.title}`,
+    body: `Your submission has been graded. Points awarded: ${points}/${assignment.maxPoints}.`,
+    link: "/student/notifications"
+  });
+
   return updatedRows[0];
 }
 

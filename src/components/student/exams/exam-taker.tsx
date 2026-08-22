@@ -591,11 +591,11 @@ export function ExamTaker({
 
       {/* Mobile Slide-Over / Bottom Sheet for Question Navigator */}
       {isMobileNavigatorOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs lg:hidden">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs lg:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-navigator-title">
           <div className="flex max-h-[80vh] flex-col rounded-t-3xl border-t border-outline-variant bg-surface-container-lowest p-6 shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200">
             <div className="flex items-center justify-between border-b border-outline-variant pb-4">
               <div>
-                <h3 className="text-base font-bold text-on-surface">
+                <h3 id="mobile-navigator-title" className="text-base font-bold text-on-surface">
                   {t("student.exam.questionNavigator")}
                 </h3>
                 <p className="text-xs text-secondary mt-0.5">
@@ -700,7 +700,7 @@ export function ExamTaker({
 
       {/* SUBMISSION CONFIRMATION MODAL */}
       {isSubmitModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">
           <div className="w-full max-w-md rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="flex items-center gap-3 border-b border-outline-variant pb-4">
@@ -710,7 +710,7 @@ export function ExamTaker({
                 </svg>
               </div>
               <div>
-                <h3 className="text-base font-bold text-on-surface">
+                <h3 id="submit-modal-title" className="text-base font-bold text-on-surface">
                   {t("student.exam.submitConfirmTitle")}
                 </h3>
                 <p className="text-xs text-secondary">

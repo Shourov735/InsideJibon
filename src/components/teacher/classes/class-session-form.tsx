@@ -71,9 +71,9 @@ export function ClassSessionForm({ courseId, session, onClose }: ClassSessionFor
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="class-session-form-title">
       <div className="w-full max-w-lg rounded-2xl bg-surface p-6 shadow-xl border border-outline-variant max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold text-on-surface mb-6">
+        <h2 id="class-session-form-title" className="text-xl font-bold text-on-surface mb-6">
           {session ? t("teacher.classes.editSession") : t("teacher.classes.createSession")}
         </h2>
 

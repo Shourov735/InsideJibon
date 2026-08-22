@@ -1,13 +1,15 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import type { CurrentUser } from "@/lib/auth";
 import { getTranslator } from "@/i18n/server";
+import { NotificationBell } from "@/components/student/notifications/notification-bell";
 
 interface StudentNavProps {
   user: CurrentUser;
-  activeSection?: "dashboard" | "courses";
+  activeSection?: "dashboard" | "courses" | "profile";
 }
 
 export async function StudentNav({ user, activeSection = "dashboard" }: StudentNavProps) {
@@ -63,11 +65,25 @@ export async function StudentNav({ user, activeSection = "dashboard" }: StudentN
             >
               {t("nav.student.courses")}
             </Link>
+            <Link
+              href="/student/profile"
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                activeSection === "profile"
+                  ? "bg-surface-container-low text-primary font-semibold"
+                  : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
+              }`}
+            >
+              Profile
+            </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
+
+          <Suspense fallback={<span className="h-5 w-5" />}>
+            <NotificationBell userId={user.id} />
+          </Suspense>
 
           <Link
             href="/courses"

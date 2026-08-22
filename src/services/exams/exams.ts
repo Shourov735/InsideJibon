@@ -11,6 +11,7 @@ import {
   type Exam,
   type ExamStatus,
 } from "@/db/schema";
+import { createCourseNotifications } from "@/services/notifications";
 import type {
   CreateExamInput,
   UpdateExamInput,
@@ -350,6 +351,13 @@ export async function publishExam(
     })
     .where(eq(exams.id, examId))
     .returning();
+
+  await createCourseNotifications(updated.courseId, {
+    type: "exam_published",
+    title: `New Exam: ${updated.title}`,
+    body: "A new exam is available.",
+    link: "/student/notifications"
+  });
 
   return updated;
 }

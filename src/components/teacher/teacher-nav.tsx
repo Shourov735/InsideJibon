@@ -84,6 +84,16 @@ export async function TeacherNav({ user, activeSection = "courses" }: TeacherNav
             >
               {t("nav.teacher.assignments")}
             </Link>
+            <Link
+              href="/teacher/profile"
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                activeSection === "profile" as any
+                  ? "bg-surface-container-low text-primary font-semibold"
+                  : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
+              }`}
+            >
+              Profile
+            </Link>
           </nav>
         </div>
 
