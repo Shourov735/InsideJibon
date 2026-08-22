@@ -13,6 +13,7 @@ import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { StatusBadge } from "@/components/teacher/status-badge";
 import { AssignmentStatusBadge } from "@/components/assignments/assignment-status-badge";
 import { PendingRequestsList } from "@/components/shared/pending-requests-list";
+import { CoursePublishControl } from "@/components/teacher/course-publish-control";
 import { getTranslator } from "@/i18n/server";
 
 interface CourseOverviewPageProps {
@@ -146,6 +147,8 @@ export default async function CourseOverviewPage({
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <CoursePublishControl course={course} />
+
             <Link
               href={`/teacher/courses/${course.id}/analytics`}
               className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-on-surface transition-colors hover:bg-surface-container hover:text-primary"

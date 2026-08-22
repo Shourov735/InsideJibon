@@ -384,7 +384,7 @@ export default function MarketingPage() {
                 
                 <div>
                   <h2 className="text-3xl font-bold font-display text-primary">তানভীর হাসান জীবন (Tanvir Hasan Jibon)</h2>
-                  <p className="text-secondary mt-1 font-medium">শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — ঢাকা সেন্ট্রাল ইউনিভার্সিটি (সরকারি তিতুমীর কলেজ)</p>
+                  <p className="text-secondary mt-1 font-medium">শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — ঢাকা সেন্ট্রাল ইউনিভার্সিটি </p>
                   <p className="text-primary font-semibold mt-2">বিজ্ঞান, আইসিটি ও গণিত শিক্ষক · Physics, Chemistry, Biology, ICT & Mathematics Educator</p>
                 </div>
                 
