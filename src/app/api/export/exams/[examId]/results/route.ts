@@ -6,8 +6,6 @@ import { courses } from "@/db/schema/courses";
 import { users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
-export const runtime = "edge";
-
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ examId: string }> }

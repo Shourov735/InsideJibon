@@ -53,6 +53,15 @@ interface R2BucketLike {
   get(key: string): Promise<R2ObjectBodyLike | null>;
   head(key: string): Promise<R2ObjectLike | null>;
   delete(key: string | string[]): Promise<unknown>;
+  list(options?: {
+    prefix?: string;
+    cursor?: string;
+    limit?: number;
+  }): Promise<{
+    objects: Array<{ key: string }>;
+    truncated: boolean;
+    cursor?: string;
+  }>;
 }
 
 class R2Storage implements Storage {
@@ -118,6 +127,36 @@ class R2Storage implements Storage {
     const bucket = await this.getBucket();
     try {
       await bucket.delete(key);
+    } catch (error) {
+      throw new StorageError("Storage operation failed.", { cause: error });
+    }
+  }
+
+  async deleteObjects(keys: string[]): Promise<void> {
+    if (keys.length === 0) return;
+    const bucket = await this.getBucket();
+    try {
+      // One Class A op removes up to 1000 objects on R2.
+      for (let i = 0; i < keys.length; i += 1000) {
+        await bucket.delete(keys.slice(i, i + 1000));
+      }
+    } catch (error) {
+      throw new StorageError("Storage operation failed.", { cause: error });
+    }
+  }
+
+  async listObjects(input?: import("./types").ListObjectsInput) {
+    const bucket = await this.getBucket();
+    try {
+      const result = await bucket.list({
+        prefix: input?.prefix,
+        cursor: input?.cursor,
+        limit: input?.limit,
+      });
+      return {
+        keys: result.objects.map((o) => o.key),
+        nextCursor: result.truncated ? result.cursor : undefined,
+      };
     } catch (error) {
       throw new StorageError("Storage operation failed.", { cause: error });
     }

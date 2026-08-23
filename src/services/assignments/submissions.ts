@@ -13,7 +13,7 @@ import {
   type AssignmentSubmission,
   type AssignmentSubmissionFile,
 } from "@/db/schema";
-import { getDefaultStorage, type Storage } from "@/lib/storage";
+import { getDefaultStorage, resolveUploadBody, type Storage } from "@/lib/storage";
 import {
   buildAssignmentStorageKey,
   validateAssignmentFile,
@@ -401,10 +401,9 @@ export async function uploadSubmissionFile(
     .returning();
 
   try {
-    const bytes = await file.arrayBuffer();
     await storage.putObject({
       key: storageKey,
-      body: bytes,
+      body: await resolveUploadBody(file),
       contentType: validation.file.mimeType,
       customMetadata: {
         fileId,

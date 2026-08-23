@@ -38,6 +38,23 @@ export interface PutObjectInput extends StorageObjectMetadata {
   body: ArrayBuffer | ReadableStream<Uint8Array>;
 }
 
+/** Options for listing stored objects. */
+export interface ListObjectsInput {
+  /** Only objects whose keys start with this prefix. */
+  prefix?: string;
+  /** Continuation token from a previous page. */
+  cursor?: string;
+  /** Maximum number of keys per page (provider may clamp). */
+  limit?: number;
+}
+
+/** One page of listed object keys. */
+export interface StorageListResult {
+  keys: string[];
+  /** Present when more pages remain; pass as `cursor` to continue. */
+  nextCursor?: string;
+}
+
 export interface Storage {
   /** Stores an object, overwriting any existing object at `key`. */
   putObject(input: PutObjectInput): Promise<void>;
@@ -48,8 +65,18 @@ export interface Storage {
   /** Removes an object. Deleting a missing object is a no-op. */
   deleteObject(key: string): Promise<void>;
 
+  /**
+   * Removes many objects in as few provider operations as possible.
+   * Deleting missing keys is a no-op. Implementations may cap the batch
+   * size; callers chunk via `listObjects`-sized batches themselves.
+   */
+  deleteObjects(keys: string[]): Promise<void>;
+
   /** Fetches an object's metadata without its body, or `null`. */
   headObject(key: string): Promise<StorageHeadResult | null>;
+
+  /** Lists stored keys page by page (storage governance / reconciliation). */
+  listObjects(input?: ListObjectsInput): Promise<StorageListResult>;
 }
 
 /** Raised when a storage backend is not available in the current runtime. */

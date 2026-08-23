@@ -48,6 +48,24 @@ export class MemoryStorage implements Storage {
     this.objects.delete(key);
   }
 
+  async deleteObjects(keys: string[]): Promise<void> {
+    for (const key of keys) this.objects.delete(key);
+  }
+
+  async listObjects(input?: import("./types").ListObjectsInput) {
+    const keys = [...this.objects.keys()]
+      .filter((key) => !input?.prefix || key.startsWith(input.prefix))
+      .sort();
+    const start = input?.cursor ? Number(input.cursor) : 0;
+    const limit = input?.limit ?? 1000;
+    const page = keys.slice(start, start + limit);
+    const next = start + page.length;
+    return {
+      keys: page,
+      nextCursor: next < keys.length ? String(next) : undefined,
+    };
+  }
+
   async headObject(key: string): Promise<StorageHeadResult | null> {
     const entry = this.objects.get(key);
     if (!entry) return null;

@@ -391,12 +391,9 @@ export async function deleteAssignment(
 
   await db.delete(assignments).where(eq(assignments.id, assignmentId));
 
-  // Best-effort object cleanup after the authoritative DB delete.
-  await Promise.allSettled(
-    fileRows.map((f) =>
-      storage.deleteObject(f.storageKey).catch((error) => {
-        console.warn("Failed to delete assignment file object:", f.storageKey, error);
-      })
-    )
-  );
+  // Best-effort object cleanup after the authoritative DB delete — one
+  // batched delete instead of one request per file.
+  await storage.deleteObjects(fileRows.map((f) => f.storageKey)).catch((error) => {
+    console.warn("Failed to delete assignment file objects:", error);
+  });
 }

@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { resolveCurrentUser } from "@/lib/auth";
+import { etagMatches } from "@/lib/http";
 import { getDefaultStorage } from "@/lib/storage";
 import { toContentDispositionFilename } from "@/schemas/assignment";
 import { resolveSubmissionFileForUser } from "@/services/assignments";
@@ -14,11 +15,14 @@ export const dynamic = "force-dynamic";
  * role-appropriate chain (teacher → assignment ownership, student → own
  * submission) → stream the object from R2 → return it with attachment headers.
  *
+ * Storage keys are immutable, so responses are privately cacheable and
+ * conditional requests are answered with a 304 via a cheap HEAD.
+ *
  * Unauthorized and missing render the same sanitized 404 so submission file
  * existence cannot be probed across tenants; internal storage errors never leak.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ submissionId: string; fileId: string }> }
 ) {
   const { submissionId, fileId } = await context.params;
@@ -33,9 +37,31 @@ export async function GET(
   const file = await resolveSubmissionFileForUser(user.id, user.role, submissionId, fileId);
   if (!file) return notFound();
 
+  const storage = getDefaultStorage();
+  const immutableCache = "private, max-age=31536000, immutable";
+
+  // Conditional request: revalidate with a HEAD instead of pulling the body.
+  const ifNoneMatch = request.headers.get("if-none-match");
+  if (ifNoneMatch) {
+    try {
+      const head = await storage.headObject(file.storageKey);
+      if (head && etagMatches(ifNoneMatch, head.etag)) {
+        return new Response(null, {
+          status: 304,
+          headers: {
+            ETag: head.etag!,
+            "Cache-Control": immutableCache,
+          },
+        });
+      }
+    } catch {
+      // Fall through to the full GET path on storage errors.
+    }
+  }
+
   let object;
   try {
-    object = await getDefaultStorage().getObject(file.storageKey);
+    object = await storage.getObject(file.storageKey);
   } catch {
     // Storage failure — sanitized; never expose internal storage errors.
     return new Response("Storage unavailable", { status: 503 });
@@ -56,7 +82,7 @@ export async function GET(
     "Content-Type": file.mimeType,
     "Content-Length": String(object.contentLength),
     "Content-Disposition": `attachment; filename="${dispositionFilename}"; filename*=UTF-8''${encodeURIComponent(dispositionFilename)}`,
-    "Cache-Control": "no-store, private",
+    "Cache-Control": immutableCache,
     "X-Content-Type-Options": "nosniff",
   });
   if (object.etag) headers.set("ETag", object.etag);

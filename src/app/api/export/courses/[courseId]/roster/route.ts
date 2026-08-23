@@ -6,8 +6,6 @@ import { enrollments } from "@/db/schema/learning";
 import { users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
-export const runtime = "edge";
-
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }

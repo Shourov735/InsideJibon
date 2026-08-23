@@ -6,7 +6,7 @@ import { getDb } from "@/db";
 import { courseModules, courses, enrollments, lessons, materials } from "@/db/schema";
 import type { Material } from "@/db/schema";
 import { isUuid } from "@/lib/utils";
-import type { Storage } from "@/lib/storage";
+import { resolveUploadBody, type Storage } from "@/lib/storage";
 import {
   buildMaterialStorageKey,
   validateMaterialFile,
@@ -235,10 +235,9 @@ export async function uploadMaterial(
     .returning();
 
   try {
-    const bytes = await file.arrayBuffer();
     await storage.putObject({
       key: storageKey,
-      body: bytes,
+      body: await resolveUploadBody(file),
       contentType: validation.file.mimeType,
       customMetadata: { materialId, lessonId: target.lessonId },
     });
@@ -422,10 +421,11 @@ export async function cleanupLessonMaterials(
   if (!isUuid(lessonId)) return;
   const db = getDb();
   try {
-    const rows = await db.select().from(materials).where(eq(materials.lessonId, lessonId));
-    for (const key of rows.map((row) => row.storageKey)) {
-      await storage.deleteObject(key);
-    }
+    const rows = await db
+      .select({ storageKey: materials.storageKey })
+      .from(materials)
+      .where(eq(materials.lessonId, lessonId));
+    await storage.deleteObjects(rows.map((row) => row.storageKey));
   } catch (error) {
     console.warn("Best-effort R2 cleanup for lesson failed (rows will still cascade):", error);
   }
@@ -439,14 +439,12 @@ export async function cleanupCourseMaterials(
   const db = getDb();
   try {
     const rows = await db
-      .select({ material: materials })
+      .select({ storageKey: materials.storageKey })
       .from(materials)
       .innerJoin(lessons, eq(materials.lessonId, lessons.id))
       .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
       .where(eq(courseModules.courseId, courseId));
-    for (const key of rows.map((row) => row.material.storageKey)) {
-      await storage.deleteObject(key);
-    }
+    await storage.deleteObjects(rows.map((row) => row.storageKey));
   } catch (error) {
     console.warn("Best-effort R2 cleanup for course failed (rows will still cascade):", error);
   }
