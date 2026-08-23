@@ -1,5 +1,6 @@
 import "server-only";
 import { and, eq, inArray } from "drizzle-orm";
+import { cache } from "react";
 
 import { getDb } from "@/db";
 import {
@@ -95,46 +96,54 @@ export async function verifyCourseOwnership(
   return row ?? null;
 }
 
-/** Assignment → course → teacher. Returns null when the chain does not own it. */
-export async function verifyAssignmentOwnership(
-  teacherId: string,
-  assignmentId: string
-): Promise<{ assignment: Assignment } | null> {
-  if (!isUuid(assignmentId)) return null;
-  const db = getDb();
-  const [row] = await db
-    .select({ assignment: assignments })
-    .from(assignments)
-    .innerJoin(courses, eq(assignments.courseId, courses.id))
-    .where(and(eq(assignments.id, assignmentId), eq(courses.teacherId, teacherId)))
-    .limit(1);
+/**
+ * Assignment → course → teacher. Returns null when the chain does not own it.
+ * Memoized per request: publish/grading flows and page+metadata pairs resolve
+ * the same chain several times — one join per request, not per call.
+ */
+export const verifyAssignmentOwnership = cache(
+  async function verifyAssignmentOwnership(
+    teacherId: string,
+    assignmentId: string
+  ): Promise<{ assignment: Assignment } | null> {
+    if (!isUuid(assignmentId)) return null;
+    const db = getDb();
+    const [row] = await db
+      .select({ assignment: assignments })
+      .from(assignments)
+      .innerJoin(courses, eq(assignments.courseId, courses.id))
+      .where(and(eq(assignments.id, assignmentId), eq(courses.teacherId, teacherId)))
+      .limit(1);
 
-  return row ? { assignment: row.assignment } : null;
-}
+    return row ? { assignment: row.assignment } : null;
+  }
+);
 
 /** Submission → assignment → course → teacher. Returns null when unauthorized. */
-export async function verifySubmissionForTeacher(
-  teacherId: string,
-  submissionId: string
-): Promise<{ submission: AssignmentSubmission; assignment: Assignment } | null> {
-  if (!isUuid(submissionId)) return null;
-  const db = getDb();
-  const [row] = await db
-    .select({
-      submission: assignmentSubmissions,
-      assignment: assignments,
-    })
-    .from(assignmentSubmissions)
-    .innerJoin(assignments, eq(assignmentSubmissions.assignmentId, assignments.id))
-    .innerJoin(courses, eq(assignments.courseId, courses.id))
-    .where(
-      and(eq(assignmentSubmissions.id, submissionId), eq(courses.teacherId, teacherId))
-    )
-    .limit(1);
+export const verifySubmissionForTeacher = cache(
+  async function verifySubmissionForTeacher(
+    teacherId: string,
+    submissionId: string
+  ): Promise<{ submission: AssignmentSubmission; assignment: Assignment } | null> {
+    if (!isUuid(submissionId)) return null;
+    const db = getDb();
+    const [row] = await db
+      .select({
+        submission: assignmentSubmissions,
+        assignment: assignments,
+      })
+      .from(assignmentSubmissions)
+      .innerJoin(assignments, eq(assignmentSubmissions.assignmentId, assignments.id))
+      .innerJoin(courses, eq(assignments.courseId, courses.id))
+      .where(
+        and(eq(assignmentSubmissions.id, submissionId), eq(courses.teacherId, teacherId))
+      )
+      .limit(1);
 
-  if (!row) return null;
-  return { submission: row.submission, assignment: row.assignment };
-}
+    if (!row) return null;
+    return { submission: row.submission, assignment: row.assignment };
+  }
+);
 
 /**
  * Student access: assignment must be visible to enrolled students of a
@@ -144,30 +153,32 @@ export async function verifySubmissionForTeacher(
  * by isAssignmentOpen()/status gates in the mutation paths, never here.
  * Returns null otherwise (behaves like Not Found).
  */
-export async function verifyStudentAssignmentAccess(
-  studentId: string,
-  assignmentId: string
-): Promise<{ assignment: Assignment } | null> {
-  if (!isUuid(assignmentId)) return null;
-  const db = getDb();
-  const [row] = await db
-    .select({ assignment: assignments })
-    .from(assignments)
-    .innerJoin(courses, eq(assignments.courseId, courses.id))
-    .innerJoin(enrollments, eq(enrollments.courseId, courses.id))
-    .where(
-      and(
-        eq(assignments.id, assignmentId),
-        inArray(assignments.status, ["published", "closed"]),
-        eq(courses.status, "published"),
-        eq(enrollments.studentId, studentId),
-        eq(enrollments.status, "active")
+export const verifyStudentAssignmentAccess = cache(
+  async function verifyStudentAssignmentAccess(
+    studentId: string,
+    assignmentId: string
+  ): Promise<{ assignment: Assignment } | null> {
+    if (!isUuid(assignmentId)) return null;
+    const db = getDb();
+    const [row] = await db
+      .select({ assignment: assignments })
+      .from(assignments)
+      .innerJoin(courses, eq(assignments.courseId, courses.id))
+      .innerJoin(enrollments, eq(enrollments.courseId, courses.id))
+      .where(
+        and(
+          eq(assignments.id, assignmentId),
+          inArray(assignments.status, ["published", "closed"]),
+          eq(courses.status, "published"),
+          eq(enrollments.studentId, studentId),
+          eq(enrollments.status, "active")
+        )
       )
-    )
-    .limit(1);
+      .limit(1);
 
-  return row ?? null;
-}
+    return row ?? null;
+  }
+);
 
 /** Submission ownership for student: submission.student_id === authenticated student. */
 export async function verifySubmissionOwnership(

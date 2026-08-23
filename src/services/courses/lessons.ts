@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { courseModules, courses, lessons, type Lesson } from "@/db/schema";
@@ -131,18 +131,32 @@ export async function deleteLesson(
   // Delete the lesson
   await db.delete(lessons).where(eq(lessons.id, lessonId));
 
-  // Re-compact remaining lessons for this module to 1..N
+  // Re-compact remaining lessons for this module to 1..N in one round-trip
   const remaining = await db
     .select({ id: lessons.id })
     .from(lessons)
     .where(eq(lessons.moduleId, targetLesson.moduleId))
     .orderBy(lessons.position);
 
-  for (let i = 0; i < remaining.length; i++) {
+  if (remaining.length > 0) {
+    const now = new Date();
     await db
       .update(lessons)
-      .set({ position: i + 1, updatedAt: new Date() })
-      .where(eq(lessons.id, remaining[i].id));
+      .set({
+        position: sql`CASE ${sql.join(
+          remaining.map((row, i) =>
+            sql`WHEN ${lessons.id} = ${row.id}::uuid THEN ${i + 1}`
+          ),
+          sql` `
+        )} ELSE ${lessons.position} END`,
+        updatedAt: now,
+      })
+      .where(
+        inArray(
+          lessons.id,
+          remaining.map((row) => row.id)
+        )
+      );
   }
 }
 
@@ -172,11 +186,20 @@ export async function reorderLessons(
     }
   }
 
-  // Update positions (1-based)
-  for (let i = 0; i < orderedLessonIds.length; i++) {
+  // Update positions (1-based) in one statement
+  if (orderedLessonIds.length > 0) {
+    const now = new Date();
     await db
       .update(lessons)
-      .set({ position: i + 1, updatedAt: new Date() })
-      .where(eq(lessons.id, orderedLessonIds[i]));
+      .set({
+        position: sql`CASE ${sql.join(
+          orderedLessonIds.map(
+            (lessonId, i) => sql`WHEN ${lessons.id} = ${lessonId}::uuid THEN ${i + 1}`
+          ),
+          sql` `
+        )} ELSE ${lessons.position} END`,
+        updatedAt: now,
+      })
+      .where(inArray(lessons.id, orderedLessonIds));
   }
 }

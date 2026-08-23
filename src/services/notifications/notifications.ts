@@ -17,13 +17,25 @@ export async function createNotification(userId: string, input: { type: Notifica
 
 export async function createCourseNotifications(courseId: string, input: { type: Notification["type"], title: string, body: string, link?: string }): Promise<void> {
   const db = getDb();
-  const students = await db.select().from(enrollments).where(eq(enrollments.courseId, courseId));
-  for (const student of students) {
-    try {
-      await createNotification(student.studentId, input);
-    } catch (error) {
-      console.error(`Failed to create notification for student ${student.studentId}`, error);
-    }
+  const recipients = await db
+    .select({ studentId: enrollments.studentId })
+    .from(enrollments)
+    .where(eq(enrollments.courseId, courseId));
+
+  if (recipients.length === 0) return;
+
+  try {
+    await db.insert(notifications).values(
+      recipients.map(({ studentId }) => ({
+        userId: studentId,
+        type: input.type,
+        title: input.title,
+        body: input.body,
+        link: input.link,
+      }))
+    );
+  } catch (error) {
+    console.error(`Failed to create course notifications for course ${courseId}`, error);
   }
 }
 

@@ -1,10 +1,12 @@
 import "server-only";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import {
   assignmentSubmissionFiles,
   assignmentSubmissions,
+  enrollments,
+  users,
   type Assignment,
   type AssignmentSubmission,
   type AssignmentSubmissionFile,
@@ -76,7 +78,6 @@ export async function getSubmissionsForAssignment(
   if (!resolved) throw new AssignmentNotFoundError();
 
   const db = getDb();
-  const { users } = await import("@/db/schema");
 
   const rows = await db
     .select({
@@ -111,15 +112,15 @@ async function getFileCountsBySubmission(submissionIds: string[]): Promise<Map<s
   if (submissionIds.length === 0) return new Map();
   const db = getDb();
   const rows = await db
-    .select({ submissionId: assignmentSubmissionFiles.submissionId })
+    .select({
+      submissionId: assignmentSubmissionFiles.submissionId,
+      total: count(),
+    })
     .from(assignmentSubmissionFiles)
-    .where(inArray(assignmentSubmissionFiles.submissionId, submissionIds));
+    .where(inArray(assignmentSubmissionFiles.submissionId, submissionIds))
+    .groupBy(assignmentSubmissionFiles.submissionId);
 
-  const map = new Map<string, number>();
-  for (const row of rows) {
-    map.set(row.submissionId, (map.get(row.submissionId) ?? 0) + 1);
-  }
-  return map;
+  return new Map(rows.map((row) => [row.submissionId, Number(row.total)]));
 }
 
 /** Full grading view of one teacher-owned submission (null when not theirs). */
@@ -134,19 +135,19 @@ export async function getSubmissionDetailForTeacher(
 
   const { submission, assignment } = resolved;
   const db = getDb();
-  const { users } = await import("@/db/schema");
 
-  const [student] = await db
-    .select({ name: users.name, email: users.email })
-    .from(users)
-    .where(eq(users.id, submission.studentId))
-    .limit(1);
-
-  const files = await db
-    .select()
-    .from(assignmentSubmissionFiles)
-    .where(eq(assignmentSubmissionFiles.submissionId, submissionId))
-    .orderBy(assignmentSubmissionFiles.createdAt);
+  const [[student], files] = await Promise.all([
+    db
+      .select({ name: users.name, email: users.email })
+      .from(users)
+      .where(eq(users.id, submission.studentId))
+      .limit(1),
+    db
+      .select()
+      .from(assignmentSubmissionFiles)
+      .where(eq(assignmentSubmissionFiles.submissionId, submissionId))
+      .orderBy(assignmentSubmissionFiles.createdAt),
+  ]);
 
   return {
     id: submission.id,
@@ -235,38 +236,27 @@ export async function getAssignmentStatistics(
   if (!resolved) throw new AssignmentNotFoundError();
 
   const db = getDb();
-  const { enrollments } = await import("@/db/schema");
-  const { count } = await import("drizzle-orm");
 
-  const [totalResult] = await db
-    .select({ value: count() })
-    .from(enrollments)
-    .where(eq(enrollments.courseId, resolved.assignment.courseId));
+  const [[totalResult], [agg]] = await Promise.all([
+    db
+      .select({ value: count() })
+      .from(enrollments)
+      .where(eq(enrollments.courseId, resolved.assignment.courseId)),
+    db
+      .select({
+        submittedCount: sql<number>`(COUNT(*) FILTER (WHERE ${assignmentSubmissions.status} IN ('submitted', 'graded')))::int`,
+        gradedCount: sql<number>`(COUNT(*) FILTER (WHERE ${assignmentSubmissions.status} = 'graded' AND ${assignmentSubmissions.points} IS NOT NULL))::int`,
+        lateCount: sql<number>`(COUNT(*) FILTER (WHERE ${assignmentSubmissions.isLate} AND ${assignmentSubmissions.status} IN ('submitted', 'graded')))::int`,
+        totalPoints: sql<number>`COALESCE(SUM(${assignmentSubmissions.points}) FILTER (WHERE ${assignmentSubmissions.status} = 'graded'), 0)::float8`,
+      })
+      .from(assignmentSubmissions)
+      .where(eq(assignmentSubmissions.assignmentId, assignmentId)),
+  ]);
 
-  const rows = await db
-    .select({
-      status: assignmentSubmissions.status,
-      isLate: assignmentSubmissions.isLate,
-      points: assignmentSubmissions.points,
-    })
-    .from(assignmentSubmissions)
-    .where(eq(assignmentSubmissions.assignmentId, assignmentId));
-
-  let submittedCount = 0;
-  let gradedCount = 0;
-  let lateCount = 0;
-  let totalPoints = 0;
-
-  for (const row of rows) {
-    if (row.status === "submitted" || row.status === "graded") {
-      submittedCount += 1;
-      if (row.isLate) lateCount += 1;
-    }
-    if (row.status === "graded" && row.points !== null) {
-      gradedCount += 1;
-      totalPoints += row.points;
-    }
-  }
+  const submittedCount = agg?.submittedCount ?? 0;
+  const gradedCount = agg?.gradedCount ?? 0;
+  const lateCount = agg?.lateCount ?? 0;
+  const totalPoints = Number(agg?.totalPoints ?? 0);
 
   return {
     totalEnrolled: Number(totalResult?.value ?? 0),

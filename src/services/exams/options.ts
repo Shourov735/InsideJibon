@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { questionOptions, type QuestionOption } from "@/db/schema";
@@ -85,28 +85,31 @@ export async function updateOption(
 
   const db = getDb();
 
-  if (input.isCorrect) {
-    await db
+  // The sibling unmark and the own-row update touch disjoint rows — run
+  // both in one round-trip window.
+  const [[updated]] = await Promise.all([
+    db
       .update(questionOptions)
-      .set({ isCorrect: false, updatedAt: new Date() })
-      .where(
-        and(
-          eq(questionOptions.questionId, resolved.question.id),
-          ne(questionOptions.id, input.optionId),
-          eq(questionOptions.isCorrect, true)
-        )
-      );
-  }
-
-  const [updated] = await db
-    .update(questionOptions)
-    .set({
-      optionText: input.optionText.trim(),
-      isCorrect: input.isCorrect,
-      updatedAt: new Date(),
-    })
-    .where(eq(questionOptions.id, input.optionId))
-    .returning();
+      .set({
+        optionText: input.optionText.trim(),
+        isCorrect: input.isCorrect,
+        updatedAt: new Date(),
+      })
+      .where(eq(questionOptions.id, input.optionId))
+      .returning(),
+    input.isCorrect
+      ? db
+          .update(questionOptions)
+          .set({ isCorrect: false, updatedAt: new Date() })
+          .where(
+            and(
+              eq(questionOptions.questionId, resolved.question.id),
+              ne(questionOptions.id, input.optionId),
+              eq(questionOptions.isCorrect, true)
+            )
+          )
+      : Promise.resolve(),
+  ]);
 
   await touchExam(resolved.exam.id);
 
@@ -129,18 +132,32 @@ export async function deleteOption(
   const db = getDb();
   await db.delete(questionOptions).where(eq(questionOptions.id, optionId));
 
-  // Re-compact remaining options for this question to 1..N
+  // Re-compact remaining options for this question to 1..N in one round-trip
   const remaining = await db
     .select({ id: questionOptions.id })
     .from(questionOptions)
     .where(eq(questionOptions.questionId, resolved.question.id))
     .orderBy(questionOptions.position);
 
-  for (let i = 0; i < remaining.length; i++) {
+  if (remaining.length > 0) {
+    const now = new Date();
     await db
       .update(questionOptions)
-      .set({ position: i + 1, updatedAt: new Date() })
-      .where(eq(questionOptions.id, remaining[i].id));
+      .set({
+        position: sql`CASE ${sql.join(
+          remaining.map((row, i) =>
+            sql`WHEN ${questionOptions.id} = ${row.id}::uuid THEN ${i + 1}`
+          ),
+          sql` `
+        )} ELSE ${questionOptions.position} END`,
+        updatedAt: now,
+      })
+      .where(
+        inArray(
+          questionOptions.id,
+          remaining.map((row) => row.id)
+        )
+      );
   }
 
   await touchExam(resolved.exam.id);

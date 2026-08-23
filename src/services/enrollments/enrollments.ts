@@ -6,11 +6,11 @@ import { isUuid } from "@/lib/utils";
 import {
   courses,
   enrollments,
+  notifications,
   users,
   type Course,
   type Enrollment,
 } from "@/db/schema";
-import { createNotification } from "@/services/notifications/notifications";
 
 /**
  * Student enrollment service. Enrollment is a request/approval flow:
@@ -70,17 +70,18 @@ async function notifyCourseOwnerAndAdmins(
   const body = `${who} requested access to "${course.title}".`;
   const link = `/courses/${course.slug}`;
 
-  for (const recipientId of recipients) {
-    try {
-      await createNotification(recipientId, {
-        type: "enrollment_request",
+  try {
+    await db.insert(notifications).values(
+      [...recipients].map((recipientId) => ({
+        userId: recipientId,
+        type: "enrollment_request" as const,
         title,
         body,
         link,
-      });
-    } catch (error) {
-      console.error(`Failed to notify ${recipientId} of enrollment request`, error);
-    }
+      }))
+    );
+  } catch (error) {
+    console.error("Failed to notify course owner/admins of enrollment request", error);
   }
 }
 
@@ -100,26 +101,30 @@ export async function enrollStudent(
 
   if (!isUuid(courseId)) throw new CourseNotFoundError();
 
-  const [course] = await db
-    .select({
-      id: courses.id,
-      slug: courses.slug,
-      title: courses.title,
-      status: courses.status,
-      teacherId: courses.teacherId,
-    })
-    .from(courses)
-    .where(eq(courses.id, courseId))
-    .limit(1);
+  const [courseRows, studentRows] = await Promise.all([
+    db
+      .select({
+        id: courses.id,
+        slug: courses.slug,
+        title: courses.title,
+        status: courses.status,
+        teacherId: courses.teacherId,
+      })
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .limit(1),
+    db
+      .select({ name: users.name, email: users.email })
+      .from(users)
+      .where(eq(users.id, studentId))
+      .limit(1),
+  ] as const);
+
+  const [course] = courseRows;
+  const [student] = studentRows;
 
   if (!course) throw new CourseNotFoundError();
   if (course.status !== "published") throw new CourseNotPublishedError();
-
-  const [student] = await db
-    .select({ name: users.name, email: users.email })
-    .from(users)
-    .where(eq(users.id, studentId))
-    .limit(1);
 
   const [inserted] = await db
     .insert(enrollments)
@@ -363,7 +368,8 @@ export async function decideEnrollment(params: {
       : "Enrollment request declined / এনরোলমেন্ট বাতিল";
 
   try {
-    await createNotification(updated.studentId, {
+    await db.insert(notifications).values({
+      userId: updated.studentId,
       type: "enrollment_decision",
       title,
       body:

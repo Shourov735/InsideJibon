@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { examQuestions, questionOptions, questions, type Question } from "@/db/schema";
@@ -65,15 +65,13 @@ export async function createQuestion(
   // Auto-create True/False options for true_false question type
   let options: typeof questionOptions.$inferSelect[] = [];
   if (questionType === "true_false") {
-    const [trueOpt] = await db
+    options = await db
       .insert(questionOptions)
-      .values({ questionId: question.id, optionText: "True", isCorrect: false, position: 1 })
+      .values([
+        { questionId: question.id, optionText: "True", isCorrect: false, position: 1 },
+        { questionId: question.id, optionText: "False", isCorrect: false, position: 2 },
+      ])
       .returning();
-    const [falseOpt] = await db
-      .insert(questionOptions)
-      .values({ questionId: question.id, optionText: "False", isCorrect: false, position: 2 })
-      .returning();
-    options = [trueOpt, falseOpt];
   }
 
   await touchExam(input.examId);
@@ -144,21 +142,33 @@ export async function deleteQuestion(
   const db = getDb();
   await db.delete(questions).where(eq(questions.id, questionId));
 
-  // Re-compact remaining questions for this exam to 1..N
+  // Re-compact remaining questions for this exam to 1..N in one round-trip
   const remaining = await db
     .select({ id: examQuestions.questionId })
     .from(examQuestions)
     .where(eq(examQuestions.examId, examId))
     .orderBy(examQuestions.position);
 
-  for (let i = 0; i < remaining.length; i++) {
+  if (remaining.length > 0) {
+    const now = new Date();
     await db
       .update(examQuestions)
-      .set({ position: i + 1, updatedAt: new Date() })
+      .set({
+        position: sql`CASE ${sql.join(
+          remaining.map((row, i) =>
+            sql`WHEN ${examQuestions.questionId} = ${row.id}::uuid THEN ${i + 1}`
+          ),
+          sql` `
+        )} ELSE ${examQuestions.position} END`,
+        updatedAt: now,
+      })
       .where(
         and(
           eq(examQuestions.examId, examId),
-          eq(examQuestions.questionId, remaining[i].id)
+          inArray(
+            examQuestions.questionId,
+            remaining.map((row) => row.id)
+          )
         )
       );
   }
@@ -193,14 +203,23 @@ export async function reorderQuestions(
     }
   }
 
-  for (let i = 0; i < orderedQuestionIds.length; i++) {
+  if (orderedQuestionIds.length > 0) {
+    const now = new Date();
     await db
       .update(examQuestions)
-      .set({ position: i + 1, updatedAt: new Date() })
+      .set({
+        position: sql`CASE ${sql.join(
+          orderedQuestionIds.map((questionId, i) =>
+            sql`WHEN ${examQuestions.questionId} = ${questionId}::uuid THEN ${i + 1}`
+          ),
+          sql` `
+        )} ELSE ${examQuestions.position} END`,
+        updatedAt: now,
+      })
       .where(
         and(
           eq(examQuestions.examId, examId),
-          eq(examQuestions.questionId, orderedQuestionIds[i])
+          inArray(examQuestions.questionId, orderedQuestionIds)
         )
       );
   }

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 import { requireStudent } from "@/lib/permissions";
 import { getAttemptForTaking, getStudentExamDetail } from "@/services/exams";
-import { getLearningCourse } from "@/services/learning";
+import { getStudentCourseTitle } from "@/services/learning";
 import { ExamStartButton } from "@/components/student/exams/exam-start-button";
 import { ExamTaker } from "@/components/student/exams/exam-taker";
 import { getTranslator } from "@/i18n/server";
@@ -32,7 +32,7 @@ export default async function ExamPage({ params, searchParams }: ExamPageProps) 
   const user = await requireStudent();
   const t = await getTranslator();
 
-  const course = await getLearningCourse(user.id, courseId);
+  const course = await getStudentCourseTitle(user.id, courseId);
   if (!course) notFound();
 
   // TAKING MODE: An in-progress attempt was just started or resumed via ?take=<attemptId>

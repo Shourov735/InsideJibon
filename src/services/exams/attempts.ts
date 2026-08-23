@@ -1,5 +1,6 @@
 import "server-only";
 import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
+import { cache } from "react";
 
 import { getDb } from "@/db";
 import { isUuid } from "@/lib/utils";
@@ -199,35 +200,38 @@ export async function getStudentCourseExams(
 
 /**
  * The exam intro payload for a student: metadata + their attempt history.
- * Contains no answers and no correct-answer information.
+ * Contains no answers and no correct-answer information. Memoized per
+ * request — generateMetadata and the page body share one fetch.
  */
-export async function getStudentExamDetail(
-  studentId: string,
-  examId: string
-): Promise<StudentExamDetail | null> {
+export const getStudentExamDetail = cache(
+  async function getStudentExamDetail(
+    studentId: string,
+    examId: string
+  ): Promise<StudentExamDetail | null> {
   const resolved = await verifyStudentExamAccess(studentId, examId);
   if (!resolved) return null;
   const { exam } = resolved;
 
   const db = getDb();
-  const [statsRow] = await db
-    .select({
-      questionCount: count(examQuestions.id),
-      totalMarks: sql<number>`COALESCE(SUM(${examQuestions.marks}), 0)::int`,
-    })
-    .from(examQuestions)
-    .where(eq(examQuestions.examId, exam.id));
-
-  const attemptRows = await db
-    .select()
-    .from(examAttempts)
-    .where(
-      and(
-        eq(examAttempts.studentId, studentId),
-        eq(examAttempts.examId, exam.id)
+  const [[statsRow], attemptRows] = await Promise.all([
+    db
+      .select({
+        questionCount: count(examQuestions.id),
+        totalMarks: sql<number>`COALESCE(SUM(${examQuestions.marks}), 0)::int`,
+      })
+      .from(examQuestions)
+      .where(eq(examQuestions.examId, exam.id)),
+    db
+      .select()
+      .from(examAttempts)
+      .where(
+        and(
+          eq(examAttempts.studentId, studentId),
+          eq(examAttempts.examId, exam.id)
+        )
       )
-    )
-    .orderBy(desc(examAttempts.attemptNumber));
+      .orderBy(desc(examAttempts.attemptNumber)),
+  ]);
 
   const attempts: StudentAttemptSummary[] = attemptRows.map((a) => ({
     id: a.id,
@@ -254,7 +258,8 @@ export async function getStudentExamDetail(
     inProgressAttemptId:
       attempts.find((a) => a.status === "in_progress")?.id ?? null,
   };
-}
+  }
+);
 
 /**
  * Starts a new attempt for an enrolled student on a published exam.
@@ -271,23 +276,31 @@ export async function startExam(
 
   const db = getDb();
 
-  if (exam.maxAttempts != null) {
-    const [used] = await db
-      .select({ value: count() })
-      .from(examAttempts)
-      .where(
-        and(
-          eq(examAttempts.examId, exam.id),
-          eq(examAttempts.studentId, studentId),
-          eq(examAttempts.status, "submitted")
-        )
-      );
-    if ((used?.value ?? 0) >= exam.maxAttempts) {
-      throw new ExamAttemptLimitError();
-    }
-  }
+  const maxAttempts = exam.maxAttempts;
+  const limitCheck =
+    maxAttempts == null
+      ? Promise.resolve()
+      : db
+          .select({ value: count() })
+          .from(examAttempts)
+          .where(
+            and(
+              eq(examAttempts.examId, exam.id),
+              eq(examAttempts.studentId, studentId),
+              eq(examAttempts.status, "submitted")
+            )
+          )
+          .then(([used]) => {
+            if ((used?.value ?? 0) >= (maxAttempts as number)) {
+              throw new ExamAttemptLimitError();
+            }
+          });
 
-  const snapshot = await buildContentSnapshot(exam);
+  // The limit check is read-only: build the snapshot while it runs.
+  const [snapshot] = await Promise.all([
+    buildContentSnapshot(exam),
+    limitCheck,
+  ]);
 
   const attempt = await insertAttemptWithRetry(exam.id, studentId, snapshot);
 
@@ -351,30 +364,32 @@ export async function submitExam(
   const db = getDb();
   if (!isUuid(attemptId)) throw new ExamAttemptNotFoundError();
 
-  const [attempt] = await db
-    .select()
+  const [row] = await db
+    .select({
+      attempt: examAttempts,
+      maxAttempts: exams.maxAttempts,
+      courseId: exams.courseId,
+    })
     .from(examAttempts)
+    .innerJoin(exams, eq(exams.id, examAttempts.examId))
     .where(eq(examAttempts.id, attemptId))
     .limit(1);
-  if (!attempt || attempt.studentId !== studentId) {
+  if (!row || row.attempt.studentId !== studentId) {
     throw new ExamAttemptNotFoundError();
   }
-  if (attempt.status === "submitted") throw new ExamAlreadySubmittedError();
+  if (row.attempt.status === "submitted") {
+    throw new ExamAlreadySubmittedError();
+  }
 
-  const [exam] = await db
-    .select()
-    .from(exams)
-    .where(eq(exams.id, attempt.examId))
-    .limit(1);
-
+  const attempt = row.attempt;
   const snapshot = attempt.contentSnapshot as unknown as ExamContentSnapshot;
   const grading = gradeAnswers(snapshot, answers);
 
   const now = new Date();
   const maxAttemptsGuard =
-    exam?.maxAttempts == null
+    row.maxAttempts == null
       ? sql`true`
-      : sql`${exam.maxAttempts} > (SELECT COUNT(*)::int FROM exam_attempts e2 WHERE e2.exam_id = ${attempt.examId} AND e2.student_id = ${studentId} AND e2.status = 'submitted' AND e2.id <> ${attempt.id})`;
+      : sql`${row.maxAttempts} > (SELECT COUNT(*)::int FROM exam_attempts e2 WHERE e2.exam_id = ${attempt.examId} AND e2.student_id = ${studentId} AND e2.status = 'submitted' AND e2.id <> ${attempt.id})`;
 
   // Atomic claim: succeeds only for this student, on an in_progress attempt,
   // within the attempt limit. Concurrent duplicates get 0 rows.
@@ -433,7 +448,7 @@ export async function submitExam(
     attemptId: attempt.id,
     attemptNumber: attempt.attemptNumber,
     examId: attempt.examId,
-    courseId: exam?.courseId ?? "",
+    courseId: row.courseId,
     score: grading.score,
     totalPoints: grading.totalPoints,
     percentage: grading.percentage,
@@ -527,19 +542,16 @@ async function buildContentSnapshot(
     .orderBy(examQuestions.position);
 
   const questionIds = links.map((l) => l.questionId);
-  const questionRows = questionIds.length
-    ? await db
-        .select()
-        .from(questions)
-        .where(inArray(questions.id, questionIds))
-    : [];
-  const optionRows = questionIds.length
-    ? await db
-        .select()
-        .from(questionOptions)
-        .where(inArray(questionOptions.questionId, questionIds))
-        .orderBy(questionOptions.position)
-    : [];
+  const [questionRows, optionRows] = questionIds.length
+    ? await Promise.all([
+        db.select().from(questions).where(inArray(questions.id, questionIds)),
+        db
+          .select()
+          .from(questionOptions)
+          .where(inArray(questionOptions.questionId, questionIds))
+          .orderBy(questionOptions.position),
+      ])
+    : [[], []];
 
   const questionsById = new Map(questionRows.map((q) => [q.id, q]));
   const optionsByQuestion = new Map<string, typeof optionRows>();

@@ -2,6 +2,7 @@ import "server-only";
 import { verifyToken } from "@clerk/backend";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
@@ -34,7 +35,7 @@ export type ResolvedSession =
  * - "not-synced": token verified, but no user row yet (webhook pending).
  * - "unknown-token": no token, or the token failed verification.
  */
-export async function resolveCurrentUser(): Promise<ResolvedSession> {
+async function resolveCurrentUserImpl(): Promise<ResolvedSession> {
   const sessionToken = (await cookies()).get("__session")?.value;
   if (!sessionToken) return { status: "unknown-token", user: null };
 
@@ -63,6 +64,13 @@ export async function resolveCurrentUser(): Promise<ResolvedSession> {
     ? { status: "authenticated", user }
     : { status: "not-synced", user: null };
 }
+
+/**
+ * Memoized per request: layouts, pages, generateMetadata and server actions
+ * all call this repeatedly; the token is verified and the user row fetched
+ * only once per invocation instead of on every call.
+ */
+export const resolveCurrentUser = cache(resolveCurrentUserImpl);
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const { user } = await resolveCurrentUser();

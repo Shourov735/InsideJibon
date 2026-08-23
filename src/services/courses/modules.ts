@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { courseModules, courses, type CourseModule } from "@/db/schema";
@@ -111,18 +111,32 @@ export async function deleteModule(
   // Delete the module (cascades to its lessons in DB)
   await db.delete(courseModules).where(eq(courseModules.id, moduleId));
 
-  // Re-compact remaining modules for this course to 1..N
+  // Re-compact remaining modules for this course to 1..N in one round-trip
   const remaining = await db
     .select({ id: courseModules.id })
     .from(courseModules)
     .where(eq(courseModules.courseId, targetModule.courseId))
     .orderBy(courseModules.position);
 
-  for (let i = 0; i < remaining.length; i++) {
+  if (remaining.length > 0) {
+    const now = new Date();
     await db
       .update(courseModules)
-      .set({ position: i + 1, updatedAt: new Date() })
-      .where(eq(courseModules.id, remaining[i].id));
+      .set({
+        position: sql`CASE ${sql.join(
+          remaining.map((row, i) =>
+            sql`WHEN ${courseModules.id} = ${row.id}::uuid THEN ${i + 1}`
+          ),
+          sql` `
+        )} ELSE ${courseModules.position} END`,
+        updatedAt: now,
+      })
+      .where(
+        inArray(
+          courseModules.id,
+          remaining.map((row) => row.id)
+        )
+      );
   }
 }
 
@@ -152,11 +166,20 @@ export async function reorderModules(
     }
   }
 
-  // Update positions (1-based)
-  for (let i = 0; i < orderedModuleIds.length; i++) {
+  // Update positions (1-based) in one statement
+  if (orderedModuleIds.length > 0) {
+    const now = new Date();
     await db
       .update(courseModules)
-      .set({ position: i + 1, updatedAt: new Date() })
-      .where(eq(courseModules.id, orderedModuleIds[i]));
+      .set({
+        position: sql`CASE ${sql.join(
+          orderedModuleIds.map(
+            (moduleId, i) => sql`WHEN ${courseModules.id} = ${moduleId}::uuid THEN ${i + 1}`
+          ),
+          sql` `
+        )} ELSE ${courseModules.position} END`,
+        updatedAt: now,
+      })
+      .where(inArray(courseModules.id, orderedModuleIds));
   }
 }

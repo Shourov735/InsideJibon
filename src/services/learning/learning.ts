@@ -1,5 +1,6 @@
 import "server-only";
-import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { cache } from "react";
 
 import { getDb } from "@/db";
 import { isUuid } from "@/lib/utils";
@@ -18,7 +19,6 @@ import type {
   LessonAccess,
   StudentCourseSummary,
 } from "@/types/learning";
-import { getStudentEnrollments } from "@/services/enrollments";
 
 /**
  * Student learning service. Every read and mutation derives access from the
@@ -107,64 +107,51 @@ async function getOrderedCourseLessons(courseId: string) {
   return flat;
 }
 
-async function getCourseStatsForStudent(studentId: string, courseId: string) {
+async function getCourseCompletionCounts(
+  studentId: string,
+  courseIds: string[]
+): Promise<Map<string, { total: number; completed: number }>> {
+  if (courseIds.length === 0) return new Map();
+
   const db = getDb();
-  const ordered = await getOrderedCourseLessons(courseId);
-
-  const total = ordered.length;
-  let completed = 0;
-  if (total > 0) {
-    const [{ value }] = await db
-      .select({ value: count() })
-      .from(lessonProgress)
-      .innerJoin(lessons, eq(lessonProgress.lessonId, lessons.id))
-      .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
-      .where(
-        and(
-          eq(lessonProgress.studentId, studentId),
-          eq(lessonProgress.completed, true),
-          eq(courseModules.courseId, courseId)
-        )
-      );
-    completed = value ?? 0;
-  }
-
-  const [last] = await db
+  const rows = await db
     .select({
-      id: lessons.id,
-      title: lessons.title,
-      lastAccessedAt: lessonProgress.updatedAt,
+      courseId: courseModules.courseId,
+      total: sql<number>`COUNT(DISTINCT ${lessons.id})::int`,
+      completed: sql<number>`(COUNT(DISTINCT ${lessonProgress.lessonId}) FILTER (WHERE ${lessonProgress.completed}))::int`,
     })
-    .from(lessonProgress)
-    .innerJoin(lessons, eq(lessonProgress.lessonId, lessons.id))
-    .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
-    .where(
+    .from(courseModules)
+    .innerJoin(lessons, eq(lessons.moduleId, courseModules.id))
+    .leftJoin(
+      lessonProgress,
       and(
-        eq(lessonProgress.studentId, studentId),
-        eq(courseModules.courseId, courseId)
+        eq(lessonProgress.lessonId, lessons.id),
+        eq(lessonProgress.studentId, studentId)
       )
     )
-    .orderBy(desc(lessonProgress.updatedAt))
-    .limit(1);
+    .where(inArray(courseModules.courseId, courseIds))
+    .groupBy(courseModules.courseId);
 
-  return {
-    total,
-    completed,
-    percent: toPercent(completed, total),
-    lastLesson: last
-      ? { id: last.id, title: last.title, lastAccessedAt: last.lastAccessedAt }
-      : null,
-  };
+  const byCourse = new Map<string, { total: number; completed: number }>();
+  for (const row of rows) {
+    byCourse.set(row.courseId, {
+      total: row.total ?? 0,
+      completed: row.completed ?? 0,
+    });
+  }
+  return byCourse;
 }
 
 /**
  * Fetches the full learning workspace for an enrolled student. Returns null
  * when the course is not published or the student is not enrolled.
+ * Memoized per request — generateMetadata and the page body share one fetch.
  */
-export async function getLearningCourse(
-  studentId: string,
-  courseId: string
-): Promise<LearningCourse | null> {
+export const getLearningCourse = cache(
+  async function getLearningCourse(
+    studentId: string,
+    courseId: string
+  ): Promise<LearningCourse | null> {
   const db = getDb();
   if (!isUuid(courseId)) return null;
 
@@ -265,6 +252,36 @@ export async function getLearningCourse(
     modules,
     progress: { completed, total, percent: toPercent(completed, total) },
   };
+  }
+);
+
+/**
+ * Lightweight access check that returns just the enrolled student's course
+ * identity (id + title) — for breadcrumbs and metadata that never need the
+ * full curriculum. One query instead of the full getLearningCourse chain.
+ */
+export async function getStudentCourseTitle(
+  studentId: string,
+  courseId: string
+): Promise<{ id: string; title: string } | null> {
+  const db = getDb();
+  if (!isUuid(courseId)) return null;
+
+  const [row] = await db
+    .select({ id: courses.id, title: courses.title })
+    .from(enrollments)
+    .innerJoin(courses, eq(enrollments.courseId, courses.id))
+    .where(
+      and(
+        eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
+        eq(courses.id, courseId),
+        eq(courses.status, "published")
+      )
+    )
+    .limit(1);
+
+  return row ?? null;
 }
 
 /**
@@ -279,37 +296,34 @@ export async function getLessonForStudent(
   const access = await verifyLessonAccess(studentId, lessonId);
   if (!access) return null;
 
-  const ordered = await getOrderedCourseLessons(access.course.id);
-  const index = ordered.findIndex((l) => l.id === lessonId);
-
-  const [progressRow] = await db
-    .select()
-    .from(lessonProgress)
-    .where(
-      and(
-        eq(lessonProgress.studentId, studentId),
-        eq(lessonProgress.lessonId, lessonId)
-      )
-    )
-    .limit(1);
-
-  const completedCount = await (async () => {
-    if (ordered.length === 0) return 0;
-    const [{ value }] = await db
-      .select({ value: count() })
+  const [ordered, [progressRow], completedRows] = await Promise.all([
+    getOrderedCourseLessons(access.course.id),
+    db
+      .select()
       .from(lessonProgress)
       .where(
         and(
           eq(lessonProgress.studentId, studentId),
-          eq(lessonProgress.completed, true),
-          inArray(
-            lessonProgress.lessonId,
-            ordered.map((l) => l.id)
-          )
+          eq(lessonProgress.lessonId, lessonId)
         )
-      );
-    return value ?? 0;
-  })();
+      )
+      .limit(1),
+    db
+      .select({ lessonId: lessonProgress.lessonId })
+      .from(lessonProgress)
+      .innerJoin(lessons, eq(lessonProgress.lessonId, lessons.id))
+      .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
+      .where(
+        and(
+          eq(lessonProgress.studentId, studentId),
+          eq(lessonProgress.completed, true),
+          eq(courseModules.courseId, access.course.id)
+        )
+      ),
+  ]);
+
+  const index = ordered.findIndex((l) => l.id === lessonId);
+  const completedCount = completedRows.length;
 
   return {
     lesson: {
@@ -348,36 +362,40 @@ export async function getLessonForStudent(
 /**
  * Re-derives the enrollment's completion state from lesson progress.
  * An enrollment is complete when every lesson in the course is completed.
+ * Runs as ONE conditional UPDATE — the lesson/progress counts are computed
+ * in SQL subqueries inside the SET clause (no extra round-trips, and no
+ * read-then-write race between them).
  */
 async function syncEnrollmentCompletion(
   studentId: string,
   courseId: string
 ): Promise<void> {
   const db = getDb();
-  const stats = await getCourseStatsForStudent(studentId, courseId);
-
-  const now = new Date();
-  if (stats.total > 0 && stats.completed >= stats.total) {
-    await db
-      .update(enrollments)
-      .set({ completedAt: sql`COALESCE(${enrollments.completedAt}, ${now})` })
-      .where(
-        and(
-          eq(enrollments.studentId, studentId),
-          eq(enrollments.courseId, courseId)
-        )
-      );
-  } else {
-    await db
-      .update(enrollments)
-      .set({ completedAt: null })
-      .where(
-        and(
-          eq(enrollments.studentId, studentId),
-          eq(enrollments.courseId, courseId)
-        )
-      );
-  }
+  await db
+    .update(enrollments)
+    .set({
+      completedAt: sql`CASE WHEN (
+        SELECT COUNT(*)::int FROM lessons l
+        INNER JOIN course_modules cm ON l.module_id = cm.id
+        WHERE cm.course_id = ${courseId}
+      ) > 0 AND (
+        SELECT COUNT(*)::int FROM lesson_progress lp
+        INNER JOIN lessons l ON lp.lesson_id = l.id
+        INNER JOIN course_modules cm ON l.module_id = cm.id
+        WHERE cm.course_id = ${courseId} AND lp.student_id = ${studentId} AND lp.completed = true
+      ) >= (
+        SELECT COUNT(*)::int FROM lessons l
+        INNER JOIN course_modules cm ON l.module_id = cm.id
+        WHERE cm.course_id = ${courseId}
+      )
+      THEN COALESCE(${enrollments.completedAt}, NOW()) ELSE NULL END`,
+    })
+    .where(
+      and(
+        eq(enrollments.studentId, studentId),
+        eq(enrollments.courseId, courseId)
+      )
+    );
 }
 
 /**
@@ -529,20 +547,62 @@ export async function getLastAccessedLesson(
 
 /**
  * Student dashboard payload: every published course the student is enrolled
- * in, with progress and resume point.
+ * in, with progress and resume point. Three queries total regardless of how
+ * many courses the student has (enrollments, per-course progress counts,
+ * latest-accessed lesson per course) — never one round-trip per course.
  */
 export async function getStudentDashboard(
   studentId: string
 ): Promise<StudentCourseSummary[]> {
-  const enrollmentsList = await getStudentEnrollments(studentId);
-  const published = enrollmentsList.filter(
-    (item) => item.course.status === "published"
-  );
+  const db = getDb();
 
-  const summaries: StudentCourseSummary[] = [];
-  for (const item of published) {
-    const stats = await getCourseStatsForStudent(studentId, item.course.id);
-    summaries.push({
+  const enrollmentRows = await db
+    .select({
+      course: courses,
+      teacherName: users.name,
+      enrolledAt: enrollments.enrolledAt,
+      completedAt: enrollments.completedAt,
+    })
+    .from(enrollments)
+    .innerJoin(courses, eq(enrollments.courseId, courses.id))
+    .leftJoin(users, eq(users.id, courses.teacherId))
+    .where(
+      and(eq(enrollments.studentId, studentId), eq(courses.status, "published"))
+    )
+    .orderBy(desc(enrollments.enrolledAt));
+
+  if (enrollmentRows.length === 0) return [];
+
+  const courseIds = enrollmentRows.map((r) => r.course.id);
+
+  const [progressByCourse, lastLessonRows] = await Promise.all([
+    getCourseCompletionCounts(studentId, courseIds),
+    db
+      .selectDistinctOn([courseModules.courseId], {
+        courseId: courseModules.courseId,
+        id: lessons.id,
+        title: lessons.title,
+        lastAccessedAt: lessonProgress.updatedAt,
+      })
+      .from(lessonProgress)
+      .innerJoin(lessons, eq(lessons.id, lessonProgress.lessonId))
+      .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
+      .where(
+        and(
+          eq(lessonProgress.studentId, studentId),
+          inArray(courseModules.courseId, courseIds)
+        )
+      )
+      .orderBy(courseModules.courseId, desc(lessonProgress.updatedAt)),
+  ]);
+
+  const lastLessonByCourse = new Map(lastLessonRows.map((r) => [r.courseId, r]));
+
+  return enrollmentRows.map((item) => {
+    const stats =
+      progressByCourse.get(item.course.id) ?? { total: 0, completed: 0 };
+    const last = lastLessonByCourse.get(item.course.id);
+    return {
       courseId: item.course.id,
       slug: item.course.slug,
       title: item.course.title,
@@ -554,11 +614,15 @@ export async function getStudentDashboard(
       progress: {
         completed: stats.completed,
         total: stats.total,
-        percent: stats.percent,
+        percent: toPercent(stats.completed, stats.total),
       },
-      lastLesson: stats.lastLesson,
-    });
-  }
-
-  return summaries;
+      lastLesson: last
+        ? {
+            id: last.id,
+            title: last.title,
+            lastAccessedAt: last.lastAccessedAt,
+          }
+        : null,
+    };
+  });
 }

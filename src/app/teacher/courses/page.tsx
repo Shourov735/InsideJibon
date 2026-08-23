@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { requireTeacher } from "@/lib/permissions";
-import { getTeacherCourses } from "@/services/courses";
+import { getTeacherCourses, getTeacherCourseStatusCounts } from "@/services/courses";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseCard } from "@/components/teacher/course-card";
 import { getTranslator } from "@/i18n/server";
@@ -29,17 +29,20 @@ export default async function TeacherCoursesPage({ searchParams }: PageProps) {
   const status = params.status as CourseStatus | undefined;
   const category = params.category as CourseCategory | undefined;
 
-  const coursesList = await getTeacherCourses(teacher.id, {
-    q: q || undefined,
-    status: status || undefined,
-    category: category || undefined,
-  });
+  const [coursesList, statusCounts] = await Promise.all([
+    getTeacherCourses(teacher.id, {
+      q: q || undefined,
+      status: status || undefined,
+      category: category || undefined,
+    }),
+    getTeacherCourseStatusCounts(teacher.id),
+  ]);
 
-  // Always fetch all for stats (no filter)
-  const allCourses = await getTeacherCourses(teacher.id);
-  const publishedCount = allCourses.filter((c) => c.status === "published").length;
-  const draftCount = allCourses.filter((c) => c.status === "draft").length;
-  const archivedCount = allCourses.filter((c) => c.status === "archived").length;
+  const publishedCount = statusCounts.published;
+  const draftCount = statusCounts.draft;
+  const archivedCount = statusCounts.archived;
+  const allCoursesTotal =
+    publishedCount + draftCount + archivedCount;
 
   const statusOptions = [
     { value: "draft", label: t("common.status.draft") },
@@ -94,7 +97,7 @@ export default async function TeacherCoursesPage({ searchParams }: PageProps) {
               {t("teacher.dashboard.stats.totalCourses")}
             </span>
             <p className="mt-1 text-2xl font-bold text-primary">
-              {allCourses.length}
+              {allCoursesTotal}
             </p>
           </div>
 

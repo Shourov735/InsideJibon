@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, ilike, inArray } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import {
@@ -149,16 +149,14 @@ export async function getTeacherExamWithQuestions(
   }
 
   const questionIds = links.map((l) => l.questionId);
-  const questionRows = await db
-    .select()
-    .from(questions)
-    .where(inArray(questions.id, questionIds));
-
-  const optionRows = await db
-    .select()
-    .from(questionOptions)
-    .where(inArray(questionOptions.questionId, questionIds))
-    .orderBy(questionOptions.position);
+  const [questionRows, optionRows] = await Promise.all([
+    db.select().from(questions).where(inArray(questions.id, questionIds)),
+    db
+      .select()
+      .from(questionOptions)
+      .where(inArray(questionOptions.questionId, questionIds))
+      .orderBy(questionOptions.position),
+  ]);
 
   const questionsById = new Map(questionRows.map((q) => [q.id, q]));
   const optionsByQuestion = new Map<string, typeof optionRows>();
@@ -463,14 +461,17 @@ async function withQuestionCounts(
 
   const db = getDb();
   const rows = await db
-    .select({ examId: examQuestions.examId, questionId: examQuestions.questionId })
+    .select({
+      examId: examQuestions.examId,
+      total: count(),
+    })
     .from(examQuestions)
-    .where(inArray(examQuestions.examId, examRows.map((e) => e.id)));
+    .where(inArray(examQuestions.examId, examRows.map((e) => e.id)))
+    .groupBy(examQuestions.examId);
 
-  const countByExam = new Map<string, number>();
-  for (const row of rows) {
-    countByExam.set(row.examId, (countByExam.get(row.examId) ?? 0) + 1);
-  }
+  const countByExam = new Map(
+    rows.map((row) => [row.examId, Number(row.total)])
+  );
 
   return examRows.map((exam) => ({
     ...exam,

@@ -1,0 +1,1 @@
+CREATE INDEX "enrollments_course_status_idx" ON "enrollments" USING btree ("course_id","status");

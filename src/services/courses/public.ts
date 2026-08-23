@@ -1,5 +1,6 @@
 import "server-only";
 import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { cache } from "react";
 
 import { getDb } from "@/db";
 import { courseModules, courses, lessons, users } from "@/db/schema";
@@ -105,10 +106,12 @@ export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise
 /**
  * Fetches a single published course (curriculum + safe teacher info) by slug.
  * Returns null for draft, archived or unknown courses so callers can notFound().
+ * Memoized per request — generateMetadata and the page body share one fetch.
  */
-export async function getPublishedCourseBySlugWithTeacher(
-  slug: string
-): Promise<PublicCourseDetail | null> {
+export const getPublishedCourseBySlugWithTeacher = cache(
+  async function getPublishedCourseBySlugWithTeacher(
+    slug: string
+  ): Promise<PublicCourseDetail | null> {
   const db = getDb();
 
   const [row] = await db
@@ -191,4 +194,5 @@ export async function getPublishedCourseBySlugWithTeacher(
     lessonCount: lessonRows.length,
     modules,
   };
-}
+  }
+);

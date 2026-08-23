@@ -1,5 +1,16 @@
 import "server-only";
-import { and, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  inArray,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
+import { cache } from "react";
 
 import { getDb } from "@/db";
 import {
@@ -113,62 +124,66 @@ export async function getTeacherCourses(
   }
 
   const teacherCourses = await db
-    .select()
+    .select({
+      ...getTableColumns(courses),
+      moduleCount: sql<number>`(SELECT COUNT(*)::int FROM ${courseModules} WHERE ${courseModules.courseId} = ${courses.id})`,
+      lessonCount: sql<number>`(SELECT COUNT(*)::int FROM ${lessons} INNER JOIN ${courseModules} ON ${lessons.moduleId} = ${courseModules.id} WHERE ${courseModules.courseId} = ${courses.id})`,
+    })
     .from(courses)
     .where(and(...conditions))
     .orderBy(desc(courses.createdAt));
 
-  if (teacherCourses.length === 0) return [];
+  return teacherCourses;
+}
 
-  // Query counts for modules and lessons
-  const result: CourseWithCounts[] = [];
+/** Per-status course totals for the teacher's stat badges — one GROUP BY. */
+export async function getTeacherCourseStatusCounts(
+  teacherId: string
+): Promise<Record<CourseStatus, number>> {
+  const db = getDb();
+  const rows = await db
+    .select({ status: courses.status, total: sql<number>`count(*)::int` })
+    .from(courses)
+    .where(eq(courses.teacherId, teacherId))
+    .groupBy(courses.status);
 
-  for (const course of teacherCourses) {
-    const [modCountRes] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(courseModules)
-      .where(eq(courseModules.courseId, course.id));
-
-    const [lessonCountRes] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(lessons)
-      .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
-      .where(eq(courseModules.courseId, course.id));
-
-    result.push({
-      ...course,
-      moduleCount: modCountRes?.count ?? 0,
-      lessonCount: lessonCountRes?.count ?? 0,
-    });
-  }
-
-  return result;
+  return {
+    draft: 0,
+    published: 0,
+    archived: 0,
+    ...Object.fromEntries(rows.map((r) => [r.status, r.total])),
+  };
 }
 
 /**
  * Fetches a single teacher course by ID with ownership verification.
+ * Memoized per request — generateMetadata and the page body share one fetch.
  */
-export async function getTeacherCourseById(
-  teacherId: string,
-  courseId: string
-): Promise<Course | null> {
-  const db = getDb();
-  const [course] = await db
-    .select()
-    .from(courses)
-    .where(and(eq(courses.id, courseId), eq(courses.teacherId, teacherId)))
-    .limit(1);
+export const getTeacherCourseById = cache(
+  async function getTeacherCourseById(
+    teacherId: string,
+    courseId: string
+  ): Promise<Course | null> {
+    const db = getDb();
+    const [course] = await db
+      .select()
+      .from(courses)
+      .where(and(eq(courses.id, courseId), eq(courses.teacherId, teacherId)))
+      .limit(1);
 
-  return course ?? null;
-}
+    return course ?? null;
+  }
+);
 
 /**
  * Fetches a full course curriculum (modules + ordered lessons) for a teacher.
+ * Memoized per request — generateMetadata and the page body share one fetch.
  */
-export async function getTeacherCourseWithCurriculum(
-  teacherId: string,
-  courseId: string
-): Promise<CourseWithCurriculum | null> {
+export const getTeacherCourseWithCurriculum = cache(
+  async function getTeacherCourseWithCurriculum(
+    teacherId: string,
+    courseId: string
+  ): Promise<CourseWithCurriculum | null> {
   const db = getDb();
 
   const [course] = await db
@@ -185,26 +200,33 @@ export async function getTeacherCourseWithCurriculum(
     .where(eq(courseModules.courseId, courseId))
     .orderBy(courseModules.position);
 
-  const modulesWithLessons = [];
+  // All lessons in one query, bucketed per module (never one query per module).
+  const lessonRows = modulesList.length
+    ? await db
+        .select()
+        .from(lessons)
+        .where(inArray(lessons.moduleId, modulesList.map((m) => m.id)))
+        .orderBy(lessons.position)
+    : [];
 
-  for (const mod of modulesList) {
-    const modLessons = await db
-      .select()
-      .from(lessons)
-      .where(eq(lessons.moduleId, mod.id))
-      .orderBy(lessons.position);
-
-    modulesWithLessons.push({
-      ...mod,
-      lessons: modLessons,
-    });
+  const lessonsByModule = new Map<string, typeof lessonRows>();
+  for (const lesson of lessonRows) {
+    const bucket = lessonsByModule.get(lesson.moduleId) ?? [];
+    bucket.push(lesson);
+    lessonsByModule.set(lesson.moduleId, bucket);
   }
+
+  const modulesWithLessons = modulesList.map((mod) => ({
+    ...mod,
+    lessons: lessonsByModule.get(mod.id) ?? [],
+  }));
 
   return {
     ...course,
     modules: modulesWithLessons,
   };
-}
+  }
+);
 
 /**
  * Updates basic course details (title, slug, description, thumbnail).
@@ -483,20 +505,25 @@ export async function getPublishedCourseBySlug(
     .where(eq(courseModules.courseId, course.id))
     .orderBy(courseModules.position);
 
-  const modulesWithLessons = [];
+  const lessonRows = modulesList.length
+    ? await db
+        .select()
+        .from(lessons)
+        .where(inArray(lessons.moduleId, modulesList.map((m) => m.id)))
+        .orderBy(lessons.position)
+    : [];
 
-  for (const mod of modulesList) {
-    const modLessons = await db
-      .select()
-      .from(lessons)
-      .where(eq(lessons.moduleId, mod.id))
-      .orderBy(lessons.position);
-
-    modulesWithLessons.push({
-      ...mod,
-      lessons: modLessons,
-    });
+  const lessonsByModule = new Map<string, typeof lessonRows>();
+  for (const lesson of lessonRows) {
+    const bucket = lessonsByModule.get(lesson.moduleId) ?? [];
+    bucket.push(lesson);
+    lessonsByModule.set(lesson.moduleId, bucket);
   }
+
+  const modulesWithLessons = modulesList.map((mod) => ({
+    ...mod,
+    lessons: lessonsByModule.get(mod.id) ?? [],
+  }));
 
   return {
     ...course,

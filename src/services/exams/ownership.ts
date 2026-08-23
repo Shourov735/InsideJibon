@@ -1,5 +1,6 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
+import { cache } from "react";
 
 import { getDb } from "@/db";
 import {
@@ -56,21 +57,27 @@ export class ExamCannotDeleteError extends Error {
   }
 }
 
-/** Exam → course → teacher. Returns null when the chain does not own it. */
-export async function verifyExamOwnership(
-  teacherId: string,
-  examId: string
-): Promise<{ exam: Exam; course: Course } | null> {
-  if (!isUuid(examId)) return null;
-  const db = getDb();
-  const [row] = await db
-    .select({ exam: exams, course: courses })
-    .from(exams)
-    .innerJoin(courses, eq(exams.courseId, courses.id))
-    .where(and(eq(exams.id, examId), eq(courses.teacherId, teacherId)))
-    .limit(1);
-  return row ?? null;
-}
+/**
+ * Exam → course → teacher. Returns null when the chain does not own it.
+ * Memoized per request: publish flows and page+metadata pairs resolve the
+ * same ownership chain several times — one join per request, not per call.
+ */
+export const verifyExamOwnership = cache(
+  async function verifyExamOwnership(
+    teacherId: string,
+    examId: string
+  ): Promise<{ exam: Exam; course: Course } | null> {
+    if (!isUuid(examId)) return null;
+    const db = getDb();
+    const [row] = await db
+      .select({ exam: exams, course: courses })
+      .from(exams)
+      .innerJoin(courses, eq(exams.courseId, courses.id))
+      .where(and(eq(exams.id, examId), eq(courses.teacherId, teacherId)))
+      .limit(1);
+    return row ?? null;
+  }
+);
 
 /** Course → teacher. Returns null when the teacher does not own it. */
 export async function verifyCourseOwnership(
@@ -93,36 +100,38 @@ export async function verifyCourseOwnership(
  * makes the resolution unambiguous even when a question later belongs to
  * several exams. Returns null when the chain does not match.
  */
-export async function verifyQuestionInExam(
-  teacherId: string,
-  examId: string,
-  questionId: string
-): Promise<
-  { question: Question; exam: Exam; course: Course; examQuestion: ExamQuestion } | null
-> {
-  if (!isUuid(examId) || !isUuid(questionId)) return null;
-  const db = getDb();
-  const [row] = await db
-    .select({
-      question: questions,
-      examQuestion: examQuestions,
-      exam: exams,
-      course: courses,
-    })
-    .from(questions)
-    .innerJoin(examQuestions, eq(examQuestions.questionId, questions.id))
-    .innerJoin(exams, eq(examQuestions.examId, exams.id))
-    .innerJoin(courses, eq(exams.courseId, courses.id))
-    .where(
-      and(
-        eq(questions.id, questionId),
-        eq(exams.id, examId),
-        eq(courses.teacherId, teacherId)
+export const verifyQuestionInExam = cache(
+  async function verifyQuestionInExam(
+    teacherId: string,
+    examId: string,
+    questionId: string
+  ): Promise<
+    { question: Question; exam: Exam; course: Course; examQuestion: ExamQuestion } | null
+  > {
+    if (!isUuid(examId) || !isUuid(questionId)) return null;
+    const db = getDb();
+    const [row] = await db
+      .select({
+        question: questions,
+        examQuestion: examQuestions,
+        exam: exams,
+        course: courses,
+      })
+      .from(questions)
+      .innerJoin(examQuestions, eq(examQuestions.questionId, questions.id))
+      .innerJoin(exams, eq(examQuestions.examId, exams.id))
+      .innerJoin(courses, eq(exams.courseId, courses.id))
+      .where(
+        and(
+          eq(questions.id, questionId),
+          eq(exams.id, examId),
+          eq(courses.teacherId, teacherId)
+        )
       )
-    )
-    .limit(1);
-  return row ?? null;
-}
+      .limit(1);
+    return row ?? null;
+  }
+);
 
 /**
  * Question → exam_questions → exam → course → teacher, resolving through any
@@ -150,32 +159,34 @@ export async function verifyQuestionForTeacher(
  * Option → question → exam_questions → exam → course → teacher. Returns null
  * when the chain does not match.
  */
-export async function verifyOptionForTeacher(
-  teacherId: string,
-  optionId: string
-): Promise<
-  { option: QuestionOption; question: Question; exam: Exam; course: Course } | null
-> {
-  if (!isUuid(optionId)) return null;
-  const db = getDb();
-  const [row] = await db
-    .select({
-      option: questionOptions,
-      question: questions,
-      exam: exams,
-      course: courses,
-    })
-    .from(questionOptions)
-    .innerJoin(questions, eq(questionOptions.questionId, questions.id))
-    .innerJoin(examQuestions, eq(examQuestions.questionId, questions.id))
-    .innerJoin(exams, eq(examQuestions.examId, exams.id))
-    .innerJoin(courses, eq(exams.courseId, courses.id))
-    .where(
-      and(eq(questionOptions.id, optionId), eq(courses.teacherId, teacherId))
-    )
-    .limit(1);
-  return row ?? null;
-}
+export const verifyOptionForTeacher = cache(
+  async function verifyOptionForTeacher(
+    teacherId: string,
+    optionId: string
+  ): Promise<
+    { option: QuestionOption; question: Question; exam: Exam; course: Course } | null
+  > {
+    if (!isUuid(optionId)) return null;
+    const db = getDb();
+    const [row] = await db
+      .select({
+        option: questionOptions,
+        question: questions,
+        exam: exams,
+        course: courses,
+      })
+      .from(questionOptions)
+      .innerJoin(questions, eq(questionOptions.questionId, questions.id))
+      .innerJoin(examQuestions, eq(examQuestions.questionId, questions.id))
+      .innerJoin(exams, eq(examQuestions.examId, exams.id))
+      .innerJoin(courses, eq(exams.courseId, courses.id))
+      .where(
+        and(eq(questionOptions.id, optionId), eq(courses.teacherId, teacherId))
+      )
+      .limit(1);
+    return row ?? null;
+  }
+);
 
 /**
  * Guards structural mutation of an exam: only draft exams are editable.
