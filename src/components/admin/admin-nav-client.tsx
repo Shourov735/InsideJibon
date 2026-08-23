@@ -2,79 +2,53 @@
 
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useState } from "react";
-
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { useTranslations } from "@/i18n/client";
 import type { CurrentUser } from "@/lib/auth";
 import { BrandLogo } from "@/components/shared/brand-logo";
 
-interface TeacherNavClientProps {
+interface AdminNavClientProps {
   user: CurrentUser;
-  activeSection?: "dashboard" | "courses" | "exams" | "assignments" | "new";
+  activeSection?: "dashboard" | "users";
 }
 
-export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherNavClientProps) {
+export function AdminNavClient({ user, activeSection = "dashboard" }: AdminNavClientProps) {
+  const { t } = useTranslations();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-outline-variant bg-surface/95 backdrop-blur-md transition-all text-on-surface">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6">
-          <BrandLogo href="/teacher" badge="EDUCATOR" />
+          <BrandLogo href="/admin" badge="ADMIN" />
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden items-center gap-1 md:flex">
             <Link
-              href="/teacher"
+              href="/admin"
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeSection === "dashboard"
                   ? "border-b-2 border-primary text-primary font-bold rounded-b-none"
                   : "text-secondary hover:text-primary"
               }`}
             >
-              Dashboard
+              {t("admin.nav.dashboard")}
             </Link>
             <Link
-              href="/teacher/courses"
+              href="/admin/users"
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                activeSection === "courses"
+                activeSection === "users"
                   ? "border-b-2 border-primary text-primary font-bold rounded-b-none"
                   : "text-secondary hover:text-primary"
               }`}
             >
-              Courses
-            </Link>
-            <Link
-              href="/teacher/exams"
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                activeSection === "exams"
-                  ? "border-b-2 border-primary text-primary font-bold rounded-b-none"
-                  : "text-secondary hover:text-primary"
-              }`}
-            >
-              Exams
-            </Link>
-            <Link
-              href="/teacher/assignments"
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                activeSection === "assignments"
-                  ? "border-b-2 border-primary text-primary font-bold rounded-b-none"
-                  : "text-secondary hover:text-primary"
-              }`}
-            >
-              Assignments
+              {t("admin.nav.users")}
             </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
-
-          <Link
-            href="/teacher/courses/new"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
-          >
-            + Create Course
-          </Link>
 
           <div className="h-6 w-px bg-outline-variant hidden sm:block" />
 
@@ -103,7 +77,7 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
       {mobileOpen && (
         <div className="md:hidden border-t border-outline-variant bg-surface-container-lowest/98 backdrop-blur-xl px-4 py-4 space-y-1.5 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
           <Link
-            href="/teacher"
+            href="/admin"
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
               activeSection === "dashboard"
@@ -112,53 +86,20 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
             }`}
           >
             <span className="text-base">📊</span>
-            <span>Dashboard</span>
+            <span>{t("admin.nav.dashboard")}</span>
           </Link>
           <Link
-            href="/teacher/courses"
+            href="/admin/users"
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
-              activeSection === "courses"
+              activeSection === "users"
                 ? "bg-primary text-on-primary font-bold shadow-xs"
                 : "text-on-surface hover:bg-surface-container-low"
             }`}
           >
-            <span className="text-base">📚</span>
-            <span>Courses</span>
+            <span className="text-base">👥</span>
+            <span>{t("admin.nav.users")}</span>
           </Link>
-          <Link
-            href="/teacher/exams"
-            onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
-              activeSection === "exams"
-                ? "bg-primary text-on-primary font-bold shadow-xs"
-                : "text-on-surface hover:bg-surface-container-low"
-            }`}
-          >
-            <span className="text-base">📝</span>
-            <span>Exams</span>
-          </Link>
-          <Link
-            href="/teacher/assignments"
-            onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
-              activeSection === "assignments"
-                ? "bg-primary text-on-primary font-bold shadow-xs"
-                : "text-on-surface hover:bg-surface-container-low"
-            }`}
-          >
-            <span className="text-base">📋</span>
-            <span>Assignments</span>
-          </Link>
-          <div className="pt-2">
-            <Link
-              href="/teacher/courses/new"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary text-center shadow-xs hover:bg-primary-container transition-colors"
-            >
-              <span>+ Create New Course</span>
-            </Link>
-          </div>
         </div>
       )}
     </header>

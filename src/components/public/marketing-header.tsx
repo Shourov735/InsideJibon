@@ -48,21 +48,21 @@ export function MarketingHeader({ role = null }: { role?: HeaderRole }) {
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.home")}</Link>
           <Link href="/courses" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.courses")}</Link>
-          <a href="#instructor" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.instructor")}</a>
+          <a href="/#instructor" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.instructor")}</a>
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button className="hidden md:inline-flex text-sm font-semibold text-primary hover:underline px-2">
+              <button className="hidden md:inline-flex text-sm font-semibold text-primary hover:underline px-2 cursor-pointer">
                 {t("nav.signIn")}
               </button>
             </SignInButton>
             <Link
               href="/sign-up"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-container hover:text-on-primary-container"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs sm:text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
             >
               {t("nav.getStarted")}
             </Link>
@@ -78,9 +78,10 @@ export function MarketingHeader({ role = null }: { role?: HeaderRole }) {
           </Show>
           {/* Mobile toggle */}
           <button
-            className="md:hidden p-2 text-secondary hover:text-primary"
+            className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant/60 bg-surface-container-lowest text-secondary hover:bg-surface-container-low hover:text-primary transition-colors cursor-pointer"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? (
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -91,18 +92,65 @@ export function MarketingHeader({ role = null }: { role?: HeaderRole }) {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Panel */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-outline-variant bg-surface-container-lowest px-4 py-4 space-y-2">
-          <Link href="/" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.home")}</Link>
-          <Link href="/courses" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.courses")}</Link>
-          <a href="#instructor" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.instructor")}</a>
-          <Show when="signed-out">
-            <Link href="/sign-up" onClick={() => setMobileOpen(false)} className="block rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary text-center">{t("nav.getStarted")}</Link>
-          </Show>
-          <Show when="signed-in">
-            <Link href={dashboardHref} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.dashboard")}</Link>
-          </Show>
+        <div className="md:hidden border-t border-outline-variant bg-surface-container-lowest/98 backdrop-blur-xl px-4 py-5 shadow-lg space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+          <nav className="flex flex-col space-y-1">
+            <Link
+              href="/"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+            >
+              <span className="text-base">🏠</span>
+              <span>{t("nav.home")}</span>
+            </Link>
+            <Link
+              href="/courses"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+            >
+              <span className="text-base">📚</span>
+              <span>{t("nav.courses")}</span>
+            </Link>
+            <a
+              href="/#instructor"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+            >
+              <span className="text-base">👨‍🏫</span>
+              <span>{t("nav.instructor")}</span>
+            </a>
+          </nav>
+
+          <div className="border-t border-outline-variant pt-3 space-y-2">
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-sm font-semibold text-primary hover:bg-surface-container transition-colors text-center cursor-pointer"
+                >
+                  {t("nav.signIn")}
+                </button>
+              </SignInButton>
+              <Link
+                href="/sign-up"
+                onClick={() => setMobileOpen(false)}
+                className="block w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary text-center shadow-sm hover:bg-primary-container transition-colors"
+              >
+                {t("nav.getStarted")}
+              </Link>
+            </Show>
+            <Show when="signed-in">
+              <Link
+                href={dashboardHref}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary text-center shadow-sm hover:bg-primary-container transition-colors"
+              >
+                <span>{t("nav.dashboard")}</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+            </Show>
+          </div>
         </div>
       )}
     </header>

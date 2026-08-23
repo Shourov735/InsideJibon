@@ -316,36 +316,40 @@ export function ExamResultView({ result, courseId }: ExamResultViewProps) {
                       return (
                         <div
                           key={option.id}
-                          className={`flex items-center gap-3 rounded-xl border p-3.5 text-xs sm:text-sm transition-colors ${containerStyle}`}
+                          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 rounded-xl border p-3.5 text-xs sm:text-sm transition-colors ${containerStyle}`}
                         >
-                          {/* Letter Badge */}
-                          <span
-                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${badgeStyle}`}
-                          >
-                            {letter}
-                          </span>
+                          <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                            {/* Letter Badge */}
+                            <span
+                              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${badgeStyle}`}
+                            >
+                              {letter}
+                            </span>
 
-                          {/* Option text */}
-                          <span className="flex-1 leading-relaxed break-words">{option.optionText}</span>
+                            {/* Option text */}
+                            <span className="flex-1 leading-relaxed break-words">{option.optionText}</span>
+                          </div>
 
                           {/* Tags */}
-                          <div className="flex items-center gap-2 shrink-0">
-                            {isSelected && isCorrectAnswer && (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
-                                ✓ {t("student.result.yourCorrectAnswer")}
-                              </span>
-                            )}
-                            {isSelected && !isCorrectAnswer && (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-900">
-                                ✗ {t("student.result.yourAnswer")}
-                              </span>
-                            )}
-                            {!isSelected && isCorrectAnswer && (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
-                                ✓ {t("student.result.correctAnswer")}
-                              </span>
-                            )}
-                          </div>
+                          {(isCorrectAnswer || isSelected) && (
+                            <div className="flex items-center gap-2 shrink-0 pl-9 sm:pl-0">
+                              {isSelected && isCorrectAnswer && (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
+                                  ✓ {t("student.result.yourCorrectAnswer")}
+                                </span>
+                              )}
+                              {isSelected && !isCorrectAnswer && (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-900">
+                                  ✗ {t("student.result.yourAnswer")}
+                                </span>
+                              )}
+                              {!isSelected && isCorrectAnswer && (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
+                                  ✓ {t("student.result.correctAnswer")}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}

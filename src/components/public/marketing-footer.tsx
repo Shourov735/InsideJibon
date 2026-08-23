@@ -7,8 +7,8 @@ export async function MarketingFooter({ role = null }: { role?: AppRole | null }
   const t = await getTranslator();
   return (
     <footer className="border-t border-outline-variant bg-surface">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand Column */}
           <div className="md:col-span-2">
             <div className="mb-4">

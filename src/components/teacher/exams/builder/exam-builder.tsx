@@ -267,11 +267,11 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col bg-surface text-on-surface overflow-hidden">
       {/* Top Header / Builder Navigation Bar */}
-      <header className="flex h-16 w-full items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-4 sm:px-6 shrink-0 z-30">
-        <div className="flex items-center gap-3 min-w-0">
+      <header className="flex h-16 w-full items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-3 sm:px-6 shrink-0 z-30 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href={`/teacher/exams/${exam.id}`}
-            className="flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
+            className="flex items-center gap-1 rounded-lg border border-outline-variant bg-surface-container-low px-2 sm:px-3 py-1.5 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors shrink-0"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -283,13 +283,15 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold tracking-tight text-on-surface truncate sm:text-base">
+              <h1 className="text-xs sm:text-base font-bold tracking-tight text-on-surface max-w-[120px] sm:max-w-xs md:max-w-md truncate">
                 {exam.title}
               </h1>
-              <StatusBadge
-              status={exam.status}
-              label={exam.status === "draft" ? t("common.status.draft") : exam.status === "published" ? t("common.status.published") : t("common.status.archived")}
-            />
+              <div className="shrink-0">
+                <StatusBadge
+                  status={exam.status}
+                  label={exam.status === "draft" ? t("common.status.draft") : exam.status === "published" ? t("common.status.published") : t("common.status.archived")}
+                />
+              </div>
             </div>
             {courseTitle && (
               <p className="text-[11px] text-secondary truncate hidden sm:block">
@@ -300,7 +302,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
         </div>
 
         {/* Center / Right controls */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Save state badge */}
           <div className="hidden items-center gap-1.5 text-xs font-medium md:flex">
             {saveState === "saving" && (
@@ -347,7 +349,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
           <button
             type="button"
             onClick={() => setIsPreviewModalOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 rounded-lg border border-outline-variant bg-surface-container-low px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
           >
             <svg className="h-4 w-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -360,7 +362,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
           <button
             type="button"
             onClick={() => setIsPublishModalOpen(true)}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold shadow-xs transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1 rounded-lg px-2.5 sm:px-4 py-1.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer ${
               exam.status === "published"
                 ? "border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
                 : "bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container"
@@ -411,7 +413,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
               : "border-transparent text-secondary hover:text-on-surface"
           }`}
         >
-          ({tn("common.questionCountUpper", exam.questions.length)})
+          {t("teacher.examDetail.stats.questions")} ({exam.questions.length})
         </button>
         <button
           type="button"

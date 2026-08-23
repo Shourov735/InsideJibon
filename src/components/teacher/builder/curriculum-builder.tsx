@@ -108,11 +108,11 @@ export function CurriculumBuilder({
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-surface text-on-surface">
       {/* Top Header / Builder Action Bar */}
-      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-4 sm:px-6">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-3 sm:px-6 gap-2">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <Link
             href="/teacher/courses"
-            className="flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
+            className="flex items-center gap-1 rounded-lg border border-outline-variant bg-surface-container-low px-2 sm:px-3 py-1.5 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors shrink-0"
           >
             <svg
               className="h-4 w-4"
@@ -127,26 +127,28 @@ export function CurriculumBuilder({
                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            <span>{t("teacher.courses.title")}</span>
+            <span className="hidden sm:inline">{t("teacher.courses.title")}</span>
           </Link>
 
-          <div className="h-5 w-px bg-outline-variant" />
+          <div className="h-5 w-px bg-outline-variant hidden sm:block" />
 
-          <div className="flex items-center gap-2.5">
-            <h1 className="max-w-md truncate text-base font-bold text-on-surface">
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="max-w-[120px] sm:max-w-xs md:max-w-md truncate text-xs sm:text-base font-bold text-on-surface">
               {course.title}
             </h1>
-            <StatusBadge
-              status={course.status}
-              label={course.status === "draft" ? t("common.status.draft") : course.status === "published" ? t("common.status.published") : t("common.status.archived")}
-            />
+            <div className="shrink-0">
+              <StatusBadge
+                status={course.status}
+                label={course.status === "draft" ? t("common.status.draft") : course.status === "published" ? t("common.status.published") : t("common.status.archived")}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             href={`/teacher/courses/${course.id}/edit`}
-            className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-xs font-medium text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
+            className="hidden sm:inline-flex rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-secondary hover:bg-surface-container hover:text-on-surface transition-colors"
           >
             {t("teacher.builder.courseSettings")}
           </Link>
@@ -154,7 +156,7 @@ export function CurriculumBuilder({
           <button
             type="button"
             onClick={() => setIsPublishModalOpen(true)}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold shadow-xs transition-colors ${
+            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 sm:px-4 py-1.5 text-xs font-semibold shadow-xs transition-colors cursor-pointer ${
               course.status === "published"
                 ? "bg-emerald-700 text-white hover:bg-emerald-800"
                 : "bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container"

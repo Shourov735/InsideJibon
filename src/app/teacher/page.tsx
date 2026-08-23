@@ -56,10 +56,10 @@ export default async function TeacherDashboardPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full sm:w-auto">
             <Link
               href="/teacher/exams/new"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-sm font-semibold text-on-surface shadow-2xs transition-colors hover:bg-surface-container hover:text-primary"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs sm:text-sm font-semibold text-on-surface shadow-2xs transition-colors hover:bg-surface-container hover:text-primary w-full sm:w-auto"
             >
               <svg
                 className="h-4 w-4 text-primary"
@@ -75,7 +75,7 @@ export default async function TeacherDashboardPage() {
 
             <Link
               href="/teacher/courses/new"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs sm:text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container w-full sm:w-auto"
             >
               <svg
                 className="h-4 w-4"

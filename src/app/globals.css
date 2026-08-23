@@ -75,6 +75,15 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-width: 320px;
+}
+
+/* Touch targets and mobile interaction */
+@media (max-width: 640px) {
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
 }
 
 /* Utility: Academic bento card */
@@ -103,6 +112,14 @@ body {
 
 .shadow-academic-lg {
   box-shadow: 0px 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive Table Horizontal Scroll with indicator hint */
+.table-responsive-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
 /* Custom scrollbar */

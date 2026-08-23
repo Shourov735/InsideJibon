@@ -49,7 +49,7 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
 
           {bell}
@@ -57,16 +57,17 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
           <div className="h-6 w-px bg-outline-variant hidden sm:block" />
 
           <div className="flex items-center gap-2">
-            <span className="hidden text-xs font-medium text-secondary sm:inline-block">
+            <span className="hidden text-xs font-medium text-secondary sm:inline-block max-w-[150px] truncate">
               {user.name ?? user.email}
             </span>
             <UserButton />
           </div>
 
           <button
-            className="md:hidden p-2 text-secondary hover:text-primary"
+            className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant/60 bg-surface-container-lowest text-secondary hover:bg-surface-container-low hover:text-primary transition-colors cursor-pointer"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? (
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -78,10 +79,39 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-outline-variant bg-surface-container-lowest px-4 py-4 space-y-2">
-          <Link href="/student" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.dashboard")}</Link>
-          <Link href="/student/courses" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-on-surface hover:bg-surface-container-low">{t("nav.courses")}</Link>
-          <Link href="/courses" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-surface-container-low">Browse Courses</Link>
+        <div className="md:hidden border-t border-outline-variant bg-surface-container-lowest/98 backdrop-blur-xl px-4 py-4 space-y-1.5 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+          <Link
+            href="/student"
+            onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
+              activeSection === "dashboard"
+                ? "bg-primary text-on-primary font-bold shadow-xs"
+                : "text-on-surface hover:bg-surface-container-low"
+            }`}
+          >
+            <span className="text-base">📊</span>
+            <span>{t("nav.dashboard")}</span>
+          </Link>
+          <Link
+            href="/student/courses"
+            onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
+              activeSection === "courses"
+                ? "bg-primary text-on-primary font-bold shadow-xs"
+                : "text-on-surface hover:bg-surface-container-low"
+            }`}
+          >
+            <span className="text-base">📖</span>
+            <span>{t("nav.courses")}</span>
+          </Link>
+          <Link
+            href="/courses"
+            onClick={() => setMobileOpen(false)}
+            className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-primary hover:bg-surface-container-low transition-colors"
+          >
+            <span className="text-base">🔍</span>
+            <span>Browse All Courses</span>
+          </Link>
         </div>
       )}
     </header>

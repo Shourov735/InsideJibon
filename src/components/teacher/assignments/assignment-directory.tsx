@@ -198,12 +198,12 @@ export function AssignmentDirectory({
         </div>
 
         {/* Search, Course selector & View Switcher */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full sm:w-auto">
           {!scopedCourseId && courses.length > 0 && (
             <select
               value={selectedCourseId}
               onChange={(e) => setSelectedCourseId(e.target.value)}
-              className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-on-surface outline-none focus:border-primary"
+              className="w-full sm:w-auto rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-on-surface outline-none focus:border-primary"
             >
               <option value="all">{t("teacher.assignments.allCourses")}</option>
               {courses.map((c) => (
@@ -215,7 +215,7 @@ export function AssignmentDirectory({
           )}
 
           {/* Search Input */}
-          <div className="relative min-w-[200px] flex-1 sm:flex-initial">
+          <div className="relative w-full sm:w-48 md:w-64">
             <input
               type="text"
               value={searchQuery}
