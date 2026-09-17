@@ -6,7 +6,7 @@ try {
   process.loadEnvFile(".env.local");
 } catch {}
 
-import { courses, enrollments, notifications, users } from "../src/db/schema";
+import { courses, enrollments, notifications } from "../src/db/schema";
 import * as enrollmentService from "../src/services/enrollments";
 
 const db = drizzle(neon(process.env.DATABASE_URL!));

@@ -20,7 +20,12 @@ export async function createCourseNotifications(courseId: string, input: { type:
   const recipients = await db
     .select({ studentId: enrollments.studentId })
     .from(enrollments)
-    .where(eq(enrollments.courseId, courseId));
+    .where(
+      and(
+        eq(enrollments.courseId, courseId),
+        eq(enrollments.status, "active")
+      )
+    );
 
   if (recipients.length === 0) return;
 

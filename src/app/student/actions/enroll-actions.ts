@@ -13,6 +13,7 @@ import { localizeMessage } from "@/i18n/errors";
 export interface EnrollActionResultData {
   enrollment: Enrollment;
   courseSlug: string;
+  courseTitle: string;
   alreadyRequested: boolean;
 }
 
@@ -42,6 +43,7 @@ export async function enrollInCourseAction(
     revalidatePath(`/courses/${result.course.slug}`);
     revalidatePath("/student");
     revalidatePath("/student/courses");
+    revalidatePath("/teacher");
     revalidatePath("/admin");
 
     return {
@@ -49,6 +51,7 @@ export async function enrollInCourseAction(
       data: {
         enrollment: result.enrollment,
         courseSlug: result.course.slug,
+        courseTitle: result.course.title,
         alreadyRequested: result.alreadyRequested,
       },
     };

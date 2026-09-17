@@ -176,6 +176,8 @@ export default async function PublicCourseDetailPage({
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <EnrollButton
               courseId={course.id}
+              courseSlug={course.slug}
+              courseTitle={course.title}
               canEnroll={canEnroll}
               enrollmentStatus={enrollmentStatus}
             />

@@ -6,6 +6,8 @@ import { getTranslator } from "@/i18n/server";
 import { SearchFilterBar } from "@/components/shared/search-filter-bar";
 import { COURSE_CATEGORIES } from "@/schemas/course";
 import type { CourseCategory } from "@/db/schema";
+import { resolveCurrentUser } from "@/lib/auth";
+import { getStudentEnrollments } from "@/services/enrollments";
 
 export const dynamic = "force-dynamic";
 
@@ -30,10 +32,18 @@ export default async function PublicCoursesPage({ searchParams }: PublicCoursesP
   const q = params.q ?? "";
   const category = params.category as CourseCategory | undefined;
 
-  const coursesList = await getPublishedCourses({
-    q: q || undefined,
-    category: category || undefined,
-  });
+  const { user } = await resolveCurrentUser();
+  const [coursesList, studentEnrollments] = await Promise.all([
+    getPublishedCourses({
+      q: q || undefined,
+      category: category || undefined,
+    }),
+    user?.role === "student" ? getStudentEnrollments(user.id) : Promise.resolve([]),
+  ]);
+
+  const enrollmentStatusMap = new Map(
+    studentEnrollments.map((e) => [e.courseId, e.status])
+  );
 
   const categoryOptions = COURSE_CATEGORIES.map((cat) => ({
     value: cat,
@@ -103,7 +113,11 @@ export default async function PublicCoursesPage({ searchParams }: PublicCoursesP
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {coursesList.map((course) => (
-              <PublicCourseCard key={course.id} course={course} />
+              <PublicCourseCard
+                key={course.id}
+                course={course}
+                enrollmentStatus={enrollmentStatusMap.get(course.id)}
+              />
             ))}
           </div>
         )}

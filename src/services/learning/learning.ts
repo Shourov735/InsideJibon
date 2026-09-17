@@ -567,7 +567,11 @@ export async function getStudentDashboard(
     .innerJoin(courses, eq(enrollments.courseId, courses.id))
     .leftJoin(users, eq(users.id, courses.teacherId))
     .where(
-      and(eq(enrollments.studentId, studentId), eq(courses.status, "published"))
+      and(
+        eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "active"),
+        eq(courses.status, "published")
+      )
     )
     .orderBy(desc(enrollments.enrolledAt));
 

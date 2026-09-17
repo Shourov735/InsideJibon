@@ -46,6 +46,12 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
             >
               {t("nav.courses")}
             </Link>
+            <Link
+              href="/courses"
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-secondary hover:text-primary transition-colors"
+            >
+              {t("nav.student.browseCourses")}
+            </Link>
           </nav>
         </div>
 
@@ -110,7 +116,7 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
             className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-primary hover:bg-surface-container-low transition-colors"
           >
             <span className="text-base">🔍</span>
-            <span>Browse All Courses</span>
+            <span>{t("nav.student.browseCourses")}</span>
           </Link>
         </div>
       )}

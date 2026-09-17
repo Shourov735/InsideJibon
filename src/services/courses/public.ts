@@ -3,7 +3,7 @@ import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { cache } from "react";
 
 import { getDb } from "@/db";
-import { courseModules, courses, lessons, users } from "@/db/schema";
+import { courseModules, courses, enrollments, lessons, users } from "@/db/schema";
 import type {
   PublicCourseDetail,
   PublicCourseSummary,
@@ -88,6 +88,62 @@ export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise
     .innerJoin(users, eq(courses.teacherId, users.id))
     .where(and(...conditions))
     .orderBy(desc(courses.publishedAt), desc(courses.updatedAt));
+
+  return rows.map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    description: row.description,
+    thumbnailUrl: row.thumbnailUrl,
+    category: row.category,
+    publishedAt: row.publishedAt,
+    teacher: toPublicTeacher(row.teacherId, row.teacherName, row.teacherImageUrl),
+    moduleCount: row.moduleCount ?? 0,
+    lessonCount: row.lessonCount ?? 0,
+  }));
+}
+
+/**
+ * Lists published courses that a student is NOT currently enrolled in
+ * (neither active nor pending). Used by the student dashboard for
+ * discovering new courses.
+ */
+export async function getDiscoverCoursesForStudent(
+  studentId: string,
+  limit = 4
+): Promise<PublicCourseSummary[]> {
+  const db = getDb();
+
+  const rows = await db
+    .select({
+      id: courses.id,
+      slug: courses.slug,
+      title: courses.title,
+      description: courses.description,
+      thumbnailUrl: courses.thumbnailUrl,
+      category: courses.category,
+      publishedAt: courses.publishedAt,
+      teacherId: users.id,
+      teacherName: users.name,
+      teacherImageUrl: users.imageUrl,
+      moduleCount: moduleCountSql,
+      lessonCount: lessonCountSql,
+    })
+    .from(courses)
+    .innerJoin(users, eq(courses.teacherId, users.id))
+    .where(
+      and(
+        eq(courses.status, "published"),
+        sql`${courses.id} NOT IN (
+          SELECT ${enrollments.courseId}
+          FROM ${enrollments}
+          WHERE ${enrollments.studentId} = ${studentId}
+          AND ${enrollments.status} IN ('active', 'pending')
+        )`
+      )
+    )
+    .orderBy(desc(courses.publishedAt), desc(courses.updatedAt))
+    .limit(limit);
 
   return rows.map((row) => ({
     id: row.id,

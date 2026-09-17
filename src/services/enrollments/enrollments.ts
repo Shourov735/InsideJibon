@@ -245,6 +245,49 @@ export async function getStudentEnrollments(
   }));
 }
 
+export interface StudentPendingEnrollment {
+  id: string;
+  courseId: string;
+  courseSlug: string;
+  courseTitle: string;
+  courseThumbnailUrl: string | null;
+  teacherName: string | null;
+  enrolledAt: Date;
+}
+
+/**
+ * Returns pending enrollment requests for a student in published courses.
+ * Used by the student dashboard to surface courses awaiting approval.
+ */
+export async function getPendingEnrollmentsForStudent(
+  studentId: string
+): Promise<StudentPendingEnrollment[]> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      id: enrollments.id,
+      courseId: courses.id,
+      courseSlug: courses.slug,
+      courseTitle: courses.title,
+      courseThumbnailUrl: courses.thumbnailUrl,
+      teacherName: users.name,
+      enrolledAt: enrollments.enrolledAt,
+    })
+    .from(enrollments)
+    .innerJoin(courses, eq(enrollments.courseId, courses.id))
+    .leftJoin(users, eq(users.id, courses.teacherId))
+    .where(
+      and(
+        eq(enrollments.studentId, studentId),
+        eq(enrollments.status, "pending"),
+        eq(courses.status, "published")
+      )
+    )
+    .orderBy(desc(enrollments.enrolledAt));
+
+  return rows;
+}
+
 export interface PendingRequestRow {
   enrollment: Enrollment;
   studentName: string | null;

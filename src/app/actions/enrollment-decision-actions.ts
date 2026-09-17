@@ -48,6 +48,8 @@ export async function decideEnrollmentAction(
     revalidatePath("/admin");
     revalidatePath("/teacher");
     revalidatePath("/courses");
+    revalidatePath("/student");
+    revalidatePath("/student/courses");
 
     return { success: true };
   } catch (error) {

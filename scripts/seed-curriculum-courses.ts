@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 try {
   process.loadEnvFile(".env.local");
@@ -14,7 +14,6 @@ import {
   courseModules,
   lessons,
 } from "../src/db/schema";
-import * as courseService from "../src/services/courses";
 
 const db = drizzle(neon(process.env.DATABASE_URL!));
 

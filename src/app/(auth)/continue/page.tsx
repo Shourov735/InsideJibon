@@ -20,10 +20,27 @@ export const dynamic = "force-dynamic";
  * authenticated users straight back here (infinite loop). Unsynced
  * accounts go to the account-pending notice.
  */
-export default async function AuthContinuePage() {
+interface AuthContinuePageProps {
+  searchParams: Promise<{ redirect_url?: string }>;
+}
+
+function getSafeRedirect(url?: string): string | null {
+  if (!url) return null;
+  if (url.startsWith("/") && !url.startsWith("//") && !url.includes("://")) {
+    return url;
+  }
+  return null;
+}
+
+export default async function AuthContinuePage({ searchParams }: AuthContinuePageProps) {
+  const params = await searchParams;
+  const safeRedirect = getSafeRedirect(params.redirect_url);
   const { status, user } = await resolveCurrentUser();
 
   if (user) {
+    if (user.role === "student" && safeRedirect) {
+      redirect(safeRedirect);
+    }
     redirect(dashboardPathForRole(user.role));
   }
 
@@ -31,5 +48,5 @@ export default async function AuthContinuePage() {
     redirect("/account-pending");
   }
 
-  return <AuthWaitingRoom />;
+  return <AuthWaitingRoom redirectUrl={safeRedirect ?? undefined} />;
 }

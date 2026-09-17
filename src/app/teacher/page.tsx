@@ -7,6 +7,8 @@ import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseCard } from "@/components/teacher/course-card";
 import { getTranslator } from "@/i18n/server";
 import { ExamCard } from "@/components/teacher/exams/exam-card";
+import { getPendingRequestsForCourses } from "@/services/enrollments";
+import { PendingRequestsList } from "@/components/shared/pending-requests-list";
 
 export const metadata = {
   title: "Educator Dashboard | InsideJibon",
@@ -20,6 +22,10 @@ export default async function TeacherDashboardPage() {
     getTeacherCourses(teacher.id),
     getTeacherExams(teacher.id),
   ]);
+
+  const courseIds = coursesList.map((c) => c.id);
+  const pendingRequests =
+    courseIds.length > 0 ? await getPendingRequestsForCourses(courseIds) : [];
 
   const courseMap = new Map(coursesList.map((c) => [c.id, c.title]));
 
@@ -94,6 +100,24 @@ export default async function TeacherDashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* Pending Enrollment Requests */}
+        {pendingRequests.length > 0 && (
+          <section className="space-y-3 rounded-2xl border-2 border-primary/20 bg-primary/5 p-5 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" />
+                  {t("teacher.dashboard.pendingRequestsTitle")} ({pendingRequests.length})
+                </h2>
+                <p className="text-xs text-secondary mt-0.5">
+                  {t("teacher.dashboard.pendingRequestsSubtitle")}
+                </p>
+              </div>
+            </div>
+            <PendingRequestsList requests={pendingRequests} />
+          </section>
+        )}
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

@@ -4,6 +4,7 @@ import { CategoryBadge } from "@/components/shared/category-badge";
 
 interface PublicCourseCardProps {
   course: PublicCourseSummary;
+  enrollmentStatus?: "active" | "pending" | "rejected" | null;
 }
 
 function TeacherAvatar({ course }: PublicCourseCardProps) {
@@ -19,7 +20,7 @@ function TeacherAvatar({ course }: PublicCourseCardProps) {
   );
 }
 
-export function PublicCourseCard({ course }: PublicCourseCardProps) {
+export function PublicCourseCard({ course, enrollmentStatus }: PublicCourseCardProps) {
   return (
     <Link
       href={`/courses/${course.slug}`}
@@ -49,11 +50,27 @@ export function PublicCourseCard({ course }: PublicCourseCardProps) {
             </svg>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60"></div>
-        
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60" />
+
+        {enrollmentStatus === "active" && (
+          <div className="absolute top-3 left-3">
+            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+              Enrolled
+            </span>
+          </div>
+        )}
+
+        {enrollmentStatus === "pending" && (
+          <div className="absolute top-3 left-3">
+            <span className="rounded-full bg-amber-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+              Pending
+            </span>
+          </div>
+        )}
+
         {course.category && (
           <div className="absolute top-3 right-3">
-             <CategoryBadge category={course.category} />
+            <CategoryBadge category={course.category} />
           </div>
         )}
       </div>
@@ -73,7 +90,7 @@ export function PublicCourseCard({ course }: PublicCourseCardProps) {
               {course.teacher.name || "Tanvir Hasan Jibon"}
             </span>
           </div>
-          
+
           <div className="flex items-center gap-3 text-xs font-semibold text-secondary">
             <span className="flex items-center gap-1">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">

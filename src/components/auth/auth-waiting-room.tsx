@@ -18,7 +18,7 @@ const MAX_POLLS = 20;
  * poll /api/me until the session resolves (or time out with manual
  * links), then route by role.
  */
-export function AuthWaitingRoom() {
+export function AuthWaitingRoom({ redirectUrl }: { redirectUrl?: string }) {
   const router = useRouter();
   const { isSignedIn, isLoaded } = useAuth();
   const [phase, setPhase] = useState<Phase>("waiting");
@@ -37,6 +37,10 @@ export function AuthWaitingRoom() {
         .then((data) => {
           if (cancelled) return;
           if (data?.authenticated && data?.role) {
+            if (data.role === "student" && redirectUrl) {
+              router.replace(redirectUrl);
+              return;
+            }
             router.replace(
               data.role === "admin"
                 ? "/admin"
@@ -74,7 +78,7 @@ export function AuthWaitingRoom() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [router]);
+  }, [router, redirectUrl]);
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-surface px-4 text-center">

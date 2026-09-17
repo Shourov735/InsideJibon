@@ -48,7 +48,7 @@ export function MarketingHeader({ role = null }: { role?: HeaderRole }) {
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.home")}</Link>
           <Link href="/courses" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.courses")}</Link>
-          <a href="/#instructor" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.instructor")}</a>
+          <Link href="/#instructor" className="text-sm font-medium text-secondary hover:text-primary transition-colors">{t("nav.instructor")}</Link>
         </nav>
 
         {/* Actions */}
@@ -112,14 +112,14 @@ export function MarketingHeader({ role = null }: { role?: HeaderRole }) {
               <span className="text-base">📚</span>
               <span>{t("nav.courses")}</span>
             </Link>
-            <a
+            <Link
               href="/#instructor"
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
             >
               <span className="text-base">👨‍🏫</span>
               <span>{t("nav.instructor")}</span>
-            </a>
+            </Link>
           </nav>
 
           <div className="border-t border-outline-variant pt-3 space-y-2">
