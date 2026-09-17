@@ -87,6 +87,7 @@ export const bn: Dictionary = {
   "nav.teacher.educatorBadge": "শিক্ষক",
 
   "footer.madeWith": "তৈরি করেছেন",
+  "footer.developedBy": "ডেভেলপ করেছেন",
   "footer.platform": "প্ল্যাটফর্ম",
   "footer.rights": "সর্বস্বত্ব সংরক্ষিত।",
   "footer.subjects": "বিষয়সমূহ",

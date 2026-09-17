@@ -80,6 +80,7 @@ export const en = {
   "nav.teacher.educatorBadge": "Educator",
 
   "footer.madeWith": "Made with ❤️ by",
+  "footer.developedBy": "Developed by",
   "footer.platform": "Platform",
   "footer.rights": "All rights reserved.",
   "footer.subjects": "Subjects",
