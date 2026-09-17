@@ -85,24 +85,18 @@ export async function MarketingFooter({ role = null }: { role?: AppRole | null }
           <p>
             © {new Date().getFullYear()} InsideJibon. {t("footer.rights")}
           </p>
-          <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-2.5 gap-y-1 text-center md:text-right">
-            <span>
-              {t("footer.madeWith")} Tanvir Hasan Jibon
-            </span>
-            <span className="text-outline-variant hidden sm:inline" aria-hidden="true">•</span>
-            <span>
-              {t("footer.developedBy")}{" "}
-              <a
-                href="https://mdshourov.vercel.app/"
-                target="_blank"
-                rel="noopener"
-                className="font-medium text-primary hover:underline transition-colors"
-                title="Md. Shourov — Software Engineer & Full-Stack Developer"
-              >
-                Md. Shourov
-              </a>
-            </span>
-          </div>
+          <p className="text-center md:text-right">
+            {t("footer.developedBy")}{" "}
+            <a
+              href="https://mdshourov.vercel.app/"
+              target="_blank"
+              rel="noopener"
+              className="font-medium text-primary hover:underline transition-colors"
+              title="Md. Shourov — Software Engineer & Full-Stack Developer"
+            >
+              Md. Shourov
+            </a>
+          </p>
         </div>
       </div>
     </footer>
