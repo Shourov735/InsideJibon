@@ -175,7 +175,7 @@ export function CourseForm({
         </div>
         <div className="mt-1.5 flex rounded-lg border border-outline-variant bg-surface-container-lowest shadow-2xs focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
           <span className="inline-flex items-center border-r border-outline-variant bg-surface-container-low px-3 text-xs font-mono text-secondary">
-            insidejibon.workers.dev/courses/
+            insidejibon.shourov.workers.dev/courses/
           </span>
           <input
             id="slug"

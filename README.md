@@ -87,10 +87,10 @@ are bilingual in the UI keep both languages in the `bn.ts` value.
 
 Run this after every deploy (or any secret change):
 
-1. `curl -I https://insidejibon.insidejibon.workers.dev/` — expect `200`, the
+1. `curl -I https://insidejibon.shourov.workers.dev/` — expect `200`, the
    security headers (`x-frame-options: DENY`, `x-content-type-options: nosniff`,
    `referrer-policy`, `permissions-policy`) and **no** `x-powered-by`.
-2. Unauthenticated: `curl -i https://insidejibon.insidejibon.workers.dev/admin`
+2. Unauthenticated: `curl -i https://insidejibon.shourov.workers.dev/admin`
    → `307` redirect to `/sign-in`; same for `/student` and `/teacher`.
 3. Signed in: request the protected routes with a valid session token cookie
    (`__session=<jwt>`) → `200` for `/student`, role-appropriate `200` for
