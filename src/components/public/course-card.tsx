@@ -16,6 +16,10 @@ function TeacherAvatar({ course }: PublicCourseCardProps) {
       src={avatarSrc}
       alt={name || "Tanvir Hasan Jibon"}
       className="h-6 w-6 rounded-full border border-outline-variant object-cover"
+      width={24}
+      height={24}
+      loading="lazy"
+      decoding="async"
     />
   );
 }
@@ -32,6 +36,8 @@ export function PublicCourseCard({ course, enrollmentStatus }: PublicCourseCardP
             src={course.thumbnailUrl}
             alt={course.title}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-primary-container/10">

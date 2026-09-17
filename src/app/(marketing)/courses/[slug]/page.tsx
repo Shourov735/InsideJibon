@@ -7,6 +7,12 @@ import { getStudentEnrollment } from "@/services/enrollments";
 import { getPublishedCourseBySlugWithTeacher } from "@/services/courses";
 import { EnrollButton } from "@/components/student/enroll-button";
 import { getTranslator } from "@/i18n/server";
+import {
+  buildAlternates,
+  buildBreadcrumbJsonLd,
+  buildCourseJsonLd,
+} from "@/lib/seo";
+import { JsonLd } from "@/components/shared/json-ld";
 
 interface PublicCourseDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -18,19 +24,66 @@ export async function generateMetadata({
   const { slug } = await params;
   const course = await getPublishedCourseBySlugWithTeacher(slug);
 
-  // Draft/archived/unknown courses never reach metadata generation with
-  // real course data — return a generic title to avoid leaking anything.
   if (!course) {
-    return { title: "Course Not Found" };
+    return {
+      title: "Course Not Found",
+      robots: { index: false, follow: false },
+    };
   }
+
+  const t = await getTranslator();
+  const isBn = t.locale === "bn";
+  const courseUrl = `https://insidejibon.com/courses/${course.slug}`;
+  const courseTitle = `${course.title} | InsideJibon`;
+  const courseDescription =
+    course.description ||
+    (isBn
+      ? `${course.title} — ইনসাইড জীবনে পরিকল্পিত একাডেমিক ভিডিও পাঠ, অ্যাসাইনমেন্ট ও পরীক্ষা প্রস্তুতি।`
+      : `Master ${course.title} with structured video lessons, assignments, and exam practice on InsideJibon.`);
+
+  const imageUrl = course.thumbnailUrl
+    ? course.thumbnailUrl.startsWith("http")
+      ? course.thumbnailUrl
+      : `https://insidejibon.com${course.thumbnailUrl}`
+    : "https://insidejibon.com/images/og-image.jpg";
 
   return {
     title: course.title,
-    description: course.description ?? undefined,
+    description: courseDescription,
+    alternates: buildAlternates(`/courses/${course.slug}`),
     openGraph: {
-      title: `${course.title} | InsideJibon`,
-      description: course.description ?? undefined,
-      images: course.thumbnailUrl ? [{ url: course.thumbnailUrl }] : undefined,
+      title: courseTitle,
+      description: courseDescription,
+      url: courseUrl,
+      siteName: "InsideJibon",
+      locale: isBn ? "bn_BD" : "en_US",
+      alternateLocale: [isBn ? "en_US" : "bn_BD"],
+      type: "article",
+      publishedTime: course.publishedAt ? new Date(course.publishedAt).toISOString() : undefined,
+      authors: [course.teacher.name || "Tanvir Hasan Jibon"],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: course.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: courseTitle,
+      description: courseDescription,
+      images: [imageUrl],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+      },
     },
   };
 }
@@ -72,6 +125,14 @@ export default async function PublicCourseDetailPage({
 
   return (
     <div>
+      <JsonLd data={buildCourseJsonLd(course, t.locale as "en" | "bn")} />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: t("marketing.home"), url: "/" },
+          { name: t("marketing.header.courses"), url: "/courses" },
+          { name: course.title, url: `/courses/${course.slug}` },
+        ])}
+      />
       <section className="bg-surface-container-lowest border-b border-outline-variant">
         <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
           <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
@@ -109,6 +170,8 @@ export default async function PublicCourseDetailPage({
                   src={course.thumbnailUrl}
                   alt={course.title}
                   className="h-full w-full object-cover"
+                  loading="eager"
+                  decoding="async"
                 />
               </div>
             )}
@@ -130,6 +193,10 @@ export default async function PublicCourseDetailPage({
                     src={course.teacher.imageUrl || "/jibon.jpg"}
                     alt={course.teacher.name || "Tanvir Hasan Jibon"}
                     className="h-9 w-9 rounded-full border border-outline-variant object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    width={36}
+                    height={36}
                   />
                   <div className="leading-tight">
                     <p className="text-sm font-medium text-on-surface">

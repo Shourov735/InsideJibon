@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import { requireStudent } from "@/lib/permissions";
 import { StudentNav } from "@/components/student/student-nav";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function StudentLayout({
   children,

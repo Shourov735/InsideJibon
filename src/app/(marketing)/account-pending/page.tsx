@@ -7,6 +7,10 @@ import { getTranslator } from "@/i18n/server";
 
 export const metadata = {
   title: "Account Setup",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export const dynamic = "force-dynamic";

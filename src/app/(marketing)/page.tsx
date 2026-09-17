@@ -1,9 +1,54 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 
-export default function MarketingPage() {
+import { getTranslator } from "@/i18n/server";
+import { buildWebsiteJsonLd, buildAlternates } from "@/lib/seo";
+import { JsonLd } from "@/components/shared/json-ld";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslator();
+  const isBn = t.locale === "bn";
+  const title = t("seo.home.title");
+  const description = t("seo.home.description");
+
+  return {
+    title: {
+      absolute: title,
+    },
+    description,
+    alternates: buildAlternates("/"),
+    openGraph: {
+      title,
+      description,
+      url: "https://insidejibon.com",
+      siteName: "InsideJibon",
+      locale: isBn ? "bn_BD" : "en_US",
+      alternateLocale: [isBn ? "en_US" : "bn_BD"],
+      type: "website",
+      images: [
+        {
+          url: "/images/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/images/og-image.jpg"],
+    },
+  };
+}
+
+export default async function MarketingPage() {
+  const t = await getTranslator();
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
+      <JsonLd data={buildWebsiteJsonLd(t.locale as "en" | "bn")} />
       {/* Hero Section */}
       <section className="relative w-full overflow-hidden bg-surface py-12 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -51,7 +96,7 @@ export default function MarketingPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 text-white">
                   <span className="text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-emerald-400">Lead Educator</span>
-                  <h3 className="font-display text-xl sm:text-2xl font-bold mt-0.5">Tanvir Hasan Jibon</h3>
+                  <p className="font-display text-xl sm:text-2xl font-bold mt-0.5">Tanvir Hasan Jibon</p>
                   <p className="text-xs text-gray-300 mt-0.5">Science & Mathematics Educator</p>
                   <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-3">
                     <span className="px-2 py-0.5 bg-white/20 backdrop-blur rounded text-[10px] sm:text-[11px] font-medium">⚛️ Physics</span>
@@ -400,27 +445,27 @@ export default function MarketingPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
                     <div className="text-xl mb-1">⚛️</div>
-                    <h4 className="font-bold text-sm text-on-surface">Physics</h4>
+                    <h3 className="font-bold text-sm text-on-surface">Physics</h3>
                     <p className="text-[11px] text-secondary mt-0.5">Mechanics & Modern Physics</p>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
                     <div className="text-xl mb-1">🧪</div>
-                    <h4 className="font-bold text-sm text-on-surface">Chemistry</h4>
+                    <h3 className="font-bold text-sm text-on-surface">Chemistry</h3>
                     <p className="text-[11px] text-secondary mt-0.5">Organic & Inorganic Mastery</p>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
                     <div className="text-xl mb-1">🧬</div>
-                    <h4 className="font-bold text-sm text-on-surface">Biology</h4>
+                    <h3 className="font-bold text-sm text-on-surface">Biology</h3>
                     <p className="text-[11px] text-secondary mt-0.5">Botany & Zoology Explorer</p>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
                     <div className="text-xl mb-1">💻</div>
-                    <h4 className="font-bold text-sm text-on-surface">ICT</h4>
+                    <h3 className="font-bold text-sm text-on-surface">ICT</h3>
                     <p className="text-[11px] text-secondary mt-0.5">C Coding & Logic Design</p>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50 sm:col-span-2">
                     <div className="text-xl mb-1">📐</div>
-                    <h4 className="font-bold text-sm text-on-surface">Higher Mathematics</h4>
+                    <h3 className="font-bold text-sm text-on-surface">Higher Mathematics</h3>
                     <p className="text-[11px] text-secondary mt-0.5">Calculus, Trigonometry & Coordinate Geometry</p>
                   </div>
                 </div>

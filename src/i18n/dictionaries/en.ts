@@ -1558,7 +1558,16 @@ export const en = {
   "student.courses.card.start": "Start",
   "teacher.dashboard.pendingRequestsTitle": "Pending Student Enrollment Requests",
   "teacher.dashboard.pendingRequestsSubtitle": "Review and approve student enrollment requests across your courses.",
-  "teacher.dashboard.viewRequests": "View Requests"
+  "teacher.dashboard.viewRequests": "View Requests",
+  "seo.home.title": "InsideJibon | Science, ICT & Academic Learning Platform",
+  "seo.home.description": "InsideJibon is a structured academic learning platform for SSC, HSC, and university admission preparation in Physics, Chemistry, Biology, ICT, and Higher Mathematics.",
+  "seo.courses.title": "Course Catalog | InsideJibon",
+  "seo.courses.description": "Browse published courses on InsideJibon — structured learning paths in Physics, Chemistry, Biology, ICT, and Math created by experienced educators.",
+  "seo.notfound.title": "Page Not Found | InsideJibon",
+  "seo.notfound.heading": "404 — Page Not Found",
+  "seo.notfound.desc": "The page you are looking for does not exist or has been moved.",
+  "seo.notfound.backHome": "Back to Home",
+  "seo.notfound.browseCourses": "Browse Courses"
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

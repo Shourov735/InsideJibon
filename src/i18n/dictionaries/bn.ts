@@ -1560,5 +1560,14 @@ export const bn: Dictionary = {
   "student.courses.card.start": "শুরু করুন",
   "teacher.dashboard.pendingRequestsTitle": "শিক্ষার্থীদের পেন্ডিং এনরোলমেন্ট রিকোয়েস্ট",
   "teacher.dashboard.pendingRequestsSubtitle": "আপনার কোর্সগুলোতে শিক্ষার্থীদের ভর্তির অনুরোধ যাচাই ও অনুমোদন করুন।",
-  "teacher.dashboard.viewRequests": "রিকোয়েস্ট দেখুন"
+  "teacher.dashboard.viewRequests": "রিকোয়েস্ট দেখুন",
+  "seo.home.title": "ইনসাইড জীবন | বিজ্ঞান ও আইসিটি শিক্ষার পরিকল্পিত প্ল্যাটফর্ম",
+  "seo.home.description": "এসএসসি, এইচএসসি ও বিশ্ববিদ্যালয় ভর্তি প্রস্তুতির জন্য পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান, আইসিটি ও উচ্চতর গণিতের পূর্ণাঙ্গ পরিকল্পিত একাডেমিক প্ল্যাটফর্ম — ইনসাইড জীবন।",
+  "seo.courses.title": "কোর্স ক্যাটালগ | ইনসাইড জীবন",
+  "seo.courses.description": "পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান, আইসিটি ও উচ্চতর গণিতের পূর্ণাঙ্গ কোর্সসমূহ এক্সপ্লোর করুন। ইনসাইড জীবনে পরিকল্পিতভাবে শিখুন।",
+  "seo.notfound.title": "পৃষ্ঠাটি পাওয়া যায়নি | ইনসাইড জীবন",
+  "seo.notfound.heading": "৪০৪ — পৃষ্ঠাটি পাওয়া যায়নি",
+  "seo.notfound.desc": "আপনি যে পৃষ্ঠাটি খুঁজছেন তা বিদ্যমান নেই অথবা স্থানান্তরিত করা হয়েছে।",
+  "seo.notfound.backHome": "হোমে ফিরে যান",
+  "seo.notfound.browseCourses": "কোর্সসমূহ দেখুন"
 };

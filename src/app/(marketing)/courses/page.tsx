@@ -9,18 +9,46 @@ import type { CourseCategory } from "@/db/schema";
 import { resolveCurrentUser } from "@/lib/auth";
 import { getStudentEnrollments } from "@/services/enrollments";
 
+import { buildAlternates, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { JsonLd } from "@/components/shared/json-ld";
+
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Courses",
-  description:
-    "Browse published courses on InsideJibon — structured learning paths created by experienced teachers.",
-  openGraph: {
-    title: "Courses | InsideJibon",
-    description:
-      "Browse published courses on InsideJibon — structured learning paths created by experienced teachers.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslator();
+  const isBn = t.locale === "bn";
+  const title = t("seo.courses.title");
+  const description = t("seo.courses.description");
+
+  return {
+    title: isBn ? "কোর্সসমূহ" : "Courses",
+    description,
+    alternates: buildAlternates("/courses"),
+    openGraph: {
+      title,
+      description,
+      url: "https://insidejibon.com/courses",
+      siteName: "InsideJibon",
+      locale: isBn ? "bn_BD" : "en_US",
+      alternateLocale: [isBn ? "en_US" : "bn_BD"],
+      type: "website",
+      images: [
+        {
+          url: "/images/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/images/og-image.jpg"],
+    },
+  };
+}
 
 interface PublicCoursesPageProps {
   searchParams: Promise<{ q?: string; category?: string }>;
@@ -54,6 +82,12 @@ export default async function PublicCoursesPage({ searchParams }: PublicCoursesP
 
   return (
     <div>
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: t("marketing.home"), url: "/" },
+          { name: t("marketing.header.courses"), url: "/courses" },
+        ])}
+      />
       <section className="bg-surface-container-lowest border-b border-outline-variant">
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <p className="mb-4 inline-block rounded-full border border-outline-variant bg-surface-container-low px-3 py-1 text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -111,7 +145,9 @@ export default async function PublicCoursesPage({ searchParams }: PublicCoursesP
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <h2 className="sr-only">{t("marketing.coursesBadge")}</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {coursesList.map((course) => (
               <PublicCourseCard
                 key={course.id}
@@ -119,6 +155,7 @@ export default async function PublicCoursesPage({ searchParams }: PublicCoursesP
                 enrollmentStatus={enrollmentStatusMap.get(course.id)}
               />
             ))}
+            </div>
           </div>
         )}
       </section>
