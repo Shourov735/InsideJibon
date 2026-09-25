@@ -73,9 +73,21 @@ export function teacherCommandItems(): CommandItem[] {
  * user can jump to their streak / leaderboard / badges without
  * knowing the URL. Pure static data — the actual streak numbers
  * live on the StreakXpCard right rail.
+ *
+ * R8 — Adds the AI tutor entry. Per-lesson context is loaded by the
+ * dashboard's TutorDashboardCard which uses `?lesson=<id>&tutor=1`;
+ * this static entry is the palette-level shortcut.
  */
 export function studentCommandItems(): CommandItem[] {
   return [
+    {
+      id: "student:tutor",
+      title: "Ask the tutor",
+      keywords: ["tutor", "ai", "ask", "help", "explain", "chatbot", "doubt"],
+      group: "Learn",
+      href: "/student?focus=tutor",
+      kind: "global",
+    },
     {
       id: "student:streak",
       title: "Show my streak",

@@ -38,6 +38,21 @@ export async function createLessonAction(
     if (courseId) {
       revalidatePath(`/teacher/courses/${courseId}/builder`);
     }
+    // R8 §3.4 — reindex lesson captions / text best-effort after create.
+    // Inline execution (see ai/pipeline.ts architecture note). The
+    // promise is intentionally not awaited: the lesson action returns
+    // immediately, and the indexing runs in the request's tail.
+    void (async () => {
+      try {
+        const { enqueueLessonReindex } = await import("@/services/ai/pipeline");
+        await enqueueLessonReindex({
+          lessonId: lesson.id,
+          videoUrl: lesson.videoUrl,
+        });
+      } catch {
+        // Best-effort — tutor UI surfaces "indexing..." state on read.
+      }
+    })();
     return { success: true, data: lesson };
   } catch (error) {
     return {
@@ -75,6 +90,18 @@ export async function updateLessonAction(
     if (courseId) {
       revalidatePath(`/teacher/courses/${courseId}/builder`);
     }
+    // R8 §3.4 — reindex on update.
+    void (async () => {
+      try {
+        const { enqueueLessonReindex } = await import("@/services/ai/pipeline");
+        await enqueueLessonReindex({
+          lessonId: lesson.id,
+          videoUrl: lesson.videoUrl,
+        });
+      } catch {
+        // Best-effort.
+      }
+    })();
     return { success: true, data: lesson };
   } catch (error) {
     return {

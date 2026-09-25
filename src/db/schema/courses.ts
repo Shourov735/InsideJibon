@@ -2,6 +2,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -9,6 +10,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 import { users } from "./users";
 
@@ -83,6 +85,18 @@ export const courseModules = pgTable(
   ]
 );
 
+export const VIDEO_PROVIDERS = ["youtube", "r2_hls", "external"] as const;
+export type VideoProvider = (typeof VIDEO_PROVIDERS)[number];
+
+export interface VideoRendition {
+  resolution: "480p" | "720p" | "1080p" | string;
+  width?: number;
+  height?: number;
+  bitrateKbps?: number;
+  manifestPath?: string;
+  codec?: string;
+}
+
 export const lessons = pgTable(
   "lessons",
   {
@@ -96,6 +110,26 @@ export const lessons = pgTable(
     videoUrl: text("video_url"),
     position: integer("position").notNull().default(1),
     isFree: boolean("is_free").notNull().default(false),
+
+    // --- Remaster Phase R2: Video provider & asset references ---
+    /** 'youtube' (default, $0) | 'r2_hls' (opt-in fallback) | 'external' (legacy) */
+    videoProvider: text("video_provider").notNull().default("youtube"),
+    /** Canonical 11-char YouTube ID (e.g. 'dQw4w9WgXcQ') */
+    youtubeVideoId: text("youtube_video_id"),
+    /** Auto-caption language code ('en' | 'bn' | null) for accessibility and R8 AI tutor */
+    youtubeCaptionLang: text("youtube_caption_lang"),
+    /** R2 manifest key when provider='r2_hls' (e.g. 'videos/<lessonId>/master.m3u8') */
+    videoAssetId: text("video_asset_id"),
+    /** Video duration in seconds */
+    videoDurationS: integer("video_duration_s"),
+    /** R2 storage key for custom thumbnail in PUBLIC_BUCKET */
+    videoThumbnailKey: text("video_thumbnail_key"),
+    /** HLS rendition metadata array (only populated for r2_hls) */
+    videoRenditions: jsonb("video_renditions")
+      .$type<VideoRendition[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -106,6 +140,7 @@ export const lessons = pgTable(
   (table) => [
     index("lessons_module_id_idx").on(table.moduleId),
     index("lessons_module_position_idx").on(table.moduleId, table.position),
+    index("lessons_video_provider_idx").on(table.videoProvider),
   ]
 );
 

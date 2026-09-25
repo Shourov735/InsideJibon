@@ -11,6 +11,7 @@ import { StudentCourseCard } from "@/components/student/student-course-card";
 import { PublicCourseCard } from "@/components/public/course-card";
 import { EmptyState } from "@/components/shared/feedback";
 import { StreakXpCard } from "@/components/student/gamification/StreakXpCard";
+import { TutorDashboardCard } from "@/components/student/tutor/tutor-card";
 import { getTranslator } from "@/i18n/server";
 import { getWhatsAppEnrollmentUrl } from "@/lib/whatsapp";
 import { formatNumber } from "@/lib/utils";
@@ -143,6 +144,14 @@ export default async function StudentDashboardPage() {
       {/* R5 — Streak / XP / League right rail */}
       <section className="mt-6">
         <StreakXpCard userId={user.id} />
+      </section>
+
+      {/* R8 — AI tutor entry point */}
+      <section className="mt-4">
+        <TutorDashboardCard
+          courseId={continueCourse?.courseId ?? null}
+          lessonId={continueCourse?.lastLesson?.id ?? null}
+        />
       </section>
 
       {/* Continue learning */}

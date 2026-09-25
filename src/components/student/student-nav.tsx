@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { CurrentUser } from "@/lib/auth";
-import { NotificationBell } from "@/components/student/notifications/notification-bell";
+import { getUnreadNotificationCount } from "@/services/notifications";
+import { NotificationBellWithPush } from "@/components/student/notifications/notification-bell-client";
 import { StudentNavClient } from "./student-nav-client";
 
 interface StudentNavProps {
@@ -9,13 +10,14 @@ interface StudentNavProps {
 }
 
 export async function StudentNav({ user, activeSection = "dashboard" }: StudentNavProps) {
+  const initialCount = await getUnreadNotificationCount(user.id);
   return (
     <StudentNavClient
       user={user}
       activeSection={activeSection}
       bell={
         <Suspense fallback={<span className="h-5 w-5" />}>
-          <NotificationBell userId={user.id} />
+          <NotificationBellWithPush initialCount={initialCount} />
         </Suspense>
       }
     />

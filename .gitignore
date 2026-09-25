@@ -46,3 +46,4 @@ cloudflare-env.d.ts
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.backup_future_migrations/

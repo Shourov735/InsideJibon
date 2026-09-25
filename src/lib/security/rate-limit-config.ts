@@ -28,6 +28,17 @@ export const RATE_LIMIT_CONFIG = {
   "ai.tutor.ask": { limit: 20, windowSec: 60, keyHint: "act:ai:tutor" },
   /** Public sign-in attempt — coarse IP-based bucket. */
   "auth.signin": { limit: 10, windowSec: 60, keyHint: "auth:signin" },
+  /**
+   * R9 — outbound Web Push delivery. 20 / day / user across ALL categories
+   * (matches the verification checklist in docs/remaster-phase-9-pwa-proctoring.md
+   * §7 item 10: "R0 KV rate limit triggers at 21st push in 24h").
+   */
+  "push.delivery": { limit: 20, windowSec: 86400, keyHint: "push:delivery" },
+  /** R9 — proctor event ingestion. Unbounded at the bucket layer (teacher-
+   *  controlled visibility); small per-second limit keeps a stuck client
+   *  from saturating DB writes.
+   */
+  "proctor.event": { limit: 120, windowSec: 60, keyHint: "proctor:event" },
 } as const;
 
 export type RateLimitBucket = keyof typeof RATE_LIMIT_CONFIG;

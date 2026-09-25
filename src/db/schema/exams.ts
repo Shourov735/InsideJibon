@@ -54,6 +54,19 @@ export const exams = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    // R9 — proctoring settings (teacher-controlled, per-exam).
+    // Defaults are conservative: fullscreen/webcam opt-in, tab-switch
+    // flagging on (the lightest-touch signal).
+    proctorFullscreenRequired: boolean("proctor_fullscreen_required")
+      .notNull()
+      .default(false),
+    proctorTabSwitchFlag: boolean("proctor_tab_switch_flag")
+      .notNull()
+      .default(true),
+    proctorWebcamRequired: boolean("proctor_webcam_required")
+      .notNull()
+      .default(false),
+    proctorWebcamStorageKey: text("proctor_webcam_storage_key"),
   },
   (table) => [
     index("exams_course_id_idx").on(table.courseId),
@@ -209,6 +222,14 @@ export const examAttempts = pgTable(
     totalPoints: integer("total_points"),
     percentage: doublePrecision("percentage"),
     contentSnapshot: jsonb("content_snapshot").notNull(),
+    // R9 — denormalized proctoring summary for fast teacher review.
+    proctorFlagCount: integer("proctor_flag_count").notNull().default(0),
+    proctorFlagged: boolean("proctor_flagged").notNull().default(false),
+    proctorReviewedAt: timestamp("proctor_reviewed_at", { withTimezone: true }),
+    proctorReviewedBy: text("proctor_reviewed_by").references(
+      () => users.id,
+      { onDelete: "set null" }
+    ),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

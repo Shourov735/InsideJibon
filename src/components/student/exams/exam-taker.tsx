@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { submitExamAction } from "@/app/student/actions";
-import type { ExamTakingQuestion } from "@/types/exam";
+import type { ExamTakingQuestion, ProctorSettings } from "@/types/exam";
 import { useTranslations } from "@/i18n/client";
 
 import { useExamTimer } from "./hooks/use-exam-timer";
@@ -13,6 +13,7 @@ import { useExamAutosave } from "./hooks/use-exam-autosave";
 import { ExamTakerQuestion } from "./exam-taker-question";
 import { ExamTakerPalette } from "./exam-taker-palette";
 import { ExamTakerControls } from "./exam-taker-controls";
+import { ProctorLobby, ProctorToolbar } from "./proctor-toolbar";
 
 interface ExamTakerProps {
   courseId: string;
@@ -22,6 +23,7 @@ interface ExamTakerProps {
   examTitle?: string;
   durationMinutes?: number | null;
   startedAt?: string;
+  proctoring?: ProctorSettings;
 }
 
 /**
@@ -50,6 +52,7 @@ export function ExamTaker({
   examTitle,
   durationMinutes,
   startedAt,
+  proctoring,
 }: ExamTakerProps) {
   const { t, tn } = useTranslations();
   const router = useRouter();
@@ -63,6 +66,14 @@ export function ExamTaker({
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [proctorLobbyAcknowledged, setProctorLobbyAcknowledged] = useState(false);
+
+  const hasProctoring = Boolean(
+    proctoring &&
+      (proctoring.fullscreenRequired ||
+        proctoring.tabSwitchFlag ||
+        proctoring.webcamRequired)
+  );
 
   const timer = useExamTimer(durationMinutes, startedAt);
   useExamKeyboardNav(currentIndex, questions.length, setCurrentIndex);
@@ -146,6 +157,15 @@ export function ExamTaker({
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-140px)] w-full">
+      {hasProctoring && proctoring && !proctorLobbyAcknowledged ? (
+        <ProctorLobby
+          settings={proctoring}
+          onContinue={() => setProctorLobbyAcknowledged(true)}
+        />
+      ) : null}
+      {hasProctoring && proctoring && proctorLobbyAcknowledged ? (
+        <ProctorToolbar attemptId={attemptId} settings={proctoring} />
+      ) : null}
       <ExamTakerControls
         examTitle={examTitle}
         currentIndex={currentIndex}

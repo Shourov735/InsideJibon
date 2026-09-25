@@ -28,7 +28,14 @@ type CloudflareEnv = Record<string, unknown>;
 export type R2BucketLike = {
   get(key: string): Promise<unknown>;
   head(key: string): Promise<unknown>;
-  put(key: string, value: unknown): Promise<unknown>;
+  put(
+    key: string,
+    value: unknown,
+    options?: {
+      httpMetadata?: { contentType?: string };
+      customMetadata?: Record<string, string>;
+    }
+  ): Promise<unknown>;
   delete(key: string | string[]): Promise<unknown>;
   list(options?: unknown): Promise<unknown>;
   /** Optional helper exposed by `@cloudflare/workers-types` >= 4.x */

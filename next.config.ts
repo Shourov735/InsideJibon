@@ -62,6 +62,12 @@ const nextConfig: NextConfig = {
           //   re-headers don't churn.
           // - Cloudflare Turnstile widget loads from
           //   `https://challenges.cloudflare.com`; also pre-allowed.
+          // - R9 Web Push: outbound dispatches target the device-
+          //   specific subscription endpoint, which is one of Mozilla
+          //   (push.services.mozilla.com), Apple (push.apple.com /
+          //   *.push.apple.com) or Google (fcm.googleapis.com). We
+          //   allowlist the hostnames so service-worker `fetch()`
+          //   calls to those origins are not blocked by CSP.
           {
             key: "Content-Security-Policy",
             value: [
@@ -71,7 +77,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
               "media-src 'self' blob: https://*.r2.dev",
-              "connect-src 'self' https://*.clerk.accounts.dev https://*.neon.tech https://api.cloudflare.com https://*.r2.dev",
+              "connect-src 'self' https://*.clerk.accounts.dev https://*.neon.tech https://api.cloudflare.com https://*.r2.dev https://*.push.apple.com https://fcm.googleapis.com https://updates.push.services.mozilla.com",
               "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube-nocookie.com https://www.youtube.com",
               "worker-src 'self' blob:",
               "base-uri 'self'",

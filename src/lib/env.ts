@@ -22,6 +22,18 @@ const envSchema = z.object({
   // Required to construct asset URLs once the bucket has a custom domain.
   PUBLIC_BUCKET_PUBLIC_URL: z.string().optional(),
   NEXT_PUBLIC_PUBLIC_BUCKET_URL: z.string().optional(),
+
+  // --- R9 Web Push (VAPID) ---
+  // Public half of the VAPID keypair, shipped to the client (used by the
+  // service worker to subscribe). Build-time inlined by Next.js, like
+  // NEXT_PUBLIC_CLERK_*. Generated via `scripts/generate-vapid-keys.mjs`.
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
+  // Private half — Worker secret ONLY. Never inlined into the client.
+  // Used to sign the VAPID JWT for outbound push dispatches.
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  // Operator-tunable contact for VAPID `sub:` (mailto or https). Many push
+  // services reject dispatches without a `sub:` claim.
+  VAPID_SUBJECT: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

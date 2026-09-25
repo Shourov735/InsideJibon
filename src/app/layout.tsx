@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/i18n/client";
 import { getLocale } from "@/i18n/server";
 import { getStoredThemePreference, resolveThemeFromPreference } from "@/lib/theme";
 import { ToastViewport } from "@/components/shared/feedback/toast-viewport";
+import { PwaBoot } from "@/components/shared/pwa-boot";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -169,6 +170,8 @@ export default async function RootLayout({
         <body className="min-h-full flex flex-col bg-surface text-on-surface font-sans">
           <LanguageProvider locale={locale}>
             <ToastViewport />
+            {/* R9 — service worker, install banner, offline pill */}
+            <PwaBoot />
             {children}
           </LanguageProvider>
         </body>

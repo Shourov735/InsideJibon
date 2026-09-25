@@ -31,6 +31,30 @@ import { gradeAnswers } from "./grading";
 export { ExamInvalidAnswerError } from "./grading";
 
 /**
+ * R9 — fetch the proctoring flags for an exam. Used by `startExam` and
+ * `getAttemptForTaking` so the toolbar can render the right affordances
+ * without a second round-trip.
+ */
+async function fetchProctoring(examId: string) {
+  const db = getDb();
+  const [row] = await db
+    .select({
+      fullscreenRequired: exams.proctorFullscreenRequired,
+      tabSwitchFlag: exams.proctorTabSwitchFlag,
+      webcamRequired: exams.proctorWebcamRequired,
+    })
+    .from(exams)
+    .where(eq(exams.id, examId))
+    .limit(1);
+  if (!row) return null;
+  return {
+    fullscreenRequired: row.fullscreenRequired,
+    tabSwitchFlag: row.tabSwitchFlag,
+    webcamRequired: row.webcamRequired,
+  };
+}
+
+/**
  * Student exam domain (Phase 4): published-exam visibility, attempt lifecycle
  * (in_progress → submitted) and server-side grading.
  *
@@ -329,6 +353,7 @@ export async function startExam(
   ]);
 
   const attempt = await insertAttemptWithRetry(exam.id, studentId, snapshot);
+  const proctoring = await fetchProctoring(exam.id);
 
   return {
     attemptId: attempt.id,
@@ -338,6 +363,7 @@ export async function startExam(
     courseId: exam.courseId,
     totalMarks: snapshot.totalMarks,
     questions: toTakingQuestions(snapshot.questions),
+    proctoring: proctoring ?? undefined,
   };
 }
 
@@ -369,6 +395,7 @@ export async function getAttemptForTaking(
   if (!attempt || attempt.status !== "in_progress") return null;
 
   const snapshot = attempt.contentSnapshot as unknown as ExamContentSnapshot;
+  const proctoring = await fetchProctoring(snapshot.examId);
 
   return {
     attemptId: attempt.id,
@@ -378,6 +405,7 @@ export async function getAttemptForTaking(
     courseId: snapshot.courseId,
     totalMarks: snapshot.totalMarks,
     questions: toTakingQuestions(snapshot.questions),
+    proctoring: proctoring ?? undefined,
   };
 }
 

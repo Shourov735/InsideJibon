@@ -78,6 +78,7 @@ export default async function ExamPage({ params, searchParams }: ExamPageProps) 
           questions={taking.questions}
           durationMinutes={taking.durationMinutes}
           startedAt={taking.startedAt}
+          proctoring={taking.proctoring}
         />
       </main>
     );

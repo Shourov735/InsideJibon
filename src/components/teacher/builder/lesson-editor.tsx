@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { Lesson } from "@/db/schema";
 import type { MaterialSummary } from "@/types/material";
 import { TeacherLessonMaterials } from "@/components/teacher/materials/teacher-lesson-materials";
+import { QuizGenPanel } from "@/components/teacher/quizgen/quizgen-panel";
 import { useTranslations } from "@/i18n/client";
 import {
   deleteLessonAction,
@@ -297,6 +298,9 @@ export function LessonEditor({
             materials={materials}
             onMaterialsChange={onMaterialsChange}
           />
+
+          {/* R8 §4.2 — AI Practice (quiz generator) */}
+          <QuizGenPanel courseId={courseId} lessonId={lesson.id} />
 
           {/* Save Action Bar */}
           <div className="flex items-center justify-between border-t border-outline-variant pt-4">

@@ -125,6 +125,21 @@ export interface StartedAttempt {
   courseId: string;
   totalMarks: number;
   questions: ExamTakingQuestion[];
+  /**
+   * R9 — proctoring flags for the attempt. Returned only when the
+   * server resolves them; see `services/exams/attempts.ts`. Snapshots
+   * intentionally do NOT embed these — proctoring settings are exam-
+   * level, not attempt-level, and may be toggled by the teacher after
+   * the attempt was started (the toolbar reads the latest values).
+   */
+  proctoring?: ProctorSettings;
+}
+
+/** R9 — exam-level proctoring settings. */
+export interface ProctorSettings {
+  fullscreenRequired: boolean;
+  tabSwitchFlag: boolean;
+  webcamRequired: boolean;
 }
 
 /** A published exam in the student's course exam list, with their stats. */

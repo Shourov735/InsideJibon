@@ -26,16 +26,23 @@
   //   wrangler queues create insidejibon-notifications
   //   wrangler queues create insidejibon-embeddings
   //   wrangler queues create insidejibon-csv-exports
+  //   wrangler vectorize create lessons_v1 --dimensions=384 --metric=cosine
   //
   // Paste the returned IDs back into this file under the corresponding
   // `id` field. No subscriptions are involved; everything is on the Workers
-  // Free plan (FREE-TIER-REFERENCE.md §1, §2, §4).
+  // Free plan (FREE-TIER-REFERENCE.md §1, §2, §4, §5, §6).
   // ---------------------------------------------------------------------------
   "kv_namespaces": [
     { "binding": "RATE_LIMIT_KV",    "id": "REPLACE_ME_rate_limit" },
     { "binding": "SESSION_KV",       "id": "REPLACE_ME_session" },
     { "binding": "FEATURE_FLAGS_KV", "id": "REPLACE_ME_feature_flags" }
   ],
+  "ai": {
+    "binding": "AI"
+  },
+  "vectorize": {
+    "binding": "VECTORIZE"
+  },
   "queues": {
     "producers": [
       { "binding": "NOTIFICATIONS_QUEUE", "queue": "insidejibon-notifications" },
@@ -58,22 +65,25 @@
   // R4 remaster: weekly leaderboard cron.
   // R5 remaster: streak-freeze (Mon 00:00), weekly-leagues (Sun 23:59),
   // energy-refill tick (every 5 min).
+  // R9 remaster: proctor-chunk purge (daily at 03:00 UTC).
   //
   // The Cron Trigger fires the matching route in src/app/api/cron/*:
   //   - 13 */2 * * *      leaderboard        (R4 — every 2 hours)
   //   - 0  0  * * 1       streak-freezes     (R5 — Mon 00:00 UTC)
   //   - 59 23 * * 0       weekly-leagues     (R5 — Sun 23:59 UTC)
   //   - */5 * * * *       energy-refill      (R5 — every 5 min)
+  //   - 0  3  * * *       proctor-purge      (R9 — daily 03:00 UTC)
   //
-  // Cloudflare's Free plan allows 5 Cron Triggers per worker — we use 4,
-  // leaving 1 slot for an R7/R8/R9 cron. See docs/remaster-phase-5-gamification.md §5.
+  // Cloudflare's Free plan allows 5 Cron Triggers per worker — R9 fills
+  // the fifth slot. See docs/remaster-phase-9-pwa-proctoring.md §3.6.
   // ---------------------------------------------------------------------------
   "triggers": {
     "crons": [
       "13 */2 * * *",
       "0 0 * * 1",
       "59 23 * * 0",
-      "*/5 * * * *"
+      "*/5 * * * *",
+      "0 3 * * *"
     ]
   },
 

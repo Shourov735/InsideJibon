@@ -20,6 +20,8 @@ import { LessonVideo } from "@/components/student/lesson-video";
 import { ProgressBar } from "@/components/student/progress-bar";
 import { LearnPageTabs } from "@/components/student/learn-tabs";
 import { StreakXpCard } from "@/components/student/gamification/StreakXpCard";
+import { TutorSheet, type TutorHistoryMessage } from "@/components/student/tutor/tutor-sheet";
+import { listTutorHistory, readBudget } from "@/services/ai/tutor";
 import { getTranslator } from "@/i18n/server";
 
 interface LearnPageProps {
@@ -88,20 +90,36 @@ export default async function LearnPage({
   const lesson = await getLessonForStudent(user.id, activeLessonId);
   if (!lesson) notFound();
 
-  const [materials, sessions, announcements, rawQaThreads] = await Promise.all([
-    getLessonMaterialsForStudent(user.id, activeLessonId),
-    getStudentSessionsForCourse(user.id, courseId),
-    getStudentAnnouncementsForCourse(user.id, courseId),
-    listLessonQa({
-      lessonId: activeLessonId,
-      currentUserId: user.id,
-      currentUserRole: user.role,
-    }),
-  ]);
+  const [materials, sessions, announcements, rawQaThreads, tutorHistory, tutorBudget] =
+    await Promise.all([
+      getLessonMaterialsForStudent(user.id, activeLessonId),
+      getStudentSessionsForCourse(user.id, courseId),
+      getStudentAnnouncementsForCourse(user.id, courseId),
+      listLessonQa({
+        lessonId: activeLessonId,
+        currentUserId: user.id,
+        currentUserRole: user.role,
+      }),
+      listTutorHistory({
+        userId: user.id,
+        courseId,
+        lessonId: activeLessonId,
+        limit: 10,
+      }),
+      readBudget(user.id),
+    ]);
   // The DB column is `text` so drizzle widens `kind` to `string`; the schema
   // enum ('question' | 'answer' | 'comment' | 'comment_legacy') is enforced
   // by the migration CHECK constraint, so narrowing here is safe.
   const qaThreads = rawQaThreads as unknown as QaQuestionView[];
+  const tutorMessages: TutorHistoryMessage[] = tutorHistory.map((m) => ({
+    id: m.id,
+    question: m.question,
+    answer: m.answer,
+    citations: m.citations,
+    lang: m.lang,
+    createdAt: m.createdAt.toISOString(),
+  }));
 
   const lessonHref = (lessonId: string) =>
     `/student/courses/${courseId}/learn?lesson=${lessonId}`;
@@ -240,7 +258,13 @@ export default async function LearnPage({
                 </p>
               )}
             </div>
-            <div className="shrink-0">
+            <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+              <TutorSheet
+                courseId={courseId}
+                lessonId={lesson.lesson.id}
+                initialHistory={tutorMessages}
+                initialBudget={tutorBudget}
+              />
               <LessonCompleteButton
                 lessonId={lesson.lesson.id}
                 completed={lesson.progress?.completed ?? false}
