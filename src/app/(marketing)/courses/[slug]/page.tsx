@@ -13,6 +13,11 @@ import {
   buildCourseJsonLd,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
+import { getDb } from "@/db";
+import { lessons, courseModules } from "@/db/schema";
+import { and, desc, eq, isNotNull, or } from "drizzle-orm";
+import { extractYouTubeVideoId } from "@/lib/video/youtube";
+import { CoursePreviewVideo } from "@/components/public/course-preview-video";
 
 // R0 §8: course detail edge-cache. The per-user `resolveCurrentUser()`
 // call inside the page component still runs on every request — Next.js
@@ -132,6 +137,39 @@ export default async function PublicCourseDetailPage({
       }).format(new Date(course.publishedAt))
     : null;
 
+  // Resolve preview video for the course
+  let previewVideoId: string | null = null;
+  try {
+    const db = getDb();
+    const [previewLesson] = await db
+      .select({
+        youtubeVideoId: lessons.youtubeVideoId,
+        videoUrl: lessons.videoUrl,
+      })
+      .from(lessons)
+      .innerJoin(courseModules, eq(lessons.moduleId, courseModules.id))
+      .where(
+        and(
+          eq(courseModules.courseId, course.id),
+          or(isNotNull(lessons.youtubeVideoId), isNotNull(lessons.videoUrl))
+        )
+      )
+      .orderBy(desc(lessons.isFree), lessons.position)
+      .limit(1);
+
+    if (previewLesson?.youtubeVideoId) {
+      previewVideoId = previewLesson.youtubeVideoId;
+    } else if (previewLesson?.videoUrl) {
+      previewVideoId = extractYouTubeVideoId(previewLesson.videoUrl);
+    }
+  } catch {
+    // Non-blocking fallback
+  }
+
+  if (!previewVideoId && course.thumbnailUrl) {
+    previewVideoId = extractYouTubeVideoId(course.thumbnailUrl);
+  }
+
   return (
     <div>
       <JsonLd data={buildCourseJsonLd(course, t.locale as "en" | "bn")} />
@@ -173,14 +211,14 @@ export default async function PublicCourseDetailPage({
           </nav>
 
           <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start">
-            {course.thumbnailUrl && (
+            {(previewVideoId || course.thumbnailUrl) && (
               <div className="aspect-[16/10] w-full shrink-0 overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-high lg:aspect-auto lg:w-96">
-                <img
-                  src={course.thumbnailUrl}
-                  alt={course.title}
-                  className="h-full w-full object-cover"
-                  loading="eager"
-                  decoding="async"
+                <CoursePreviewVideo
+                  youtubeVideoId={previewVideoId}
+                  thumbnailUrl={course.thumbnailUrl}
+                  title={course.title}
+                  badgeLabel={t("learning.player.previewNotice")}
+                  className="h-full w-full"
                 />
               </div>
             )}

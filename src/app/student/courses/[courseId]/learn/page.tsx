@@ -22,6 +22,7 @@ import { LearnPageTabs } from "@/components/student/learn-tabs";
 import { StreakXpCard } from "@/components/student/gamification/StreakXpCard";
 import { TutorSheet, type TutorHistoryMessage } from "@/components/student/tutor/tutor-sheet";
 import { listTutorHistory, readBudget } from "@/services/ai/tutor";
+import { getLessonVideoForStudent } from "@/services/lessons/video";
 import { getTranslator } from "@/i18n/server";
 
 interface LearnPageProps {
@@ -90,7 +91,7 @@ export default async function LearnPage({
   const lesson = await getLessonForStudent(user.id, activeLessonId);
   if (!lesson) notFound();
 
-  const [materials, sessions, announcements, rawQaThreads, tutorHistory, tutorBudget] =
+  const [materials, sessions, announcements, rawQaThreads, tutorHistory, tutorBudget, videoData] =
     await Promise.all([
       getLessonMaterialsForStudent(user.id, activeLessonId),
       getStudentSessionsForCourse(user.id, courseId),
@@ -107,6 +108,7 @@ export default async function LearnPage({
         limit: 10,
       }),
       readBudget(user.id),
+      getLessonVideoForStudent(activeLessonId, user.id).catch(() => null),
     ]);
   // The DB column is `text` so drizzle widens `kind` to `string`; the schema
   // enum ('question' | 'answer' | 'comment' | 'comment_legacy') is enforced
@@ -231,11 +233,16 @@ export default async function LearnPage({
             <StreakXpCard userId={user.id} compact />
           </div>
 
-          {lesson.lesson.videoUrl && (
+          {(videoData?.video || lesson.lesson.videoUrl) && (
             <div className="mt-6">
               <LessonVideo
                 lessonId={lesson.lesson.id}
-                videoUrl={lesson.lesson.videoUrl}
+                video={videoData?.video ?? null}
+                descriptor={videoData?.video ?? null}
+                videoProvider={videoData?.provider ?? (lesson.lesson.videoUrl ? "external" : "youtube")}
+                youtubeVideoId={videoData?.youtubeVideoId}
+                videoAssetId={videoData?.video?.manifestUrl}
+                videoUrl={videoData?.videoUrl ?? lesson.lesson.videoUrl}
                 initialPosition={lesson.progress?.lastPosition ?? null}
               />
             </div>

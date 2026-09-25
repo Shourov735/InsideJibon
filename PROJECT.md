@@ -38,12 +38,12 @@
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| 1 | M1: Schema, Migration & Public Storage | Features 1, 2, 3, 4, 5 | none | PLANNED |
-| 2 | M2: YouTube Utilities & Video Service | Features 6, 7, 8 | M1 | PLANNED |
-| 3 | M3: Edge Caching & CSP Hardening | Features 9, 10, 11, 12 | M1 | PLANNED |
-| 4 | M4: Student Video Player Router | Features 13, 14, 15, 16 | M2 | PLANNED |
-| 5 | M5: Teacher Builder & i18n Localization | Features 17, 18, 19, 20 | M1, M2 | PLANNED |
-| 6 | M6: E2E Testing & Quality Gates Pass | Features 21, 22, 23 | M1, M2, M3, M4, M5 | PLANNED |
+| 1 | M1: Schema, Migration & Public Storage | Features 1, 2, 3, 4, 5 | none | DONE |
+| 2 | M2: YouTube Utilities & Video Service | Features 6, 7, 8 | M1 | DONE |
+| 3 | M3: Edge Caching & CSP Hardening | Features 9, 10, 11, 12 | M1 | DONE |
+| 4 | M4: Student Video Player Router | Features 13, 14, 15, 16 | M2 | DONE |
+| 5 | M5: Teacher Builder & i18n Localization | Features 17, 18, 19, 20 | M1, M2 | DONE |
+| 6 | M6: E2E Testing & Quality Gates Pass | Features 21, 22, 23 | M1, M2, M3, M4, M5 | DONE |
 
 ## Interface Contracts
 ### Video Domain (`src/types/video.ts` & `src/lib/video/youtube.ts`)

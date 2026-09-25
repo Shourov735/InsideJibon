@@ -40,11 +40,62 @@ export type EdgeCacheOptions = {
   cacheName?: string;
 };
 
+/**
+ * Standard cache tag constants and helper functions.
+ */
+export const cacheTags = {
+  marketingLanding: "marketing:landing",
+  catalogList: "catalog:list",
+  course: (slug: string) => `course:${slug}`,
+  teacher: (handleOrId: string) => `teacher:${handleOrId}`,
+  asset: (key: string) => `asset:${key}`,
+} as const;
+
+/**
+ * Runtime detection: returns true only if the Cloudflare Cache API (caches.default)
+ * is present and available in the current environment.
+ */
+export function hasCacheRuntime(): boolean {
+  return (
+    typeof (globalThis as unknown as { caches?: CacheStorage & { default?: Cache } })
+      .caches?.default !== "undefined"
+  );
+}
+
+/**
+ * Checks whether the request carries a Clerk session cookie.
+ * Authenticated requests must bypass the edge cache to prevent session bleed.
+ */
+export function hasSessionCookie(request: Request): boolean {
+  const cookie = request.headers.get("cookie") || "";
+  return cookie.includes("__session=");
+}
+
+/**
+ * Generates canonical cache key for a request:
+ * - Strips tracking and analytics query parameters (ts, utm_*)
+ * - Distinguishes React Server Component (RSC) requests from full-document HTML requests
+ *   via the `#__rsc__` fragment identifier so RSC payloads don't collide with HTML.
+ */
 export function cacheKey(request: Request): string {
   const url = new URL(request.url);
+  const isRsc =
+    url.searchParams.has("_rsc") ||
+    request.headers.get("RSC") === "1" ||
+    request.headers.get("rsc") === "1";
+
   // Strip query params that should never affect identity (e.g. analytics).
-  url.searchParams.delete("_rsc");
   url.searchParams.delete("ts");
+  url.searchParams.delete("utm_source");
+  url.searchParams.delete("utm_medium");
+  url.searchParams.delete("utm_campaign");
+
+  if (isRsc) {
+    url.searchParams.delete("_rsc");
+    return `${url.toString()}#__rsc__`;
+  }
+
+  url.searchParams.delete("_rsc");
   return url.toString();
 }
 
@@ -65,28 +116,34 @@ function buildCachedResponse(
   });
 }
 
-function buildCacheControl(ttl: number, swr?: number): string {
-  if (swr && swr > 0) {
-    return `public, max-age=${ttl}, s-maxage=${ttl}, stale-while-revalidate=${swr}`;
+export function buildCacheControl(ttl: number, swr?: number): string {
+  if (ttl <= 0) {
+    return "no-store, no-cache";
   }
-  return `public, max-age=${ttl}, s-maxage=${ttl}`;
+  if (swr && swr > 0) {
+    return `public, max-age=${ttl}, stale-while-revalidate=${swr}`;
+  }
+  return `public, max-age=${ttl}`;
 }
 
-async function openCache(cacheName?: string): Promise<Cache> {
+export async function openCache(cacheName?: string): Promise<Cache | null> {
   // `caches` and `caches.default` are Cloudflare Workers extensions to
   // the standard `CacheStorage` DOM type. We narrow via a runtime
-  // check and an unknown cast to avoid pulling `@cloudflare/workers-
-  // types` into every consumer.
+  // check and gracefully return null if unavailable in Node/dev/test.
   const cs = (globalThis as unknown as { caches?: CacheStorage & { default?: Cache } })
     .caches;
   if (!cs) {
-    throw new Error("Cache API is not available in this runtime.");
+    return null;
   }
   if (cacheName) {
-    return cs.open(cacheName);
+    try {
+      return await cs.open(cacheName);
+    } catch {
+      return null;
+    }
   }
   if (!cs.default) {
-    throw new Error("Default Cache instance is not available in this runtime.");
+    return null;
   }
   return cs.default;
 }
@@ -101,11 +158,37 @@ export async function edgeCache(
   fetcher: () => Promise<Response>,
   opts: EdgeCacheOptions
 ): Promise<Response> {
+  // Safe runtime detection & bypasses:
+  // 1. Only GET and HEAD requests can be cached.
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return fetcher();
+  }
+  // 2. Bypass when authenticated session cookie is present.
+  if (hasSessionCookie(request)) {
+    return fetcher();
+  }
+  // 3. Bypass if ttl is non-positive.
+  if (opts.ttl <= 0) {
+    return fetcher();
+  }
+  // 4. Safe runtime detection: if Cache API is unavailable in Node/dev/test.
+  if (!hasCacheRuntime()) {
+    return fetcher();
+  }
+
   const cache = await openCache(opts.cacheName);
+  if (!cache) {
+    return fetcher();
+  }
+
   const key = cacheKey(request);
 
-  const cached = await cache.match(key);
-  if (cached) return cached;
+  try {
+    const cached = await cache.match(key);
+    if (cached) return cached;
+  } catch {
+    // Non-fatal match failure
+  }
 
   const fresh = await fetcher();
   // Never cache error / redirect / streaming responses.
@@ -114,7 +197,11 @@ export async function edgeCache(
     // put() must be awaited before returning so the cache state is
     // consistent within this request, but we don't block the response
     // on KV tag indexing.
-    await cache.put(key, cachedResponse.clone());
+    try {
+      await cache.put(key, cachedResponse.clone());
+    } catch {
+      // Non-fatal put failure
+    }
     if (opts.tags && opts.tags.length) {
       void indexTags(key, opts.tags);
     }
@@ -132,23 +219,29 @@ export async function edgeCache(
  * that fit comfortably within the 1k writes/day Free quota).
  */
 export async function purgeByTag(tag: string): Promise<void> {
-  const { getRateLimitKv } = await import("./kv");
-  const kv = await getRateLimitKv();
-  if (!kv) return; // Node dev / missing binding — silent no-op
-
-  const raw = await kv.get(`cache_tag:${tag}`);
-  if (!raw) return;
-
-  let urls: string[];
   try {
-    urls = JSON.parse(raw) as string[];
-  } catch {
-    return;
-  }
+    const { getRateLimitKv } = await import("./kv");
+    const kv = await getRateLimitKv();
+    if (!kv) return; // Node dev / missing binding — silent no-op
 
-  const cache = await openCache();
-  await Promise.all(urls.map((url) => cache.delete(url)));
-  await kv.delete(`cache_tag:${tag}`);
+    const raw = await kv.get(`cache_tag:${tag}`);
+    if (!raw) return;
+
+    let urls: string[];
+    try {
+      urls = JSON.parse(raw) as string[];
+    } catch {
+      return;
+    }
+
+    const cache = await openCache();
+    if (cache) {
+      await Promise.all(urls.map((url) => cache.delete(url).catch(() => false)));
+    }
+    await kv.delete(`cache_tag:${tag}`);
+  } catch {
+    // Graceful fallback for non-Cloudflare/dev/test runtimes
+  }
 }
 
 /**
@@ -156,24 +249,28 @@ export async function purgeByTag(tag: string): Promise<void> {
  * hard dependency on `kv.ts` at import time.
  */
 async function indexTags(url: string, tags: string[]): Promise<void> {
-  const { getRateLimitKv } = await import("./kv");
-  const kv = await getRateLimitKv();
-  if (!kv) return;
-  for (const tag of tags) {
-    const key = `cache_tag:${tag}`;
-    const raw = await kv.get(key);
-    let urls: string[];
-    try {
-      urls = raw ? (JSON.parse(raw) as string[]) : [];
-    } catch {
-      urls = [];
+  try {
+    const { getRateLimitKv } = await import("./kv");
+    const kv = await getRateLimitKv();
+    if (!kv) return;
+    for (const tag of tags) {
+      const key = `cache_tag:${tag}`;
+      const raw = await kv.get(key);
+      let urls: string[];
+      try {
+        urls = raw ? (JSON.parse(raw) as string[]) : [];
+      } catch {
+        urls = [];
+      }
+      if (!urls.includes(url)) {
+        urls.push(url);
+        // 7-day TTL on the tag index — older entries are stale and can
+        // simply be ignored when a purge fires.
+        await kv.put(key, JSON.stringify(urls), { expirationTtl: 7 * 24 * 60 * 60 });
+      }
     }
-    if (!urls.includes(url)) {
-      urls.push(url);
-      // 7-day TTL on the tag index — older entries are stale and can
-      // simply be ignored when a purge fires.
-      await kv.put(key, JSON.stringify(urls), { expirationTtl: 7 * 24 * 60 * 60 });
-    }
+  } catch {
+    // Non-fatal indexing failure
   }
 }
 
@@ -185,9 +282,13 @@ async function indexTags(url: string, tags: string[]): Promise<void> {
  * without provisioning a separate binding.
  */
 export async function enqueuePurgeByTag(tag: string): Promise<void> {
-  await enqueue("NOTIFICATIONS_QUEUE", {
-    type: "cache.purge",
-    id: `purge:${tag}:${Date.now()}`,
-    payload: { tag },
-  });
+  try {
+    await enqueue("NOTIFICATIONS_QUEUE", {
+      type: "cache.purge",
+      id: `purge:${tag}:${Date.now()}`,
+      payload: { tag },
+    });
+  } catch {
+    // Graceful fallback if queue binding is unavailable in local dev / test
+  }
 }

@@ -1,7 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
 
+import { getDb } from "@/db";
+import { courses, courseModules } from "@/db/schema";
 import { requireTeacher } from "@/lib/permissions";
 import {
   createModuleSchema,
@@ -13,6 +16,36 @@ import * as courseService from "@/services/courses";
 import type { ActionResult, CourseModule } from "@/types/course";
 import { getTranslator } from "@/i18n/server";
 import { localizeMessage } from "@/i18n/errors";
+import { invalidateTags } from "@/services/cache/invalidate";
+
+async function resolveCourseSlug(params: {
+  courseId?: string;
+  moduleId?: string;
+}): Promise<string | null> {
+  try {
+    const db = getDb();
+    if (params.courseId) {
+      const [c] = await db
+        .select({ slug: courses.slug })
+        .from(courses)
+        .where(eq(courses.id, params.courseId))
+        .limit(1);
+      if (c?.slug) return c.slug;
+    }
+    if (params.moduleId) {
+      const [row] = await db
+        .select({ slug: courses.slug })
+        .from(courseModules)
+        .innerJoin(courses, eq(courseModules.courseId, courses.id))
+        .where(eq(courseModules.id, params.moduleId))
+        .limit(1);
+      if (row?.slug) return row.slug;
+    }
+  } catch {
+    // Non-fatal slug resolution fallback
+  }
+  return null;
+}
 
 /**
  * Creates a new module inside a course.
@@ -33,9 +66,20 @@ export async function createModuleAction(
   }
 
   try {
+    const courseSlug = await resolveCourseSlug({
+      courseId: parsed.data.courseId,
+    });
     const moduleRow = await courseService.createModule(teacher.id, parsed.data);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
+
+    if (courseSlug) {
+      await invalidateTags([`course:${courseSlug}`], {
+        reason: "module.create",
+        actorId: teacher.id,
+      });
+    }
+
     return { success: true, data: moduleRow };
   } catch (error) {
     return {
@@ -65,6 +109,10 @@ export async function updateModuleAction(
   }
 
   try {
+    const courseSlug = await resolveCourseSlug({
+      courseId,
+      moduleId: parsed.data.moduleId,
+    });
     const moduleRow = await courseService.updateModule(
       teacher.id,
       parsed.data.moduleId,
@@ -74,6 +122,14 @@ export async function updateModuleAction(
       revalidatePath(`/teacher/courses/${courseId}/builder`);
       revalidatePath(`/teacher/courses/${courseId}`);
     }
+
+    if (courseSlug) {
+      await invalidateTags([`course:${courseSlug}`], {
+        reason: "module.update",
+        actorId: teacher.id,
+      });
+    }
+
     return { success: true, data: moduleRow };
   } catch (error) {
     return {
@@ -102,11 +158,23 @@ export async function deleteModuleAction(
   }
 
   try {
+    const courseSlug = await resolveCourseSlug({
+      courseId,
+      moduleId: parsed.data.moduleId,
+    });
     await courseService.deleteModule(teacher.id, parsed.data.moduleId);
     if (courseId) {
       revalidatePath(`/teacher/courses/${courseId}/builder`);
       revalidatePath(`/teacher/courses/${courseId}`);
     }
+
+    if (courseSlug) {
+      await invalidateTags([`course:${courseSlug}`], {
+        reason: "module.delete",
+        actorId: teacher.id,
+      });
+    }
+
     return { success: true, data: { deleted: true } };
   } catch (error) {
     return {
@@ -134,12 +202,23 @@ export async function reorderModulesAction(
   }
 
   try {
+    const courseSlug = await resolveCourseSlug({
+      courseId: parsed.data.courseId,
+    });
     await courseService.reorderModules(
       teacher.id,
       parsed.data.courseId,
       parsed.data.orderedModuleIds
     );
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
+
+    if (courseSlug) {
+      await invalidateTags([`course:${courseSlug}`], {
+        reason: "module.reorder",
+        actorId: teacher.id,
+      });
+    }
+
     return { success: true, data: { reordered: true } };
   } catch (error) {
     return {

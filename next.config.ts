@@ -12,9 +12,13 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: "/continue",
   },
   images: {
-    // Clerk profile photos are served from img.clerk.com and rendered
-    // through next/image (e.g. the admin user directory avatars).
-    remotePatterns: [{ protocol: "https", hostname: "img.clerk.com" }],
+    // Clerk profile photos, YouTube oEmbed thumbnails, and R2 CDN public assets
+    remotePatterns: [
+      { protocol: "https", hostname: "img.clerk.com" },
+      { protocol: "https", hostname: "cdn.insidejibon.com.bd" },
+      { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "img.youtube.com" },
+    ],
   },
   async headers() {
     return [
@@ -72,12 +76,12 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube.com",
+              "script-src 'self' 'unsafe-inline' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube.com https://s.ytimg.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              "media-src 'self' blob: https://*.r2.dev",
-              "connect-src 'self' https://*.clerk.accounts.dev https://*.neon.tech https://api.cloudflare.com https://*.r2.dev https://*.push.apple.com https://fcm.googleapis.com https://updates.push.services.mozilla.com",
+              "media-src 'self' blob: https://*.r2.dev https://cdn.insidejibon.com.bd",
+              "connect-src 'self' https://*.clerk.accounts.dev https://*.neon.tech https://api.cloudflare.com https://*.r2.dev https://cdn.insidejibon.com.bd https://*.push.apple.com https://fcm.googleapis.com https://updates.push.services.mozilla.com",
               "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube-nocookie.com https://www.youtube.com",
               "worker-src 'self' blob:",
               "base-uri 'self'",

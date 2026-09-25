@@ -13,6 +13,7 @@ import * as courseService from "@/services/courses";
 import type { ActionResult, Course } from "@/types/course";
 import { getTranslator } from "@/i18n/server";
 import { localizeMessage } from "@/i18n/errors";
+import { invalidateTags } from "@/services/cache/invalidate";
 
 /**
  * Creates a new course under the authenticated teacher's account.
@@ -63,6 +64,7 @@ export async function updateCourseAction(
   }
 
   try {
+    const existing = await courseService.getTeacherCourseById(teacher.id, parsed.data.courseId);
     const course = await courseService.updateCourse(
       teacher.id,
       parsed.data.courseId,
@@ -72,6 +74,16 @@ export async function updateCourseAction(
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/edit`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
+
+    const tags = [`course:${course.slug}`, "catalog:list"];
+    if (existing?.slug && existing.slug !== course.slug) {
+      tags.push(`course:${existing.slug}`);
+    }
+    await invalidateTags(tags, {
+      reason: "course.update",
+      actorId: teacher.id,
+    });
+
     return { success: true, data: course };
   } catch (error) {
     return {
@@ -99,8 +111,17 @@ export async function deleteCourseAction(
   }
 
   try {
+    const existing = await courseService.getTeacherCourseById(teacher.id, parsed.data.courseId);
     await courseService.deleteCourse(teacher.id, parsed.data.courseId);
     revalidatePath("/teacher/courses");
+
+    if (existing?.slug) {
+      await invalidateTags([`course:${existing.slug}`, "catalog:list"], {
+        reason: "course.delete",
+        actorId: teacher.id,
+      });
+    }
+
     return { success: true, data: { deleted: true } };
   } catch (error) {
     return {
@@ -132,6 +153,12 @@ export async function archiveCourseAction(
     revalidatePath("/teacher/courses");
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
+
+    await invalidateTags([`course:${course.slug}`, "catalog:list"], {
+      reason: "course.archive",
+      actorId: teacher.id,
+    });
+
     return { success: true, data: course };
   } catch (error) {
     return {
@@ -163,6 +190,12 @@ export async function restoreCourseAction(
     revalidatePath("/teacher/courses");
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
+
+    await invalidateTags([`course:${course.slug}`, "catalog:list"], {
+      reason: "course.restore",
+      actorId: teacher.id,
+    });
+
     return { success: true, data: course };
   } catch (error) {
     return {
@@ -194,22 +227,15 @@ export async function publishCourseAction(
     revalidatePath("/teacher/courses");
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
-    // R0 §8: invalidate the public edge cache so the change is reflected
-    // on the marketing landing and catalog immediately. The course
-    // detail page (where it lives) is also invalidated.
     revalidatePath("/");
     revalidatePath("/courses");
     if (course.slug) revalidatePath(`/courses/${course.slug}`);
-    // Best-effort async purge via Workers Queues for downstream caches
-    // that do not honor Next.js revalidatePath (e.g. external CDNs). We
-    // reuse the notifications queue to avoid adding a fourth binding.
-    try {
-      const { enqueuePurgeByTag } = await import("@/lib/cloudflare/cache");
-      void enqueuePurgeByTag(`course:${course.slug}`);
-      void enqueuePurgeByTag("courses:list");
-    } catch {
-      // No-op if the helper or queue is unavailable (Node dev).
-    }
+
+    await invalidateTags([`course:${course.slug}`, "catalog:list", "marketing:landing"], {
+      reason: "course.publish",
+      actorId: teacher.id,
+    });
+
     return { success: true, data: course };
   } catch (error) {
     return {
@@ -241,6 +267,12 @@ export async function unpublishCourseAction(
     revalidatePath("/teacher/courses");
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
+
+    await invalidateTags([`course:${course.slug}`, "catalog:list"], {
+      reason: "course.unpublish",
+      actorId: teacher.id,
+    });
+
     return { success: true, data: course };
   } catch (error) {
     return {

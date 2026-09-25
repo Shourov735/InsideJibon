@@ -9,6 +9,11 @@ import { TeacherLessonMaterials } from "@/components/teacher/materials/teacher-l
 import { QuizGenPanel } from "@/components/teacher/quizgen/quizgen-panel";
 import { useTranslations } from "@/i18n/client";
 import {
+  LessonVideoEditor,
+  type VideoChangePayload,
+  type VideoProviderType,
+} from "./lesson-video-editor";
+import {
   deleteLessonAction,
   updateLessonAction,
 } from "@/app/teacher/courses/actions";
@@ -38,6 +43,10 @@ export function LessonEditor({
   const [content, setContent] = useState(lesson.content ?? "");
   const [videoUrl, setVideoUrl] = useState(lesson.videoUrl ?? "");
   const [isFree, setIsFree] = useState(lesson.isFree);
+
+  const handleVideoChange = (data: VideoChangePayload) => {
+    setVideoUrl(data.videoUrl ?? "");
+  };
 
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -233,37 +242,18 @@ export function LessonEditor({
             </div>
           </div>
 
-          {/* Video Link */}
-          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-on-surface">{t("teacher.builder.lessonVideo")}</h4>
-              <span className="text-xs text-secondary">{t("teacher.builder.optionalExternalLink")}</span>
-            </div>
-
-            <div>
-              <label
-                htmlFor="video-url"
-                className="block text-xs font-semibold text-on-surface"
-              >
-                {t("teacher.builder.videoLinkUrl")}
-              </label>
-              <input
-                id="video-url"
-                type="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
-                className="mt-1.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3.5 py-2 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-            </div>
-
-            {videoUrl && (
-              <p className="text-xs text-secondary">
-                {t("teacher.builder.configuredVideoLink")}{" "}
-                <span className="font-mono text-primary">{videoUrl}</span>
-              </p>
-            )}
-          </div>
+          {/* Remaster Phase R2: Lesson Video Flow */}
+          <LessonVideoEditor
+            initialProvider={(lesson.videoProvider as VideoProviderType) || "youtube"}
+            initialVideoUrl={lesson.videoUrl}
+            initialYoutubeVideoId={lesson.youtubeVideoId}
+            initialVideoAssetId={lesson.videoAssetId}
+            initialThumbnailKey={lesson.videoThumbnailKey}
+            initialDurationS={lesson.videoDurationS}
+            onVideoChange={handleVideoChange}
+            onAutoSetTitle={(newTitle) => setTitle(newTitle)}
+            disabled={isSaving || isDeleting}
+          />
 
           {/* Lesson Content / Notes */}
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xs space-y-4">
