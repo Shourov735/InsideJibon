@@ -40,7 +40,17 @@ export async function getPlatformStats() {
 
 export async function getAllUsers() {
   const db = getDb();
-  return db.select().from(users).orderBy(users.createdAt);
+  return db
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      imageUrl: users.imageUrl,
+      role: users.role,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .orderBy(users.createdAt);
 }
 
 export async function updateUserRole(adminId: string, userId: string, newRole: Role) {

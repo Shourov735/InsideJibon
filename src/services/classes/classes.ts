@@ -132,7 +132,19 @@ export async function getTeacherSessionsForCourse(
 
   const db = getDb();
   return db
-    .select()
+    .select({
+      id: classSessions.id,
+      courseId: classSessions.courseId,
+      title: classSessions.title,
+      description: classSessions.description,
+      sessionType: classSessions.sessionType,
+      externalUrl: classSessions.externalUrl,
+      scheduledAt: classSessions.scheduledAt,
+      durationMinutes: classSessions.durationMinutes,
+      status: classSessions.status,
+      createdAt: classSessions.createdAt,
+      updatedAt: classSessions.updatedAt,
+    })
     .from(classSessions)
     .where(eq(classSessions.courseId, courseId))
     .orderBy(desc(classSessions.scheduledAt));

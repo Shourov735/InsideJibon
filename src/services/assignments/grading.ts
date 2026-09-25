@@ -143,7 +143,13 @@ export async function getSubmissionDetailForTeacher(
       .where(eq(users.id, submission.studentId))
       .limit(1),
     db
-      .select()
+      .select({
+        id: assignmentSubmissionFiles.id,
+        originalFilename: assignmentSubmissionFiles.originalFilename,
+        mimeType: assignmentSubmissionFiles.mimeType,
+        sizeBytes: assignmentSubmissionFiles.sizeBytes,
+        createdAt: assignmentSubmissionFiles.createdAt,
+      })
       .from(assignmentSubmissionFiles)
       .where(eq(assignmentSubmissionFiles.submissionId, submissionId))
       .orderBy(assignmentSubmissionFiles.createdAt),
@@ -278,7 +284,13 @@ export async function getSubmissionFilesForTeacher(
 
   const db = getDb();
   return db
-    .select()
+    .select({
+      id: assignmentSubmissionFiles.id,
+      originalFilename: assignmentSubmissionFiles.originalFilename,
+      mimeType: assignmentSubmissionFiles.mimeType,
+      sizeBytes: assignmentSubmissionFiles.sizeBytes,
+      createdAt: assignmentSubmissionFiles.createdAt,
+    })
     .from(assignmentSubmissionFiles)
     .where(eq(assignmentSubmissionFiles.submissionId, submissionId))
     .orderBy(assignmentSubmissionFiles.createdAt);

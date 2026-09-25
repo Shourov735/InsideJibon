@@ -166,7 +166,19 @@ export const getTeacherCourseById = cache(
   ): Promise<Course | null> {
     const db = getDb();
     const [course] = await db
-      .select()
+      .select({
+        id: courses.id,
+        teacherId: courses.teacherId,
+        title: courses.title,
+        slug: courses.slug,
+        description: courses.description,
+        thumbnailUrl: courses.thumbnailUrl,
+        category: courses.category,
+        status: courses.status,
+        publishedAt: courses.publishedAt,
+        createdAt: courses.createdAt,
+        updatedAt: courses.updatedAt,
+      })
       .from(courses)
       .where(and(eq(courses.id, courseId), eq(courses.teacherId, teacherId)))
       .limit(1);
@@ -187,7 +199,19 @@ export const getTeacherCourseWithCurriculum = cache(
   const db = getDb();
 
   const [course] = await db
-    .select()
+    .select({
+      id: courses.id,
+      teacherId: courses.teacherId,
+      title: courses.title,
+      slug: courses.slug,
+      description: courses.description,
+      thumbnailUrl: courses.thumbnailUrl,
+      category: courses.category,
+      status: courses.status,
+      publishedAt: courses.publishedAt,
+      createdAt: courses.createdAt,
+      updatedAt: courses.updatedAt,
+    })
     .from(courses)
     .where(and(eq(courses.id, courseId), eq(courses.teacherId, teacherId)))
     .limit(1);
@@ -195,7 +219,15 @@ export const getTeacherCourseWithCurriculum = cache(
   if (!course) return null;
 
   const modulesList = await db
-    .select()
+    .select({
+      id: courseModules.id,
+      courseId: courseModules.courseId,
+      title: courseModules.title,
+      description: courseModules.description,
+      position: courseModules.position,
+      createdAt: courseModules.createdAt,
+      updatedAt: courseModules.updatedAt,
+    })
     .from(courseModules)
     .where(eq(courseModules.courseId, courseId))
     .orderBy(courseModules.position);
@@ -203,7 +235,18 @@ export const getTeacherCourseWithCurriculum = cache(
   // All lessons in one query, bucketed per module (never one query per module).
   const lessonRows = modulesList.length
     ? await db
-        .select()
+        .select({
+          id: lessons.id,
+          moduleId: lessons.moduleId,
+          title: lessons.title,
+          description: lessons.description,
+          content: lessons.content,
+          videoUrl: lessons.videoUrl,
+          position: lessons.position,
+          isFree: lessons.isFree,
+          createdAt: lessons.createdAt,
+          updatedAt: lessons.updatedAt,
+        })
         .from(lessons)
         .where(inArray(lessons.moduleId, modulesList.map((m) => m.id)))
         .orderBy(lessons.position)
@@ -492,7 +535,19 @@ export async function getPublishedCourseBySlug(
   const db = getDb();
 
   const [course] = await db
-    .select()
+    .select({
+      id: courses.id,
+      teacherId: courses.teacherId,
+      title: courses.title,
+      slug: courses.slug,
+      description: courses.description,
+      thumbnailUrl: courses.thumbnailUrl,
+      category: courses.category,
+      status: courses.status,
+      publishedAt: courses.publishedAt,
+      createdAt: courses.createdAt,
+      updatedAt: courses.updatedAt,
+    })
     .from(courses)
     .where(and(eq(courses.slug, slug), eq(courses.status, "published")))
     .limit(1);
@@ -500,14 +555,33 @@ export async function getPublishedCourseBySlug(
   if (!course) return null;
 
   const modulesList = await db
-    .select()
+    .select({
+      id: courseModules.id,
+      courseId: courseModules.courseId,
+      title: courseModules.title,
+      description: courseModules.description,
+      position: courseModules.position,
+      createdAt: courseModules.createdAt,
+      updatedAt: courseModules.updatedAt,
+    })
     .from(courseModules)
     .where(eq(courseModules.courseId, course.id))
     .orderBy(courseModules.position);
 
   const lessonRows = modulesList.length
     ? await db
-        .select()
+        .select({
+          id: lessons.id,
+          moduleId: lessons.moduleId,
+          title: lessons.title,
+          description: lessons.description,
+          content: lessons.content,
+          videoUrl: lessons.videoUrl,
+          position: lessons.position,
+          isFree: lessons.isFree,
+          createdAt: lessons.createdAt,
+          updatedAt: lessons.updatedAt,
+        })
         .from(lessons)
         .where(inArray(lessons.moduleId, modulesList.map((m) => m.id)))
         .orderBy(lessons.position)

@@ -46,7 +46,17 @@ export async function createCourseNotifications(courseId: string, input: { type:
 
 export async function getUserNotifications(userId: string): Promise<Notification[]> {
   const db = getDb();
-  return db.select()
+  return db
+    .select({
+      id: notifications.id,
+      userId: notifications.userId,
+      type: notifications.type,
+      title: notifications.title,
+      body: notifications.body,
+      link: notifications.link,
+      isRead: notifications.isRead,
+      createdAt: notifications.createdAt,
+    })
     .from(notifications)
     .where(eq(notifications.userId, userId))
     .orderBy(desc(notifications.createdAt))

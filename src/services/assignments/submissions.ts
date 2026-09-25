@@ -32,6 +32,23 @@ import {
   verifySubmissionOwnership,
 } from "./access";
 
+/** Narrowed projection used by getStudentSubmission / startOrResumeSubmission. */
+export interface StudentSubmissionStatus {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  status: AssignmentSubmission["status"];
+  isLate: boolean;
+  submittedAt: Date | null;
+}
+
+/** Narrowed projection used by internal checks where only id+status matter. */
+export interface SubmissionIdStatus {
+  id: string;
+  status: AssignmentSubmission["status"];
+  submittedAt: Date | null;
+}
+
 /**
  * Student submission domain: draft lifecycle, submit/resubmit, and files.
  *
@@ -108,7 +125,16 @@ async function listVisibleAssignmentsForEnrolledCourse(
   if (!enrolled) return null;
 
   return db
-    .select()
+    .select({
+      id: assignments.id,
+      courseId: assignments.courseId,
+      title: assignments.title,
+      instructions: assignments.instructions,
+      dueAt: assignments.dueAt,
+      maxPoints: assignments.maxPoints,
+      allowLateSubmission: assignments.allowLateSubmission,
+      status: assignments.status,
+    })
     .from(assignments)
     .where(
       and(
@@ -134,7 +160,12 @@ export async function getStudentCourseAssignmentsWithStatus(
   const assignmentIds = courseAssignments.map((a) => a.id);
   const submissions = assignmentIds.length
     ? await db
-        .select()
+        .select({
+          id: assignmentSubmissions.id,
+          assignmentId: assignmentSubmissions.assignmentId,
+          status: assignmentSubmissions.status,
+          isLate: assignmentSubmissions.isLate,
+        })
         .from(assignmentSubmissions)
         .where(
           and(
@@ -173,11 +204,18 @@ export async function getStudentCourseAssignmentsWithStatus(
 export async function getStudentSubmission(
   studentId: string,
   assignmentId: string
-): Promise<AssignmentSubmission | null> {
+): Promise<StudentSubmissionStatus | null> {
   if (!isUuid(assignmentId)) return null;
   const db = getDb();
   const [row] = await db
-    .select()
+    .select({
+      id: assignmentSubmissions.id,
+      assignmentId: assignmentSubmissions.assignmentId,
+      studentId: assignmentSubmissions.studentId,
+      status: assignmentSubmissions.status,
+      isLate: assignmentSubmissions.isLate,
+      submittedAt: assignmentSubmissions.submittedAt,
+    })
     .from(assignmentSubmissions)
     .where(
       and(
@@ -210,7 +248,14 @@ export async function startOrResumeSubmission(
   const db = getDb();
 
   const [existing] = await db
-    .select()
+    .select({
+      id: assignmentSubmissions.id,
+      assignmentId: assignmentSubmissions.assignmentId,
+      studentId: assignmentSubmissions.studentId,
+      status: assignmentSubmissions.status,
+      isLate: assignmentSubmissions.isLate,
+      submittedAt: assignmentSubmissions.submittedAt,
+    })
     .from(assignmentSubmissions)
     .where(
       and(
@@ -244,7 +289,14 @@ export async function startOrResumeSubmission(
 
   // Lost a creation race — the winner's row is ours to use.
   const [winner] = await db
-    .select()
+    .select({
+      id: assignmentSubmissions.id,
+      assignmentId: assignmentSubmissions.assignmentId,
+      studentId: assignmentSubmissions.studentId,
+      status: assignmentSubmissions.status,
+      isLate: assignmentSubmissions.isLate,
+      submittedAt: assignmentSubmissions.submittedAt,
+    })
     .from(assignmentSubmissions)
     .where(
       and(
@@ -313,7 +365,7 @@ export async function submitSubmission(
   if (updatedRows.length === 0) {
     // Either graded in the meantime or closed — reload to report precisely.
     const [current] = await db
-      .select()
+      .select({ status: assignmentSubmissions.status })
       .from(assignmentSubmissions)
       .where(eq(assignmentSubmissions.id, submission.id))
       .limit(1);
@@ -495,7 +547,13 @@ export async function getSubmissionFilesForStudent(
 
   const db = getDb();
   return db
-    .select()
+    .select({
+      id: assignmentSubmissionFiles.id,
+      originalFilename: assignmentSubmissionFiles.originalFilename,
+      mimeType: assignmentSubmissionFiles.mimeType,
+      sizeBytes: assignmentSubmissionFiles.sizeBytes,
+      createdAt: assignmentSubmissionFiles.createdAt,
+    })
     .from(assignmentSubmissionFiles)
     .where(eq(assignmentSubmissionFiles.submissionId, submissionId))
     .orderBy(assignmentSubmissionFiles.createdAt);

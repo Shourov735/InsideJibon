@@ -144,7 +144,14 @@ export async function getTeacherAnnouncementsForCourse(
 
   const db = getDb();
   return db
-    .select()
+    .select({
+      id: announcements.id,
+      courseId: announcements.courseId,
+      title: announcements.title,
+      content: announcements.content,
+      isPinned: announcements.isPinned,
+      createdAt: announcements.createdAt,
+    })
     .from(announcements)
     .where(eq(announcements.courseId, courseId))
     .orderBy(desc(announcements.isPinned), desc(announcements.createdAt));

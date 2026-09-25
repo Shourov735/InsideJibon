@@ -83,11 +83,11 @@ export const verifyExamOwnership = cache(
 export async function verifyCourseOwnership(
   teacherId: string,
   courseId: string
-): Promise<Course | null> {
+): Promise<{ id: string } | null> {
   if (!isUuid(courseId)) return null;
   const db = getDb();
   const [row] = await db
-    .select()
+    .select({ id: courses.id })
     .from(courses)
     .where(and(eq(courses.id, courseId), eq(courses.teacherId, teacherId)))
     .limit(1);

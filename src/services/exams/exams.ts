@@ -139,7 +139,11 @@ export async function getTeacherExamWithQuestions(
 
   const db = getDb();
   const links = await db
-    .select()
+    .select({
+      questionId: examQuestions.questionId,
+      marks: examQuestions.marks,
+      position: examQuestions.position,
+    })
     .from(examQuestions)
     .where(eq(examQuestions.examId, exam.id))
     .orderBy(examQuestions.position);
@@ -150,9 +154,23 @@ export async function getTeacherExamWithQuestions(
 
   const questionIds = links.map((l) => l.questionId);
   const [questionRows, optionRows] = await Promise.all([
-    db.select().from(questions).where(inArray(questions.id, questionIds)),
     db
-      .select()
+      .select({
+        id: questions.id,
+        questionType: questions.questionType,
+        questionText: questions.questionText,
+        explanation: questions.explanation,
+      })
+      .from(questions)
+      .where(inArray(questions.id, questionIds)),
+    db
+      .select({
+        id: questionOptions.id,
+        questionId: questionOptions.questionId,
+        optionText: questionOptions.optionText,
+        isCorrect: questionOptions.isCorrect,
+        position: questionOptions.position,
+      })
       .from(questionOptions)
       .where(inArray(questionOptions.questionId, questionIds))
       .orderBy(questionOptions.position),

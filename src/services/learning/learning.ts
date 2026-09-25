@@ -80,7 +80,10 @@ async function verifyLessonAccess(studentId: string, lessonId: string) {
 async function getOrderedCourseLessons(courseId: string) {
   const db = getDb();
   const modulesList = await db
-    .select()
+    .select({
+      id: courseModules.id,
+      position: courseModules.position,
+    })
     .from(courseModules)
     .where(eq(courseModules.courseId, courseId))
     .orderBy(courseModules.position);
@@ -88,7 +91,11 @@ async function getOrderedCourseLessons(courseId: string) {
   if (modulesList.length === 0) return [];
 
   const lessonRows = await db
-    .select()
+    .select({
+      id: lessons.id,
+      moduleId: lessons.moduleId,
+      position: lessons.position,
+    })
     .from(lessons)
     .where(inArray(lessons.moduleId, modulesList.map((m) => m.id)))
     .orderBy(lessons.position);
@@ -178,14 +185,26 @@ export const getLearningCourse = cache(
   if (!row) return null;
 
   const modulesList = await db
-    .select()
+    .select({
+      id: courseModules.id,
+      position: courseModules.position,
+      title: courseModules.title,
+      description: courseModules.description,
+    })
     .from(courseModules)
     .where(eq(courseModules.courseId, courseId))
     .orderBy(courseModules.position);
 
   const lessonRows = modulesList.length
     ? await db
-        .select()
+        .select({
+          id: lessons.id,
+          moduleId: lessons.moduleId,
+          position: lessons.position,
+          title: lessons.title,
+          description: lessons.description,
+          isFree: lessons.isFree,
+        })
         .from(lessons)
         .where(inArray(lessons.moduleId, modulesList.map((m) => m.id)))
         .orderBy(lessons.position)
@@ -194,7 +213,10 @@ export const getLearningCourse = cache(
   const lessonIds = lessonRows.map((l) => l.id);
   const progressRows = lessonIds.length
     ? await db
-        .select()
+        .select({
+          lessonId: lessonProgress.lessonId,
+          completed: lessonProgress.completed,
+        })
         .from(lessonProgress)
         .where(
           and(
@@ -299,7 +321,11 @@ export async function getLessonForStudent(
   const [ordered, [progressRow], completedRows] = await Promise.all([
     getOrderedCourseLessons(access.course.id),
     db
-      .select()
+      .select({
+        completed: lessonProgress.completed,
+        completedAt: lessonProgress.completedAt,
+        lastPosition: lessonProgress.lastPosition,
+      })
       .from(lessonProgress)
       .where(
         and(
@@ -494,10 +520,10 @@ export async function updateLessonPosition(
 async function getLessonProgressRow(
   studentId: string,
   lessonId: string
-): Promise<LessonProgress | null> {
+): Promise<{ id: string } | null> {
   const db = getDb();
   const [row] = await db
-    .select()
+    .select({ id: lessonProgress.id })
     .from(lessonProgress)
     .where(
       and(

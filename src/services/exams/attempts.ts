@@ -128,7 +128,15 @@ export async function getStudentCourseExams(
   if (!enrolled) return null;
 
   const examRows = await db
-    .select()
+    .select({
+      id: exams.id,
+      title: exams.title,
+      description: exams.description,
+      durationMinutes: exams.durationMinutes,
+      maxAttempts: exams.maxAttempts,
+      status: exams.status,
+      publishedAt: exams.publishedAt,
+    })
     .from(exams)
     .where(and(eq(exams.courseId, courseId), eq(exams.status, "published")))
     .orderBy(desc(exams.publishedAt));
@@ -137,12 +145,19 @@ export async function getStudentCourseExams(
 
   const examIds = examRows.map((e) => e.id);
   const linkRows = await db
-    .select()
+    .select({
+      examId: examQuestions.examId,
+      marks: examQuestions.marks,
+    })
     .from(examQuestions)
     .where(inArray(examQuestions.examId, examIds));
 
   const attemptRows = await db
-    .select()
+    .select({
+      examId: examAttempts.examId,
+      status: examAttempts.status,
+      percentage: examAttempts.percentage,
+    })
     .from(examAttempts)
     .where(
       and(
@@ -222,7 +237,16 @@ export const getStudentExamDetail = cache(
       .from(examQuestions)
       .where(eq(examQuestions.examId, exam.id)),
     db
-      .select()
+      .select({
+        id: examAttempts.id,
+        attemptNumber: examAttempts.attemptNumber,
+        status: examAttempts.status,
+        startedAt: examAttempts.startedAt,
+        submittedAt: examAttempts.submittedAt,
+        score: examAttempts.score,
+        totalPoints: examAttempts.totalPoints,
+        percentage: examAttempts.percentage,
+      })
       .from(examAttempts)
       .where(
         and(
@@ -328,7 +352,13 @@ export async function getAttemptForTaking(
   if (!isUuid(attemptId)) return null;
 
   const [attempt] = await db
-    .select()
+    .select({
+      id: examAttempts.id,
+      attemptNumber: examAttempts.attemptNumber,
+      startedAt: examAttempts.startedAt,
+      status: examAttempts.status,
+      contentSnapshot: examAttempts.contentSnapshot,
+    })
     .from(examAttempts)
     .where(
       and(eq(examAttempts.id, attemptId), eq(examAttempts.studentId, studentId))
@@ -476,7 +506,16 @@ export async function getAttemptResult(
   if (!isUuid(attemptId)) return null;
 
   const [attempt] = await db
-    .select()
+    .select({
+      studentId: examAttempts.studentId,
+      status: examAttempts.status,
+      score: examAttempts.score,
+      totalPoints: examAttempts.totalPoints,
+      percentage: examAttempts.percentage,
+      startedAt: examAttempts.startedAt,
+      submittedAt: examAttempts.submittedAt,
+      contentSnapshot: examAttempts.contentSnapshot,
+    })
     .from(examAttempts)
     .where(eq(examAttempts.id, attemptId))
     .limit(1);
@@ -484,7 +523,12 @@ export async function getAttemptResult(
   if (attempt.status !== "submitted") return null;
 
   const answerRows = await db
-    .select()
+    .select({
+      questionId: examAnswers.questionId,
+      selectedOptionId: examAnswers.selectedOptionId,
+      awardedPoints: examAnswers.awardedPoints,
+      isCorrect: examAnswers.isCorrect,
+    })
     .from(examAnswers)
     .where(eq(examAnswers.attemptId, attempt.id));
 
@@ -536,7 +580,11 @@ async function buildContentSnapshot(
 ): Promise<ExamContentSnapshot> {
   const db = getDb();
   const links = await db
-    .select()
+    .select({
+      questionId: examQuestions.questionId,
+      marks: examQuestions.marks,
+      position: examQuestions.position,
+    })
     .from(examQuestions)
     .where(eq(examQuestions.examId, exam.id))
     .orderBy(examQuestions.position);
@@ -544,9 +592,23 @@ async function buildContentSnapshot(
   const questionIds = links.map((l) => l.questionId);
   const [questionRows, optionRows] = questionIds.length
     ? await Promise.all([
-        db.select().from(questions).where(inArray(questions.id, questionIds)),
         db
-          .select()
+          .select({
+            id: questions.id,
+            questionType: questions.questionType,
+            questionText: questions.questionText,
+            explanation: questions.explanation,
+          })
+          .from(questions)
+          .where(inArray(questions.id, questionIds)),
+        db
+          .select({
+            id: questionOptions.id,
+            questionId: questionOptions.questionId,
+            optionText: questionOptions.optionText,
+            isCorrect: questionOptions.isCorrect,
+            position: questionOptions.position,
+          })
           .from(questionOptions)
           .where(inArray(questionOptions.questionId, questionIds))
           .orderBy(questionOptions.position),

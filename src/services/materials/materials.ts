@@ -302,7 +302,16 @@ export async function getTeacherLessonMaterials(
 
   const db = getDb();
   const rows = await db
-    .select()
+    .select({
+      id: materials.id,
+      lessonId: materials.lessonId,
+      name: materials.name,
+      originalFilename: materials.originalFilename,
+      mimeType: materials.mimeType,
+      sizeBytes: materials.sizeBytes,
+      createdAt: materials.createdAt,
+      updatedAt: materials.updatedAt,
+    })
     .from(materials)
     .where(eq(materials.lessonId, lessonId))
     .orderBy(materials.createdAt);
@@ -348,7 +357,16 @@ export async function getLessonMaterialsForStudent(
 
   const db = getDb();
   const rows = await db
-    .select()
+    .select({
+      id: materials.id,
+      lessonId: materials.lessonId,
+      name: materials.name,
+      originalFilename: materials.originalFilename,
+      mimeType: materials.mimeType,
+      sizeBytes: materials.sizeBytes,
+      createdAt: materials.createdAt,
+      updatedAt: materials.updatedAt,
+    })
     .from(materials)
     .where(eq(materials.lessonId, lessonId))
     .orderBy(materials.createdAt);

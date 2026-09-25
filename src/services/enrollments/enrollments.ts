@@ -201,14 +201,22 @@ export async function isStudentEnrolled(
   );
 }
 
+export interface StudentEnrollmentStatus {
+  id: string;
+  status: "active" | "pending" | "rejected" | "withdrawn" | "completed";
+}
+
 export async function getStudentEnrollment(
   studentId: string,
   courseId: string
-): Promise<Enrollment | null> {
+): Promise<StudentEnrollmentStatus | null> {
   const db = getDb();
   if (!isUuid(courseId)) return null;
   const [row] = await db
-    .select()
+    .select({
+      id: enrollments.id,
+      status: enrollments.status,
+    })
     .from(enrollments)
     .where(
       and(eq(enrollments.studentId, studentId), eq(enrollments.courseId, courseId))
