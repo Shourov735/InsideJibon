@@ -13,6 +13,10 @@ const eslintConfig = defineConfig([
       // optimizer is not supported on Cloudflare Workers (OpenNext). Plain
       // <img> is intentional.
       "@next/next/no-img-element": "off",
+      // src/emails/* is rendered to a standalone HTML email body via
+      // react-dom/server; the <head> element is required for the email
+      // client to honour <meta> + <title>, even though Next pages forbid it.
+      "@next/next/no-head-element": "off",
     },
   },
   // Override default ignores of eslint-config-next.

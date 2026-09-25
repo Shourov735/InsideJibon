@@ -1,5 +1,4 @@
 import "server-only";
-import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { DEFAULT_FROM_ADDRESS } from "@/lib/cloudflare/email";

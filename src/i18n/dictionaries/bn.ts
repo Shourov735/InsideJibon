@@ -2062,6 +2062,6 @@ export const bn: Dictionary = {
   "account.emails.unsubscribeAll": "সব ঐচ্ছিক ইমেইল থেকে আনসাবস্ক্রাইব",
   "account.emails.resubscribeAll": "সব ঐচ্ছিক ইমেইলে রিসাবস্ক্রাইব",
 
-  "signup.legalNotice": "অ্যাকাউন্ট তৈরি করার মাধ্যমে আপনি আমাদের {terms} এবং {privacy} মেনে নিচ্ছেন।",
+  "signup.legalNotice": "অ্যাকাউন্ট তৈরি করার মাধ্যমে আপনি আমাদের শর্তাবলী ও গোপনীয়তা নীতি মেনে নিচ্ছেন।",
   "signup.legalCheckboxRequired": "চালিয়ে যাওয়ার আগে শর্তাবলী ও গোপনীয়তা নীতি মেনে নিন।",
 };

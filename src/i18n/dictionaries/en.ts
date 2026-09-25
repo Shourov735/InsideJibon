@@ -2063,7 +2063,7 @@ export const en = {
   "account.emails.unsubscribeAll": "Unsubscribe from all optional emails",
   "account.emails.resubscribeAll": "Resubscribe to all optional emails",
 
-  "signup.legalNotice": "By creating an account you agree to our {terms} and {privacy}.",
+  "signup.legalNotice": "By creating an account you agree to our terms and privacy policy.",
   "signup.legalCheckboxRequired": "Please accept the terms and privacy policy to continue.",
 } as const;
 

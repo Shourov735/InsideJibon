@@ -79,6 +79,33 @@ export async function MarketingFooter({ role = null }: { role?: AppRole | null }
               ))}
             </ul>
           </div>
+
+          {/* R10 — Legal */}
+          <div>
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-primary">{t("legal.footerLink")}</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/legal/terms" className="text-sm text-secondary hover:text-primary transition-colors">
+                  {t("legal.footerTerms")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/privacy" className="text-sm text-secondary hover:text-primary transition-colors">
+                  {t("legal.footerPrivacy")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/refund" className="text-sm text-secondary hover:text-primary transition-colors">
+                  {t("legal.footerRefund")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/cookies" className="text-sm text-secondary hover:text-primary transition-colors">
+                  {t("legal.footerCookies")}
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-10 border-t border-outline-variant pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-secondary">

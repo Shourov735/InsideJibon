@@ -83,6 +83,7 @@ export async function markSuppressed(input: { id: number }): Promise<void> {
 export async function countSendsSince(
   since: Date
 ): Promise<number> {
+  void since; // reserved for future time-windowed counts
   const db = getDb();
   const rows = await db
     .select({ id: emailSendLog.id })
