@@ -56,16 +56,25 @@
 
   // ---------------------------------------------------------------------------
   // R4 remaster: weekly leaderboard cron.
+  // R5 remaster: streak-freeze (Mon 00:00), weekly-leagues (Sun 23:59),
+  // energy-refill tick (every 5 min).
   //
-  // The Cron Trigger fires at hh:13 every 2 hours and invokes
-  // src/app/api/cron/leaderboard/route.ts (matched by the `triggers` block).
-  // The route recomputes the global leaderboard snapshot and enqueues
-  // per-course recomputes via the EXPORT_QUEUE. The Worker's Free plan
-  // allows 5 Cron Triggers per worker; this is well under that limit.
-  // See docs/remaster-phase-4-qna-leaderboard.md §3.4.
+  // The Cron Trigger fires the matching route in src/app/api/cron/*:
+  //   - 13 */2 * * *      leaderboard        (R4 — every 2 hours)
+  //   - 0  0  * * 1       streak-freezes     (R5 — Mon 00:00 UTC)
+  //   - 59 23 * * 0       weekly-leagues     (R5 — Sun 23:59 UTC)
+  //   - */5 * * * *       energy-refill      (R5 — every 5 min)
+  //
+  // Cloudflare's Free plan allows 5 Cron Triggers per worker — we use 4,
+  // leaving 1 slot for an R7/R8/R9 cron. See docs/remaster-phase-5-gamification.md §5.
   // ---------------------------------------------------------------------------
   "triggers": {
-    "crons": ["13 */2 * * *"]
+    "crons": [
+      "13 */2 * * *",
+      "0 0 * * 1",
+      "59 23 * * 0",
+      "*/5 * * * *"
+    ]
   },
 
   "observability": {

@@ -1771,4 +1771,106 @@ export const bn: Dictionary = {
   // -------------------------------------------------------------------------
   "xp.events.qaUpvote": "আপভোটের জন্য +৫ XP পেয়েছেন",
   "xp.events.qaAccepted": "গৃহীত উত্তরের জন্য +২৫ XP",
+
+  // -------------------------------------------------------------------------
+  // R5 — Gamification (XP, streaks, badges, leagues, energy)
+  // -------------------------------------------------------------------------
+  // Right-rail / StreakXpCard (§4.1)
+  "gamification.card.ariaLabel": "স্ট্রিক, XP এবং লিগ",
+  "gamification.card.title": "স্ট্রিক ও XP",
+  "gamification.card.xpThisWeek": "এই সপ্তাহে {xp} XP",
+  "gamification.card.viewBadges": "ব্যাজ দেখুন",
+  "gamification.card.streak": "স্ট্রিক",
+  "gamification.card.streakDays_one": "{count} দিন",
+  "gamification.card.streakDays_other": "{count} দিন",
+  "gamification.card.longest": "সর্বোচ্চ: {count}",
+  "gamification.card.freezes": "{count} ফ্রিজ বাকি",
+  "gamification.card.freezes_other": "{count} ফ্রিজ বাকি",
+  "gamification.card.allTime": "সর্বমোট: {xp} XP",
+  "gamification.card.noLeague": "এখনো কোনো লিগ নেই — যোগ্যতা অর্জন করতে XP সংগ্রহ করুন।",
+
+  // Streak repair (§4.2)
+  "gamification.streak.title": "দৈনিক স্ট্রিক",
+  "gamification.streak.repair.title": "স্ট্রিক মেরামত করবেন?",
+  "gamification.streak.repair.description": "আপনি একটি দিন মিস করেছেন। {days}-দিনের স্ট্রিক ধরে রাখতে একটি ফ্রিজ ব্যবহার করুন।",
+  "gamification.streak.repair.confirm": "ফ্রিজ ব্যবহার করুন",
+  "gamification.streak.repair.cancel": "এখন নয়",
+  "gamification.streak.repair.success": "স্ট্রিক পুনরুদ্ধার হয়েছে — একটি ফ্রিজ ব্যবহৃত।",
+  "gamification.streak.repair.noFreezes": "এই সপ্তাহে আর কোনো ফ্রিজ নেই।",
+  "gamification.streak.freezeUsed": "১টি ফ্রিজ ব্যবহৃত",
+  "gamification.streak.freezeAvailable_one": "{count} ফ্রিজ বাকি",
+  "gamification.streak.freezeAvailable_other": "{count} ফ্রিজ বাকি",
+  "gamification.streak.broken": "স্ট্রিক ভেঙে গেছে — আজ থেকে নতুন শুরু।",
+
+  // XP source registry descriptions (§3)
+  "gamification.xp.lessonComplete": "একটি পাঠ সম্পন্ন করুন",
+  "gamification.xp.firstOfDay": "দিনের প্রথম পাঠ",
+  "gamification.xp.examPassed": "পরীক্ষায় পাস (≥৫০%)",
+  "gamification.xp.examPerfect": "পরীক্ষায় ১০০% স্কোর",
+  "gamification.xp.assignmentOnTime": "সময়মতো অ্যাসাইনমেন্ট জমা দিন",
+  "gamification.xp.assignmentGradedA": "গ্রেডেড অ্যাসাইনমেন্টে A পান",
+  "gamification.xp.qaUpvote": "প্রশ্নোত্তরে আপভোট পান",
+  "gamification.xp.qaAccepted": "উত্তর গৃহীত হয়",
+  "gamification.xp.streakDay": "দৈনিক স্ট্রিক ধরে রাখুন",
+  "gamification.xp.streakWeek": "৭-দিনের সাপ্তাহিক স্ট্রিক অর্জন করুন",
+  "gamification.xp.badgeUnlocked": "একটি ব্যাজ আনলক করুন",
+  "gamification.xp.classAttended60": "একটি লাইভ ক্লাসের ৬০% উপস্থিত থাকুন",
+
+  // Badge shelf / catalog (§4.4)
+  "gamification.badges.kicker": "অর্জনসমূহ",
+  "gamification.badges.title": "ব্যাজ",
+  "gamification.badges.subtitle_one": "আপনি {total}টির মধ্যে {earned}টি ব্যাজ অর্জন করেছেন।",
+  "gamification.badges.subtitle_other": "আপনি {total}টির মধ্যে {earned}টি ব্যাজ অর্জন করেছেন।",
+  "gamification.badges.tab.all": "সব",
+  "gamification.badges.tab.earned": "অর্জিত",
+  "gamification.badges.tab.locked": "বাকি",
+  "gamification.badges.lockedHeading": "বাকি",
+  "gamification.badges.earnedOn": "অর্জিত: {date}",
+  "gamification.badges.firstLesson.title": "প্রথম পদক্ষেপ",
+  "gamification.badges.firstLesson.desc": "আপনার প্রথম পাঠ সম্পন্ন করুন।",
+  "gamification.badges.firstExam.title": "পরীক্ষার জন্য প্রস্তুত",
+  "gamification.badges.firstExam.desc": "আপনার প্রথম পরীক্ষায় পাস করুন।",
+  "gamification.badges.streak3.title": "ওয়ার্ম-আপ",
+  "gamification.badges.streak3.desc": "৩ দিনের স্ট্রিক ধরে রাখুন।",
+  "gamification.badges.streak7.title": "এগিয়ে চলেছি",
+  "gamification.badges.streak7.desc": "৭ দিনের স্ট্রিক ধরে রাখুন।",
+  "gamification.badges.streak30.title": "লৌহ শৃঙ্খলা",
+  "gamification.badges.streak30.desc": "৩০ দিনের স্ট্রিক ধরে রাখুন।",
+  "gamification.badges.qaFirstPost.title": "জ্ঞানপিপাসু",
+  "gamification.badges.qaFirstPost.desc": "আপনার প্রথম প্রশ্ন করুন।",
+  "gamification.badges.qa10Accepted.title": "সহায়ক সহপাঠী",
+  "gamification.badges.qa10Accepted.desc": "১০টি উত্তর গৃহীত হোক।",
+  "gamification.badges.classAttend10.title": "নির্ভরযোগ্য শিক্ষার্থী",
+  "gamification.badges.classAttend10.desc": "১০টি লাইভ ক্লাসে যোগ দিন।",
+
+  // Leagues (§4.5)
+  "gamification.league.bronze": "ব্রোঞ্জ",
+  "gamification.league.silver": "সিলভার",
+  "gamification.league.gold": "গোল্ড",
+  "gamification.league.diamond": "ডায়মন্ড",
+  "gamification.league.promoted": "↑ উন্নীত",
+  "gamification.league.relegated": "↓ অবনমিত",
+  "gamification.league.rankOfTotal": "{total}-এর মধ্যে #{rank}",
+
+  // Energy / lives (§4.6)
+  "gamification.energy.heart_one": "{count}টি হৃদয়",
+  "gamification.energy.heart_other": "{count}টি হৃদয়",
+  "gamification.energy.refillIn": "পরবর্তী হৃদয় {minutes} মিনিটে",
+  "gamification.energy.outOfHearts": "হৃদয় শেষ — {minutes} মিনিটে পূর্ণ হবে।",
+
+  // Celebration moments (§4.7)
+  "gamification.celebration.streakDay": "{day} দিন — স্ট্রিক জীবিত!",
+  "gamification.celebration.levelUp": "লেভেল আপ — আরো দ্রুত হচ্ছেন।",
+  "gamification.celebration.badgeUnlocked": "নতুন ব্যাজ: {title}",
+  "gamification.celebration.leaguePromoted": "{league}-এ উন্নীত!",
+
+  // Leaderboard — League tab (§4.5)
+  "leaderboard.view.global": "গ্লোবাল",
+  "leaderboard.view.league": "লিগ",
+  "leaderboard.league.title": "আপনার লিগ",
+  "leaderboard.league.subtitle": "{league} · {total}-এর মধ্যে #{rank}",
+  "leaderboard.league.emptyHint": "এই সপ্তাহে XP অর্জন করে লিগ কোহোর্টে প্রবেশ করুন।",
+  "leaderboard.league.movement": "এই সপ্তাহে",
+  "leaderboard.league.promotedNote": "↑ {league}-এ উন্নীত",
+  "leaderboard.league.relegatedNote": "↓ {league}-এ অবনমিত",
 };

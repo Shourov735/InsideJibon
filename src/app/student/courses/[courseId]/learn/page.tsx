@@ -19,6 +19,7 @@ import { LessonResources } from "@/components/student/lesson-resources";
 import { LessonVideo } from "@/components/student/lesson-video";
 import { ProgressBar } from "@/components/student/progress-bar";
 import { LearnPageTabs } from "@/components/student/learn-tabs";
+import { StreakXpCard } from "@/components/student/gamification/StreakXpCard";
 import { getTranslator } from "@/i18n/server";
 
 interface LearnPageProps {
@@ -205,6 +206,11 @@ export default async function LearnPage({
                 ? t("common.status.completed")
                 : t("common.status.inProgress")}
             </span>
+          </div>
+
+          {/* R5 — compact streak / XP / league card on the lesson page */}
+          <div className="mt-4">
+            <StreakXpCard userId={user.id} compact />
           </div>
 
           {lesson.lesson.videoUrl && (

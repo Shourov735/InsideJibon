@@ -32,6 +32,7 @@ import {
   verifySubmissionOwnership,
 } from "./access";
 import type { SubmissionFileSummary } from "./grading";
+import { emitGamifiedXp } from "@/services/gamification";
 
 /** Narrowed projection used by getStudentSubmission / startOrResumeSubmission. */
 export interface StudentSubmissionStatus {
@@ -417,6 +418,25 @@ export async function submitSubmission(
       .limit(1);
     if (current?.status === "graded") throw new AssignmentAlreadyGradedError();
     throw new AssignmentClosedError();
+  }
+
+  // R5 — on-time submissions earn `assignment.submitted_ontime` XP. Late
+  // submissions are excluded per the spec. The dedupeKey pins to the
+  // submission id so a re-submit within the deadline window doesn't
+  // double-credit.
+  if (!late) {
+    emitGamifiedXp(
+      studentId,
+      "assignment.submitted_ontime",
+      {
+        assignmentId,
+        submissionId: updatedRows[0].id,
+        courseId: assignment.courseId,
+      },
+      { dedupeKey: `submission:${updatedRows[0].id}` }
+    ).catch((err) => {
+      console.error("assignment XP emit failed", { studentId, assignmentId, err });
+    });
   }
 
   return updatedRows[0];

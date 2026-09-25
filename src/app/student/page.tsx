@@ -10,6 +10,7 @@ import { UpcomingSessionsList } from "@/components/student/classes/upcoming-sess
 import { StudentCourseCard } from "@/components/student/student-course-card";
 import { PublicCourseCard } from "@/components/public/course-card";
 import { EmptyState } from "@/components/shared/feedback";
+import { StreakXpCard } from "@/components/student/gamification/StreakXpCard";
 import { getTranslator } from "@/i18n/server";
 import { getWhatsAppEnrollmentUrl } from "@/lib/whatsapp";
 import { formatNumber } from "@/lib/utils";
@@ -137,6 +138,11 @@ export default async function StudentDashboardPage() {
             </div>
           </dl>
         </div>
+      </section>
+
+      {/* R5 — Streak / XP / League right rail */}
+      <section className="mt-6">
+        <StreakXpCard userId={user.id} />
       </section>
 
       {/* Continue learning */}

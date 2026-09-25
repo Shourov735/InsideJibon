@@ -13,6 +13,7 @@ import {
   users,
   type LessonProgress,
 } from "@/db/schema";
+import { emitGamifiedXp } from "@/services/gamification";
 import type {
   CourseProgress,
   LearningCourse,
@@ -432,6 +433,10 @@ async function syncEnrollmentCompletion(
 /**
  * Marks a lesson completed for the student. Throws LessonAccessDeniedError
  * when the student is not enrolled in the lesson's published course.
+ *
+ * R5 — emits `lesson.complete` XP and the per-day streak day bump on the
+ * first completion of this lesson (idempotent on repeat toggles via a
+ * `(user, source, lessonId)` dedupeKey).
  */
 export async function markLessonCompleted(
   studentId: string,
@@ -461,6 +466,16 @@ export async function markLessonCompleted(
         updatedAt: now,
       },
     });
+
+  // R5 XP emission. Best-effort: an XP error must not undo the completion.
+  emitGamifiedXp(
+    studentId,
+    "lesson.complete",
+    { lessonId, courseId: access.course.id },
+    { dedupeKey: `lesson:${lessonId}` }
+  ).catch((err) => {
+    console.error("lesson.complete XP emit failed", { studentId, lessonId, err });
+  });
 
   await syncEnrollmentCompletion(studentId, access.course.id);
   return { courseId: access.course.id };

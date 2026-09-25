@@ -65,3 +65,48 @@ export function teacherCommandItems(): CommandItem[] {
     },
   ];
 }
+
+/**
+ * R5 §4.4 — Student quick links into the gamification surfaces.
+ *
+ * Surfaced as a dedicated "Gamification" group in the palette so a
+ * user can jump to their streak / leaderboard / badges without
+ * knowing the URL. Pure static data — the actual streak numbers
+ * live on the StreakXpCard right rail.
+ */
+export function studentCommandItems(): CommandItem[] {
+  return [
+    {
+      id: "student:streak",
+      title: "Show my streak",
+      keywords: ["streak", "daily", "fire", "flame"],
+      group: "Gamification",
+      href: "/student?focus=streak",
+      kind: "global",
+    },
+    {
+      id: "student:badges",
+      title: "Show my badges",
+      keywords: ["badges", "trophies", "achievements", "medals"],
+      group: "Gamification",
+      href: "/student/badges",
+      kind: "global",
+    },
+    {
+      id: "student:leaderboard",
+      title: "Show leaderboard",
+      keywords: ["leaderboard", "ranking", "league", "xp", "competition"],
+      group: "Gamification",
+      href: "/leaderboard",
+      kind: "global",
+    },
+    {
+      id: "student:league",
+      title: "Show my league",
+      keywords: ["league", "bronze", "silver", "gold", "diamond", "cohort"],
+      group: "Gamification",
+      href: "/leaderboard?view=league",
+      kind: "global",
+    },
+  ];
+}

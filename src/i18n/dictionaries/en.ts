@@ -1769,6 +1769,108 @@ export const en = {
   "dashboard.admin.placeholder.title": "Admin panel — coming soon",
   "dashboard.admin.placeholder.description": "The admin experience is being reshaped in Phase R7. Per-user controls, role changes, and platform-wide metrics will live here.",
   "dashboard.admin.placeholder.cta": "Read the roadmap",
+
+  // -------------------------------------------------------------------------
+  // R5 — Gamification (XP, streaks, badges, leagues, energy)
+  // -------------------------------------------------------------------------
+  // Right-rail / StreakXpCard (§4.1)
+  "gamification.card.ariaLabel": "Streak, XP, and league",
+  "gamification.card.title": "Streak & XP",
+  "gamification.card.xpThisWeek": "{xp} XP this week",
+  "gamification.card.viewBadges": "View badges",
+  "gamification.card.streak": "Streak",
+  "gamification.card.streakDays_one": "{count} day",
+  "gamification.card.streakDays_other": "{count} days",
+  "gamification.card.longest": "Longest: {count}",
+  "gamification.card.freezes": "{count} freeze available",
+  "gamification.card.freezes_other": "{count} freezes available",
+  "gamification.card.allTime": "All time: {xp} XP",
+  "gamification.card.noLeague": "No league yet — earn XP to qualify.",
+
+  // Streak repair (§4.2)
+  "gamification.streak.title": "Daily streak",
+  "gamification.streak.repair.title": "Repair your streak?",
+  "gamification.streak.repair.description": "You missed a day. Use one streak freeze to keep your {days}-day streak alive.",
+  "gamification.streak.repair.confirm": "Use a freeze",
+  "gamification.streak.repair.cancel": "Not now",
+  "gamification.streak.repair.success": "Streak restored — freeze used.",
+  "gamification.streak.repair.noFreezes": "No freezes left this week.",
+  "gamification.streak.freezeUsed": "1 freeze used",
+  "gamification.streak.freezeAvailable_one": "{count} freeze available",
+  "gamification.streak.freezeAvailable_other": "{count} freezes available",
+  "gamification.streak.broken": "Streak broken — start fresh today.",
+
+  // XP source registry descriptions (§3)
+  "gamification.xp.lessonComplete": "Complete a lesson",
+  "gamification.xp.firstOfDay": "First lesson of the day",
+  "gamification.xp.examPassed": "Pass an exam (≥50%)",
+  "gamification.xp.examPerfect": "Score 100% on an exam",
+  "gamification.xp.assignmentOnTime": "Submit an assignment before the deadline",
+  "gamification.xp.assignmentGradedA": "Earn an A on a graded assignment",
+  "gamification.xp.qaUpvote": "Receive an upvote on a Q&A thread",
+  "gamification.xp.qaAccepted": "Have an answer accepted",
+  "gamification.xp.streakDay": "Keep your daily streak alive",
+  "gamification.xp.streakWeek": "Reach a 7-day streak week",
+  "gamification.xp.badgeUnlocked": "Unlock a badge",
+  "gamification.xp.classAttended60": "Attend 60% of a live class",
+
+  // Badge shelf / catalog (§4.4)
+  "gamification.badges.kicker": "Achievements",
+  "gamification.badges.title": "Badges",
+  "gamification.badges.subtitle_one": "You've earned {earned} of {total} badges.",
+  "gamification.badges.subtitle_other": "You've earned {earned} of {total} badges.",
+  "gamification.badges.tab.all": "All",
+  "gamification.badges.tab.earned": "Earned",
+  "gamification.badges.tab.locked": "Locked",
+  "gamification.badges.lockedHeading": "Locked",
+  "gamification.badges.earnedOn": "Earned {date}",
+  "gamification.badges.firstLesson.title": "First steps",
+  "gamification.badges.firstLesson.desc": "Complete your first lesson.",
+  "gamification.badges.firstExam.title": "Exam-ready",
+  "gamification.badges.firstExam.desc": "Pass your first exam.",
+  "gamification.badges.streak3.title": "Warm-up",
+  "gamification.badges.streak3.desc": "Keep a 3-day streak.",
+  "gamification.badges.streak7.title": "On a roll",
+  "gamification.badges.streak7.desc": "Keep a 7-day streak.",
+  "gamification.badges.streak30.title": "Iron discipline",
+  "gamification.badges.streak30.desc": "Keep a 30-day streak.",
+  "gamification.badges.qaFirstPost.title": "Curious mind",
+  "gamification.badges.qaFirstPost.desc": "Ask your first question.",
+  "gamification.badges.qa10Accepted.title": "Helpful peer",
+  "gamification.badges.qa10Accepted.desc": "Have 10 answers accepted.",
+  "gamification.badges.classAttend10.title": "Reliable learner",
+  "gamification.badges.classAttend10.desc": "Attend 10 live classes.",
+
+  // Leagues (§4.5)
+  "gamification.league.bronze": "Bronze",
+  "gamification.league.silver": "Silver",
+  "gamification.league.gold": "Gold",
+  "gamification.league.diamond": "Diamond",
+  "gamification.league.promoted": "↑ promoted",
+  "gamification.league.relegated": "↓ relegated",
+  "gamification.league.rankOfTotal": "#{rank} of {total}",
+
+  // Energy / lives (§4.6)
+  "gamification.energy.heart_one": "{count} heart",
+  "gamification.energy.heart_other": "{count} hearts",
+  "gamification.energy.refillIn": "Next heart in {minutes}m",
+  "gamification.energy.outOfHearts": "Out of hearts — refills in {minutes}m.",
+
+  // Celebration moments (§4.7)
+  "gamification.celebration.streakDay": "Day {day} — streak alive!",
+  "gamification.celebration.levelUp": "Level up — you're getting faster.",
+  "gamification.celebration.badgeUnlocked": "New badge: {title}",
+  "gamification.celebration.leaguePromoted": "Promoted to {league}!",
+
+  // Leaderboard — League tab (§4.5)
+  "leaderboard.view.global": "Global",
+  "leaderboard.view.league": "League",
+  "leaderboard.league.title": "Your League",
+  "leaderboard.league.subtitle": "{league} · rank #{rank} of {total}",
+  "leaderboard.league.emptyHint": "Earn XP this week to enter a league cohort.",
+  "leaderboard.league.movement": "This week",
+  "leaderboard.league.promotedNote": "↑ Promoted to {league}",
+  "leaderboard.league.relegatedNote": "↓ Relegated to {league}",
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

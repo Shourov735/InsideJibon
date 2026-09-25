@@ -12,7 +12,9 @@ import {
 
 import { sql } from "drizzle-orm";
 
-import { courses, lessons, users } from "./index";
+import { courses } from "./courses";
+import { lessons } from "./courses";
+import { users } from "./users";
 
 /**
  * Enrollment lifecycle: a student request starts as `pending`, gains

@@ -13,6 +13,7 @@ import {
 } from "@/db/schema";
 import { isUuid } from "@/lib/utils";
 import { createNotification } from "@/services/notifications";
+import { emitGamifiedXp } from "@/services/gamification";
 import {
   AssignmentNotFoundError,
   SubmissionNotFoundError,
@@ -230,6 +231,25 @@ export async function gradeSubmission(
     body: `Your submission has been graded. Points awarded: ${points}/${assignment.maxPoints}.`,
     link: "/student/notifications"
   });
+
+  // R5 — emit `assignment.graded_a` XP when the awarded score is at
+  // or above 90% of the assignment's max points. The dedupeKey pins to
+  // the submission id so re-grading doesn't double-credit.
+  const gradeRatio = assignment.maxPoints > 0 ? points / assignment.maxPoints : 0;
+  if (gradeRatio >= 0.9) {
+    emitGamifiedXp(
+      submission.studentId,
+      "assignment.graded_a",
+      {
+        assignmentId: assignment.id,
+        submissionId,
+        gradeRatio,
+      },
+      { dedupeKey: `graded:${submissionId}` }
+    ).catch((err) => {
+      console.error("assignment.graded_a XP emit failed", { submissionId, err });
+    });
+  }
 
   return updatedRows[0];
 }

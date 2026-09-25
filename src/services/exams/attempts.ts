@@ -15,6 +15,7 @@ import {
   questions,
   type Exam,
 } from "@/db/schema";
+import { emitGamifiedXp } from "@/services/gamification";
 import type { SubmittedAnswer } from "@/schemas/exam-attempt";
 import type {
   AttemptResult,
@@ -452,6 +453,30 @@ export async function submitExam(
       .limit(1);
     if (fresh?.status === "submitted") throw new ExamAlreadySubmittedError();
     throw new ExamAttemptLimitError();
+  }
+
+  // R5 — emit XP for passing / perfect attempts. Per the R5 spec the
+  // threshold is "passing" = ≥ 50% and "perfect" = 100%. The dedupeKey
+  // pins to the attempt so retries don't double-credit.
+  const attemptSource =
+    grading.percentage >= 100
+      ? "exam.perfect"
+      : grading.percentage >= 50
+        ? "exam.passed"
+        : null;
+  if (attemptSource) {
+    emitGamifiedXp(
+      studentId,
+      attemptSource,
+      {
+        attemptId: attempt.id,
+        examId: attempt.examId,
+        percentage: grading.percentage,
+      },
+      { dedupeKey: `attempt:${attempt.id}` }
+    ).catch((err) => {
+      console.error("exam XP emit failed", { studentId, attemptId, err });
+    });
   }
 
   // Persist the graded answers (only the answered questions). The unique

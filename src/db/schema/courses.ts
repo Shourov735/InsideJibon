@@ -10,7 +10,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { users } from "./index";
+import { users } from "./users";
 
 export const courseStatusEnum = pgEnum("course_status", [
   "draft",
