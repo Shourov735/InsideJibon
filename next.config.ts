@@ -26,7 +26,54 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+            // camera/microphone allowed on same-origin for R9 proctoring
+            // (webcam). Geolocation and FLoC/Topics remain off.
+            value: "camera=(self), microphone=(self), geolocation=(), interest-cohort=()",
+          },
+          // Strict-Transport-Security — 2 years, include subdomains,
+          // preload-ready. Applied on every response; safe once TLS is
+          // in place (Cloudflare Universal SSL on workers.dev domains).
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          // CSP — REPORT-ONLY during R0. The strict policy below will be
+          // promoted to an enforced `Content-Security-Policy` after R1
+          // lands (when we have real insight into script/style sources).
+          //
+          // Notes:
+          // - Clerk injects its hosted sign-in/up pages via the `__session`
+          //   cookie flow; we must allow `https://*.clerk.accounts.dev` for
+          //   frames and connect, and Clerk telemetry script via the same
+          //   origin. Clerk also requires `https://img.clerk.com` for
+          //   avatars (covered by `img-src https:`).
+          // - Tailwind v4 + Next 16 emit inline styles in some hot paths,
+          //   so `style-src 'unsafe-inline'` is intentionally permitted.
+          //   Scripts are still hashed by Next.js at build time; we keep
+          //   `'unsafe-inline'` for scripts ONLY because Clerk + Next dev
+          //   tooling rely on it. Will tighten in R1.
+          // - R3 (live class) and R2 (YouTube embeds) require the
+          //   YouTube IFrame API; we pre-allow it here so R1 / R2
+          //   re-headers don't churn.
+          // - Cloudflare Turnstile widget loads from
+          //   `https://challenges.cloudflare.com`; also pre-allowed.
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "img-src 'self' data: https: blob:",
+              "media-src 'self' blob: https://*.r2.dev",
+              "connect-src 'self' https://*.clerk.accounts.dev https://*.neon.tech https://api.cloudflare.com https://*.r2.dev",
+              "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube-nocookie.com https://www.youtube.com",
+              "worker-src 'self' blob:",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "object-src 'none'",
+              "report-uri /api/csp-report",
+            ].join("; "),
           },
         ],
       },
