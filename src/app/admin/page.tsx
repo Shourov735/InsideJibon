@@ -6,6 +6,10 @@ import { UserDirectory } from "@/components/admin/user-directory";
 import { PendingRequestsList } from "@/components/shared/pending-requests-list";
 import Link from "next/link";
 
+// Public roadmap anchor for placeholder CTAs. Phase R7 will replace
+// these placeholders with the redesigned admin experience.
+const ROADMAP_URL = "https://github.com/insidejibon/insidejibon#roadmap";
+
 export const metadata = {
   title: "Admin Dashboard | InsideJibon",
 };
@@ -36,6 +40,32 @@ export default async function AdminDashboardPage() {
           {t("admin.dashboard.welcomeSubtitle")}
         </p>
       </div>
+
+      {/* R1 §6.4 marker: a v2 roadmap banner so admins know the redesign
+          is in flight. We keep the existing dashboard fully functional
+          (per-user controls, platform stats, pending requests, user
+          directory, course overview) until R7 lands. */}
+      <section className="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-5 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-1">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary-container px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary-container">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              {t("dashboard.admin.placeholder.title")}
+            </span>
+            <p className="max-w-2xl text-sm text-secondary">
+              {t("dashboard.admin.placeholder.description")}
+            </p>
+          </div>
+          <Link
+            href={ROADMAP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-0 px-3.5 py-2 text-xs font-semibold text-primary hover:bg-surface-container transition-colors shrink-0"
+          >
+            {t("dashboard.admin.placeholder.cta")} →
+          </Link>
+        </div>
+      </section>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">

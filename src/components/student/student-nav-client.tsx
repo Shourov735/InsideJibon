@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
-import { useState, ReactNode } from "react";
+import { ThemeToggle } from "@/components/shared/feedback";
+import { CommandTrigger } from "@/components/shared/command";
+import { useState, type ReactNode } from "react";
 import { useTranslations } from "@/i18n/client";
 import type { CurrentUser } from "@/lib/auth";
 
@@ -48,7 +50,7 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
             </Link>
             <Link
               href="/courses"
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-secondary hover:text-primary transition-colors"
+              className={`rounded-md px-3 py-1.5 text-sm font-medium text-secondary hover:text-primary transition-colors`}
             >
               {t("nav.student.browseCourses")}
             </Link>
@@ -56,6 +58,10 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden md:block">
+            <CommandTrigger />
+          </div>
+          <ThemeToggle showLabels={false} className="hidden md:inline-flex" />
           <LanguageSwitcher />
 
           {bell}
@@ -113,11 +119,14 @@ export function StudentNavClient({ user, activeSection = "dashboard", bell }: St
           <Link
             href="/courses"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-primary hover:bg-surface-container-low transition-colors"
+            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-primary hover:bg-surface-container-low transition-colors`}
           >
             <span className="text-base">🔍</span>
             <span>{t("nav.student.browseCourses")}</span>
           </Link>
+          <div className="pt-2 border-t border-outline-variant">
+            <ThemeToggle showLabels className="w-full justify-between" />
+          </div>
         </div>
       )}
     </header>

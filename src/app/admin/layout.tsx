@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/permissions";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { CommandProvider } from "@/components/shared/command";
 
 export const metadata: Metadata = {
   robots: {
@@ -14,9 +15,10 @@ export default async function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const admin = await requireAdmin();
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
+    <div data-role="admin" className="flex min-h-screen flex-col bg-surface">
       <AdminNav user={admin} />
       {children}
+      <CommandProvider role="admin" />
     </div>
   );
 }

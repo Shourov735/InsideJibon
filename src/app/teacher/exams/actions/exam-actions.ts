@@ -103,11 +103,22 @@ export async function publishExamAction(
   try {
     const exam = await examService.publishExam(teacher.id, parsed.data.examId, t);
     EXAM_PATHS(parsed.data.examId).forEach((p) => revalidatePath(p));
-    return { success: true, data: exam };
+    return {
+      success: true,
+      data: exam,
+      toast: {
+        title: t("teacher.examDetail.publishSuccess"),
+        variant: "success",
+      },
+    };
   } catch (error) {
     return {
       success: false,
       error: localizeMessage(error instanceof Error ? error.message : "Failed to publish exam.", t),
+      toast: {
+        title: t("teacher.examDetail.actionFailed"),
+        variant: "error",
+      },
     };
   }
 }
@@ -129,11 +140,22 @@ export async function unpublishExamAction(
   try {
     const exam = await examService.unpublishExam(teacher.id, parsed.data.examId);
     EXAM_PATHS(parsed.data.examId).forEach((p) => revalidatePath(p));
-    return { success: true, data: exam };
+    return {
+      success: true,
+      data: exam,
+      toast: {
+        title: t("teacher.examDetail.unpublishSuccess"),
+        variant: "success",
+      },
+    };
   } catch (error) {
     return {
       success: false,
       error: localizeMessage(error instanceof Error ? error.message : "Failed to unpublish exam.", t),
+      toast: {
+        title: t("teacher.examDetail.failedUnpublish"),
+        variant: "error",
+      },
     };
   }
 }
@@ -155,11 +177,22 @@ export async function archiveExamAction(
   try {
     const exam = await examService.archiveExam(teacher.id, parsed.data.examId);
     EXAM_PATHS(parsed.data.examId).forEach((p) => revalidatePath(p));
-    return { success: true, data: exam };
+    return {
+      success: true,
+      data: exam,
+      toast: {
+        title: t("teacher.examDetail.archiveSuccess"),
+        variant: "success",
+      },
+    };
   } catch (error) {
     return {
       success: false,
       error: localizeMessage(error instanceof Error ? error.message : "Failed to archive exam.", t),
+      toast: {
+        title: t("teacher.examDetail.failedArchive"),
+        variant: "error",
+      },
     };
   }
 }
@@ -181,11 +214,22 @@ export async function restoreExamAction(
   try {
     const exam = await examService.restoreExam(teacher.id, parsed.data.examId);
     EXAM_PATHS(parsed.data.examId).forEach((p) => revalidatePath(p));
-    return { success: true, data: exam };
+    return {
+      success: true,
+      data: exam,
+      toast: {
+        title: t("teacher.examDetail.restoreSuccess"),
+        variant: "success",
+      },
+    };
   } catch (error) {
     return {
       success: false,
       error: localizeMessage(error instanceof Error ? error.message : "Failed to restore exam.", t),
+      toast: {
+        title: t("teacher.examDetail.failedRestore"),
+        variant: "error",
+      },
     };
   }
 }
@@ -207,11 +251,22 @@ export async function deleteExamAction(
   try {
     await examService.deleteExam(teacher.id, parsed.data.examId);
     revalidatePath("/teacher/exams");
-    return { success: true, data: { deleted: true } };
+    return {
+      success: true,
+      data: { deleted: true },
+      toast: {
+        title: t("teacher.examDetail.deleteSuccess"),
+        variant: "success",
+      },
+    };
   } catch (error) {
     return {
       success: false,
       error: localizeMessage(error instanceof Error ? error.message : "Failed to delete exam.", t),
+      toast: {
+        title: t("teacher.examDetail.failedDelete"),
+        variant: "error",
+      },
     };
   }
 }

@@ -1,0 +1,233 @@
+/**
+ * R1 — Design tokens (Academic Modernism).
+ *
+ * Single source of truth for color, typography, radius, shadow, motion,
+ * and role-accent CSS variables. Tailwind v4 picks these up via @theme
+ * so utilities like `bg-surface-0`, `text-ink-900`, `rounded-md`,
+ * `shadow-2`, etc. resolve to these values.
+ *
+ * Dark mode is selected via `data-theme="dark"` on <html>.
+ * Roles are selected via `data-role="student|teacher|admin|parent"`
+ * on <body> (set by role layouts) — they bind to the same accent
+ * tokens below.
+ */
+
+@theme {
+  /* Surfaces — neutral ramp (light) */
+  --color-surface-0: #ffffff;
+  --color-surface-1: #f7f7f5;
+  --color-surface-2: #efefec;
+  --color-surface-3: #e7e7e3;
+  --color-surface-4: #deded8;
+
+  /* Backwards-compatible aliases (existing bento-card / surfaces depend on them) */
+  --color-surface: var(--color-surface-1);
+  --color-surface-dim: var(--color-surface-3);
+  --color-surface-bright: var(--color-surface-0);
+  --color-surface-container-lowest: var(--color-surface-0);
+  --color-surface-container-low: #f3f3f7;
+  --color-surface-container: #edeef1;
+  --color-surface-container-high: #e7e8ec;
+  --color-surface-container-highest: #e2e2e6;
+  --color-surface-variant: #e2e2e6;
+  --color-background: var(--color-surface-1);
+  --color-on-background: #191c1f;
+
+  /* Ink / text */
+  --color-ink-900: #0c0c0e;
+  --color-ink-700: #2a2a2f;
+  --color-ink-500: #56565e;
+  --color-ink-300: #8a8a92;
+  --color-ink-100: #c9c9cf;
+
+  /* Role accents */
+  --color-student: #0f8a5f; /* emerald */
+  --color-teacher: #4338ca; /* indigo */
+  --color-admin:   #1e293b; /* slate */
+  --color-parent:  #be185d; /* rose */
+
+  /* Brand / Primary (kept compatible with the existing primary palette) */
+  --color-primary: #003555;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #0f4c75;
+  --color-on-primary-container: #8bbceb;
+  --color-primary-fixed: #cee5ff;
+  --color-primary-fixed-dim: #9acbfb;
+  --color-on-primary-fixed: #001d32;
+  --color-on-primary-fixed-variant: #0b4a73;
+  --color-inverse-primary: #9acbfb;
+  --color-surface-tint: #2e628c;
+
+  /* Secondary (kept from existing palette) */
+  --color-secondary: #4f6072;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d2e4fa;
+  --color-on-secondary-container: #556678;
+  --color-secondary-fixed: #d2e4fa;
+  --color-secondary-fixed-dim: #b6c8dd;
+  --color-on-secondary-fixed: #0a1d2c;
+  --color-on-secondary-fixed-variant: #37485a;
+  --color-on-surface: #191c1f;
+  --color-on-surface-variant: #41474e;
+  --color-inverse-surface: #2e3134;
+  --color-inverse-on-surface: #f0f0f4;
+
+  /* Outline */
+  --color-outline: #72787f;
+  --color-outline-variant: #c1c7cf;
+
+  /* Tertiary (warm gold — achievements/milestones, kept from existing palette) */
+  --color-tertiary: #4b2a00;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #6a3e00;
+  --color-on-tertiary-container: #eaab66;
+  --color-tertiary-fixed: #ffdcbc;
+  --color-tertiary-fixed-dim: #fbba74;
+  --color-on-tertiary-fixed: #2c1700;
+  --color-on-tertiary-fixed-variant: #683d00;
+
+  /* Feedback */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-success: #0f8a5f;
+  --color-warning: #b45309;
+  --color-danger:  #b91c1c;
+  --color-info:    #1d4ed8;
+
+  /* Typography */
+  --font-sans: var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-hind), 'Hind Siliguri', ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-hind), 'Hind Siliguri', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --text-display-1: 2.75rem;
+  --text-display-2: 2rem;
+  --text-h1: 1.5rem;
+  --text-h2: 1.25rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-micro: 0.75rem;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows — single-key low-blur (Academic Modernism keeps it flat) */
+  --shadow-1: 0 1px 0 0 rgba(0, 0, 0, 0.04);
+  --shadow-2: 0 4px 14px -6px rgba(0, 0, 0, 0.08);
+  --shadow-3: 0 12px 32px -10px rgba(0, 0, 0, 0.12);
+  --shadow-4: 0 24px 64px -20px rgba(0, 0, 0, 0.18);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+
+  /* Spacing rhythm — 4px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+}
+
+/* Dark theme — same tokens, different values */
+[data-theme='dark'] {
+  --color-surface-0: #0b0b0d;
+  --color-surface-1: #131318;
+  --color-surface-2: #1a1a20;
+  --color-surface-3: #21212a;
+  --color-surface-4: #2a2a34;
+
+  --color-surface: #131318;
+  --color-surface-dim: #21212a;
+  --color-surface-bright: #0b0b0d;
+  --color-surface-container-lowest: #0b0b0d;
+  --color-surface-container-low: #131318;
+  --color-surface-container: #1a1a20;
+  --color-surface-container-high: #21212a;
+  --color-surface-container-highest: #2a2a34;
+  --color-surface-variant: #2a2a34;
+  --color-background: #0b0b0d;
+  --color-on-background: #f5f5f7;
+
+  --color-ink-900: #f5f5f7;
+  --color-ink-700: #d1d1d8;
+  --color-ink-500: #a1a1ad;
+  --color-ink-300: #6f6f7a;
+  --color-ink-100: #3a3a44;
+
+  --color-on-surface: #f5f5f7;
+  --color-on-surface-variant: #c1c7cf;
+  --color-inverse-surface: #f0f0f4;
+  --color-inverse-on-surface: #2e3134;
+
+  --color-outline: #8a8a92;
+  --color-outline-variant: #3a3a44;
+
+  --color-primary: #9acbfb;
+  --color-on-primary: #001d32;
+  --color-primary-container: #0f4c75;
+  --color-on-primary-container: #cee5ff;
+
+  color-scheme: dark;
+}
+
+/* Respect system on first paint, persist via cookie after toggle */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    color-scheme: dark;
+  }
+}
+
+/* Role accents — applied via data-role on <body>. Lets role layouts swap
+ * the accent color without runtime checks.
+ */
+[data-role='student'] {
+  --color-role: var(--color-student);
+  --color-role-container: color-mix(in oklab, var(--color-student) 15%, transparent);
+}
+[data-role='teacher'] {
+  --color-role: var(--color-teacher);
+  --color-role-container: color-mix(in oklab, var(--color-teacher) 15%, transparent);
+}
+[data-role='admin'] {
+  --color-role: var(--color-admin);
+  --color-role-container: color-mix(in oklab, var(--color-admin) 15%, transparent);
+}
+[data-role='parent'] {
+  --color-role: var(--color-parent);
+  --color-role-container: color-mix(in oklab, var(--color-parent) 15%, transparent);
+}
+
+/* Focus ring — Academic Modernism, accent-blue 2px outline + offset */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* Reduced motion — collapse transitions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

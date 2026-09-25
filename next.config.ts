@@ -37,9 +37,14 @@ const nextConfig: NextConfig = {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
           },
-          // CSP — REPORT-ONLY during R0. The strict policy below will be
-          // promoted to an enforced `Content-Security-Policy` after R1
-          // lands (when we have real insight into script/style sources).
+          // CSP — enforced starting R1. The policy was promoted from
+          // `Content-Security-Policy-Report-Only` after R0 gave us
+          // enough signal to trust the allowed origins cover Clerk,
+          // YouTube (R2), Cloudflare Turnstile (R3 live class), and
+          // Cloudflare R2 (R3 media). Violations are reported to
+          // /api/csp-report; if you change CSP origins, verify the
+          // report endpoint is still reachable or violations will be
+          // silently dropped.
           //
           // Notes:
           // - Clerk injects its hosted sign-in/up pages via the `__session`
@@ -51,14 +56,14 @@ const nextConfig: NextConfig = {
           //   so `style-src 'unsafe-inline'` is intentionally permitted.
           //   Scripts are still hashed by Next.js at build time; we keep
           //   `'unsafe-inline'` for scripts ONLY because Clerk + Next dev
-          //   tooling rely on it. Will tighten in R1.
+          //   tooling rely on it. Will tighten in a follow-up.
           // - R3 (live class) and R2 (YouTube embeds) require the
           //   YouTube IFrame API; we pre-allow it here so R1 / R2
           //   re-headers don't churn.
           // - Cloudflare Turnstile widget loads from
           //   `https://challenges.cloudflare.com`; also pre-allowed.
           {
-            key: "Content-Security-Policy-Report-Only",
+            key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube.com",

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { useState } from "react";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { ThemeToggle } from "@/components/shared/feedback";
+import { CommandTrigger } from "@/components/shared/command";
 import { useTranslations } from "@/i18n/client";
 import type { CurrentUser } from "@/lib/auth";
 import { BrandLogo } from "@/components/shared/brand-logo";
@@ -48,6 +50,10 @@ export function AdminNavClient({ user, activeSection = "dashboard" }: AdminNavCl
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden md:block">
+            <CommandTrigger />
+          </div>
+          <ThemeToggle showLabels={false} className="hidden md:inline-flex" />
           <LanguageSwitcher />
 
           <div className="h-6 w-px bg-outline-variant hidden sm:block" />
@@ -100,6 +106,9 @@ export function AdminNavClient({ user, activeSection = "dashboard" }: AdminNavCl
             <span className="text-base">👥</span>
             <span>{t("admin.nav.users")}</span>
           </Link>
+          <div className="pt-2 border-t border-outline-variant">
+            <ThemeToggle showLabels className="w-full justify-between" />
+          </div>
         </div>
       )}
     </header>

@@ -98,6 +98,7 @@ export const bn: Dictionary = {
   "nav.teacher.createCourse": "কোর্স তৈরি করুন",
   "nav.teacher.createExam": "পরীক্ষা তৈরি করুন",
   "nav.teacher.educatorBadge": "শিক্ষক",
+  "nav.parent": "অভিভাবক প্যানেল",
 
   "footer.madeWith": "তৈরি করেছেন",
   "footer.developedBy": "ডেভেলপ করেছেন",
@@ -1689,6 +1690,81 @@ export const bn: Dictionary = {
   "leaderboard.row.xp": "এই সপ্তাহে XP",
   "leaderboard.weeklyWeek": "{date} সপ্তাহ",
   "leaderboard.lastUpdated": "আপডেট {when}",
+
+  // -------------------------------------------------------------------------
+  // R1 — Design System 2.0 + Dashboard Overhaul
+  // -------------------------------------------------------------------------
+  // System toast surfaces (R1 §7) — used by defineServerAction.
+  "system.toast.success.title": "সংরক্ষিত হয়েছে",
+  "system.toast.success.description": "আপনার পরিবর্তনগুলো সংরক্ষণ করা হয়েছে।",
+  "system.toast.error.title": "কিছু ভুল হয়েছে",
+  "system.toast.error.description": "একটু পর আবার চেষ্টা করুন।",
+  "system.toast.warning.title": "সতর্কতা",
+  "system.toast.info.title": "তথ্য",
+  "system.permissionDenied": "আপনার এই কাজ করার অনুমতি নেই।",
+
+  // Command palette (R1 §4)
+  "command.title": "কমান্ড প্যালেট",
+  "command.placeholder": "কোর্স, পাঠ, পরীক্ষা বা সেটিং-এ যান…",
+  "command.empty": "কোনো মিল পাওয়া যায়নি।",
+  "command.recent": "সাম্প্রতিক",
+  "command.footer.hint": "টিপ",
+  "command.footer.navigate": "নেভিগেট",
+  "command.footer.select": "নির্বাচন",
+  "command.footer.shortcuts": "শর্টকাট দেখুন",
+
+  // Keyboard shortcuts dialog (R1 §4)
+  "shortcuts.title": "কিবোর্ড শর্টকাট",
+  "shortcuts.close": "বন্ধ",
+  "shortcuts.footer": "বন্ধ করতে Esc চাপুন",
+
+  // Theme toggle (R1 §3)
+  "theme.light": "হালকা",
+  "theme.system": "সিস্টেম",
+  "theme.dark": "গাঢ়",
+
+  // Generic empty-state (R1 §5)
+  "empty.title": "এখানে এখনো কিছু নেই",
+  "empty.description": "প্রদর্শনের জন্য কিছু থাকলে এখানে দেখা যাবে।",
+
+  // Student dashboard hero (R1 §6.1)
+  "dashboard.student.hero.badge": "আজকের রুটিন",
+  "dashboard.student.hero.title": "হ্যালো {name}, আরো এগোতে প্রস্তুত?",
+  "dashboard.student.hero.subtitle": "যেখানে থেমেছিলেন সেখান থেকে শুরু করুন, অথবা পরবর্তী লাইভ ক্লাসে যোগ দিন।",
+
+  // Student dashboard sections
+  "dashboard.student.continue.title": "শেখা চালিয়ে যান",
+  "dashboard.student.continue.viewAll": "সব দেখুন",
+  "dashboard.student.noContinue": "কোনো সক্রিয় কোর্স নেই",
+  "dashboard.student.recentGrades.title": "সাম্প্রতিক গ্রেড",
+  "dashboard.student.recentGrades.empty": "এখনো কোনো গ্রেডেড পরীক্ষা নেই।",
+  "dashboard.student.upcoming.title": "আসন্ন",
+  "dashboard.student.upcoming.empty": "কিছু নির্ধারিত নেই — নিচে নতুন কোর্স খুঁজুন।",
+
+  // Teacher dashboard hero (R1 §6.2)
+  "dashboard.teacher.hero.title": "আজকের ক্লাস",
+  "dashboard.teacher.hero.subtitle": "লাইভ সেশন, কোর্সের বিষয়বস্তু এবং শিক্ষার্থীদের প্রশ্ন এক জায়গায় পরিচালনা করুন।",
+  "dashboard.teacher.stats.monthlyHours": "মাসিক ঘণ্টা",
+  "dashboard.teacher.stats.studentsTaught": "প্রকাশিত পাঠ",
+  "dashboard.teacher.stats.aiUsage": "AI ব্যবহার",
+
+  // Teacher dashboard sections
+  "dashboard.teacher.recentSubmissions.title": "সাম্প্রতিক জমা",
+  "dashboard.teacher.recentSubmissions.empty": "এখনো কোনো মুলতুবি কাজ নেই।",
+  "dashboard.teacher.coursePerformance.title": "কোর্সের পারফরম্যান্স",
+  "dashboard.teacher.coursePerformance.empty": "চার্ট R4 ফেজে আসছে।",
+  "dashboard.teacher.questions.title": "প্রশ্নোত্তর",
+  "dashboard.teacher.questions.empty": "এখন কোনো উত্তরহীন প্রশ্ন নেই।",
+
+  // Parent dashboard placeholder (R1 §6.3)
+  "dashboard.parent.placeholder.title": "প্যারেন্ট প্যানেল — শীঘ্রই আসছে",
+  "dashboard.parent.placeholder.description": "আমরা R7 ফেজে একটি ডেডিকেটেড প্যারেন্ট অভিজ্ঞতা তৈরি করছি। আপনার সন্তানের অগ্রগতি, উপস্থিতি এবং সাপ্তাহিক সারসংক্ষেপ এখানে দেখা যাবে।",
+  "dashboard.parent.placeholder.cta": "রোডম্যাপ পড়ুন",
+
+  // Admin dashboard placeholder (R1 §6.4)
+  "dashboard.admin.placeholder.title": "অ্যাডমিন প্যানেল — শীঘ্রই আসছে",
+  "dashboard.admin.placeholder.description": "R7 ফেজে অ্যাডমিন অভিজ্ঞতা পুনর্নির্মিত হচ্ছে। ব্যবহারকারী-নির্দিষ্ট নিয়ন্ত্রণ, রোল পরিবর্তন এবং প্ল্যাটফর্ম-ব্যাপী মেট্রিক্স এখানে থাকবে।",
+  "dashboard.admin.placeholder.cta": "রোডম্যাপ পড়ুন",
 
   // -------------------------------------------------------------------------
   // R4 — XP toasts

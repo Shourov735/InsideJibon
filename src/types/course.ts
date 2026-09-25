@@ -101,5 +101,21 @@ export interface PublicCourseDetail extends PublicCourseSummary {
 }
 
 export type ActionResult<T = unknown> =
-  | { success: true; data: T }
-  | { success: false; error: string; fieldErrors?: Record<string, string[]> };
+  | { success: true; data: T; toast?: ToastHint }
+  | {
+      success: false;
+      error: string;
+      fieldErrors?: Record<string, string[]>;
+      toast?: ToastHint;
+    };
+
+/**
+ * Optional toast descriptor returned by a Server Action. The calling
+ * client inspects `result.toast` after each invocation and dispatches
+ * a transient toast via `useToast()` (R1 §7).
+ */
+export interface ToastHint {
+  title: string;
+  description?: string;
+  variant: "success" | "error" | "warning" | "info";
+}

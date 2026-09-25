@@ -1,73 +1,14 @@
+/**
+ * R1 — App-level Tailwind entry.
+ *
+ * All design tokens now live in @/styles/tokens.css (single source of
+ * truth). This file just imports Tailwind + tokens, then defines a
+ * small set of utility classes used across the app (bento cards,
+ * scrollbars, table containers). Per R1 §2.
+ */
+
 @import "tailwindcss";
-
-@theme {
-  /* Academic Modernism — Design System */
-  /* Surfaces */
-  --color-surface: #f9f9fd;
-  --color-surface-dim: #d9dade;
-  --color-surface-bright: #f9f9fd;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f3f3f7;
-  --color-surface-container: #edeef1;
-  --color-surface-container-high: #e7e8ec;
-  --color-surface-container-highest: #e2e2e6;
-  --color-surface-variant: #e2e2e6;
-  --color-background: #f9f9fd;
-  --color-on-background: #191c1f;
-
-  /* On-Surface */
-  --color-on-surface: #191c1f;
-  --color-on-surface-variant: #41474e;
-  --color-inverse-surface: #2e3134;
-  --color-inverse-on-surface: #f0f0f4;
-
-  /* Outline */
-  --color-outline: #72787f;
-  --color-outline-variant: #c1c7cf;
-
-  /* Primary */
-  --color-primary: #003555;
-  --color-on-primary: #ffffff;
-  --color-primary-container: #0f4c75;
-  --color-on-primary-container: #8bbceb;
-  --color-primary-fixed: #cee5ff;
-  --color-primary-fixed-dim: #9acbfb;
-  --color-on-primary-fixed: #001d32;
-  --color-on-primary-fixed-variant: #0b4a73;
-  --color-inverse-primary: #9acbfb;
-  --color-surface-tint: #2e628c;
-
-  /* Secondary */
-  --color-secondary: #4f6072;
-  --color-on-secondary: #ffffff;
-  --color-secondary-container: #d2e4fa;
-  --color-on-secondary-container: #556678;
-  --color-secondary-fixed: #d2e4fa;
-  --color-secondary-fixed-dim: #b6c8dd;
-  --color-on-secondary-fixed: #0a1d2c;
-  --color-on-secondary-fixed-variant: #37485a;
-
-  /* Tertiary (Warm Gold — achievements & milestones) */
-  --color-tertiary: #4b2a00;
-  --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #6a3e00;
-  --color-on-tertiary-container: #eaab66;
-  --color-tertiary-fixed: #ffdcbc;
-  --color-tertiary-fixed-dim: #fbba74;
-  --color-on-tertiary-fixed: #2c1700;
-  --color-on-tertiary-fixed-variant: #683d00;
-
-  /* Feedback */
-  --color-error: #ba1a1a;
-  --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
-
-  /* Typography */
-  --font-sans: var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-jakarta), 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
-}
+@import "../styles/tokens.css";
 
 body {
   background: var(--color-surface);
@@ -81,40 +22,39 @@ body {
 
 /* Touch targets and mobile interaction */
 @media (max-width: 640px) {
-  button, a, input, select, textarea {
+  button,
+  a,
+  input,
+  select,
+  textarea {
     touch-action: manipulation;
   }
 }
 
 /* Utility: Academic bento card */
 .bento-card {
-  background: #ffffff;
-  border: 1px solid #c1c7cf;
-  border-radius: 0.75rem;
-  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  background: var(--color-surface-0);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  transition:
+    box-shadow var(--dur-base) var(--ease-standard),
+    transform var(--dur-base) var(--ease-standard);
 }
-
 .bento-card:hover {
-  box-shadow: 0px 4px 12px rgba(15, 76, 117, 0.07);
+  box-shadow: var(--shadow-2);
   transform: translateY(-1px);
 }
-
 .bento-card-static {
-  background: #ffffff;
-  border: 1px solid #c1c7cf;
-  border-radius: 0.75rem;
+  background: var(--color-surface-0);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
 }
-
-/* Subtle shadow used for elevated elements */
 .shadow-academic {
-  box-shadow: 0px 4px 12px rgba(15, 76, 117, 0.05);
+  box-shadow: var(--shadow-2);
 }
-
 .shadow-academic-lg {
-  box-shadow: 0px 12px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-3);
 }
-
-/* Responsive Table Horizontal Scroll with indicator hint */
 .table-responsive-container {
   width: 100%;
   overflow-x: auto;
@@ -122,14 +62,27 @@ body {
   scrollbar-width: thin;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c1c7cf; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #72787f; }
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
 
-/* Focus ring */
-*:focus-visible {
-  outline: 2px solid #003555;
-  outline-offset: 2px;
+/* Skeleton shimmer — used by the Skeleton primitive in feedback/ */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

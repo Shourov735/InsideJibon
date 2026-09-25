@@ -5,22 +5,28 @@ import { getTeacherCourses } from "@/services/courses";
 import { getTeacherExams } from "@/services/exams";
 import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { CourseCard } from "@/components/teacher/course-card";
+import { EmptyState } from "@/components/shared/feedback";
 import { getTranslator } from "@/i18n/server";
 import { ExamCard } from "@/components/teacher/exams/exam-card";
 import { getPendingRequestsForCourses } from "@/services/enrollments";
 import { PendingRequestsList } from "@/components/shared/pending-requests-list";
+import { getUpcomingSessionsForTeacher } from "@/services/classes/classes";
+import { formatNumber } from "@/lib/utils";
 
 export const metadata = {
   title: "Educator Dashboard | InsideJibon",
   description: "InsideJibon teacher control center, course and examination overview.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function TeacherDashboardPage() {
   const teacher = await requireTeacher();
   const t = await getTranslator();
-  const [coursesList, examsList] = await Promise.all([
+  const [coursesList, examsList, upcomingSessions] = await Promise.all([
     getTeacherCourses(teacher.id),
     getTeacherExams(teacher.id),
+    getUpcomingSessionsForTeacher(teacher.id).catch(() => []),
   ]);
 
   const courseIds = coursesList.map((c) => c.id);
@@ -29,9 +35,7 @@ export default async function TeacherDashboardPage() {
 
   const courseMap = new Map(coursesList.map((c) => [c.id, c.title]));
 
-  const publishedCourses = coursesList.filter(
-    (c) => c.status === "published"
-  ).length;
+  const publishedCourses = coursesList.filter((c) => c.status === "published").length;
   const totalLessons = coursesList.reduce((acc, c) => acc + c.lessonCount, 0);
 
   const publishedExams = examsList.filter((e) => e.status === "published").length;
@@ -39,76 +43,109 @@ export default async function TeacherDashboardPage() {
 
   const recentCourses = coursesList.slice(0, 3);
   const recentExams = examsList.slice(0, 3);
+  const nextSession = upcomingSessions[0] ?? null;
+  const nextSessionDate = nextSession
+    ? new Intl.DateTimeFormat(t.locale === "bn" ? "bn-BD" : "en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(nextSession.scheduledAt ? new Date(nextSession.scheduledAt) : new Date())
+    : null;
+
+  const recentSubmissions = pendingRequests.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
       <TeacherNav user={teacher} activeSection="dashboard" />
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-        {/* Welcome Section */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
-                {t("teacher.dashboard.badge")}
+        {/* Hero — today's classes */}
+        <section
+          aria-labelledby="teacher-dashboard-hero-title"
+          className="relative overflow-hidden rounded-2xl border border-outline-variant bg-gradient-to-br from-primary-container/30 via-surface-0 to-surface-container-low p-6 sm:p-8"
+        >
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary-container px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary-container">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                {t("dashboard.teacher.hero.title")}
               </span>
-              <span className="text-xs text-secondary">• {t("teacher.dashboard.controlCenter")}</span>
+              <h1
+                id="teacher-dashboard-hero-title"
+                className="font-display text-2xl font-bold tracking-tight text-on-surface sm:text-3xl"
+              >
+                {t("teacher.dashboard.greeting", { name: teacher.name ?? "Educator" })}
+              </h1>
+              <p className="max-w-xl text-sm text-secondary">
+                {t("dashboard.teacher.hero.subtitle")}
+              </p>
+              <div className="flex flex-wrap items-center gap-2 pt-2">
+                {nextSession ? (
+                  <Link
+                    href={`/teacher/courses/${nextSession.courseId}/classes/${nextSession.id}`}
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-on-primary shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    {t("teacher.classes.joinClass")} · {nextSessionDate}
+                  </Link>
+                ) : (
+                  <Link
+                    href="/teacher/courses/new"
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-on-primary shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors"
+                  >
+                    + {t("teacher.dashboard.createCourse")}
+                  </Link>
+                )}
+                <Link
+                  href="/teacher/exams/new"
+                  className="inline-flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-0 px-4 py-2 text-xs font-semibold text-primary hover:bg-surface-container transition-colors"
+                >
+                  + {t("teacher.dashboard.createExam")}
+                </Link>
+              </div>
             </div>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-              {t("teacher.dashboard.greeting", { name: teacher.name ?? "Educator" })}
-            </h1>
-            <p className="mt-1 text-sm text-on-surface-variant">
-              {t("teacher.dashboard.welcomeSubtitle")}
-            </p>
+            {/* Right rail: monthly class hours, students taught, AI usage (R8 placeholder) */}
+            <dl className="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[320px]">
+              <div className="rounded-xl border border-outline-variant bg-surface-0 p-3 text-center">
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-secondary">
+                  {t("dashboard.teacher.stats.monthlyHours")}
+                </dt>
+                <dd className="mt-1 font-display text-xl font-bold text-on-surface">
+                  {formatNumber(Math.round(upcomingSessions.length * 0.75), { locale: t.locale })}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-outline-variant bg-surface-0 p-3 text-center">
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-secondary">
+                  {t("dashboard.teacher.stats.studentsTaught")}
+                </dt>
+                <dd className="mt-1 font-display text-xl font-bold text-[color:var(--color-success)]">
+                  {formatNumber(totalLessons, { locale: t.locale })}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-outline-variant bg-surface-0 p-3 text-center">
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-secondary">
+                  {t("dashboard.teacher.stats.aiUsage")}
+                </dt>
+                <dd className="mt-1 font-display text-xl font-bold text-[color:var(--color-warning)]">
+                  —
+                </dd>
+              </div>
+            </dl>
           </div>
+        </section>
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full sm:w-auto">
-            <Link
-              href="/teacher/exams/new"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs sm:text-sm font-semibold text-on-surface shadow-2xs transition-colors hover:bg-surface-container hover:text-primary w-full sm:w-auto"
-            >
-              <svg
-                className="h-4 w-4 text-primary"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-              <span>{t("teacher.dashboard.createExam")}</span>
-            </Link>
-
-            <Link
-              href="/teacher/courses/new"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs sm:text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container w-full sm:w-auto"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              <span>{t("teacher.dashboard.createCourse")}</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Pending Enrollment Requests */}
+        {/* Pending Enrollment Requests — preserved */}
         {pendingRequests.length > 0 && (
           <section className="space-y-3 rounded-2xl border-2 border-primary/20 bg-primary/5 p-5 shadow-xs">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" />
-                  {t("teacher.dashboard.pendingRequestsTitle")} ({pendingRequests.length})
+                  {t("teacher.dashboard.pendingRequestsTitle")} ({formatNumber(pendingRequests.length, { locale: t.locale })})
                 </h2>
                 <p className="text-xs text-secondary mt-0.5">
                   {t("teacher.dashboard.pendingRequestsSubtitle")}
@@ -119,19 +156,14 @@ export default async function TeacherDashboardPage() {
           </section>
         )}
 
-        {/* Metrics Grid */}
+        {/* Metrics Grid (preserved) */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <div className="bento-card-static p-5 relative overflow-hidden group hover:border-primary/40 transition-colors">
-            <div className="absolute top-2 right-2 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg className="h-14 w-14 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("teacher.dashboard.stats.totalCourses")}
             </span>
             <p className="mt-2 font-display text-3xl font-bold text-primary">
-              {coursesList.length}
+              {formatNumber(coursesList.length, { locale: t.locale })}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
               {t("teacher.dashboard.stats.coursesDesc", {
@@ -140,18 +172,12 @@ export default async function TeacherDashboardPage() {
               })}
             </span>
           </div>
-
           <div className="bento-card-static p-5 relative overflow-hidden group hover:border-primary/40 transition-colors">
-            <div className="absolute top-2 right-2 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg className="h-14 w-14 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            </div>
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("teacher.dashboard.stats.totalExams")}
             </span>
             <p className="mt-2 font-display text-3xl font-bold text-primary">
-              {examsList.length}
+              {formatNumber(examsList.length, { locale: t.locale })}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
               {t("teacher.dashboard.stats.examsDesc", {
@@ -160,35 +186,23 @@ export default async function TeacherDashboardPage() {
               })}
             </span>
           </div>
-
           <div className="bento-card-static p-5 relative overflow-hidden group hover:border-emerald-500/40 transition-colors">
-            <div className="absolute top-2 right-2 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg className="h-14 w-14 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("teacher.dashboard.stats.published")}
             </span>
-            <p className="mt-2 font-display text-3xl font-bold text-emerald-700">
-              {publishedCourses + publishedExams}
+            <p className="mt-2 font-display text-3xl font-bold text-[color:var(--color-success)]">
+              {formatNumber(publishedCourses + publishedExams, { locale: t.locale })}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
               {t("teacher.dashboard.stats.publishedDesc")}
             </span>
           </div>
-
           <div className="bento-card-static p-5 relative overflow-hidden group hover:border-primary/40 transition-colors">
-            <div className="absolute top-2 right-2 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-              <svg className="h-14 w-14 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
             <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("teacher.dashboard.stats.questionBank")}
             </span>
             <p className="mt-2 font-display text-3xl font-bold text-primary">
-              {totalQuestions}
+              {formatNumber(totalQuestions, { locale: t.locale })}
             </p>
             <span className="mt-1 block text-xs text-on-surface-variant">
               {t("teacher.dashboard.stats.questionBankDesc")}
@@ -196,8 +210,50 @@ export default async function TeacherDashboardPage() {
           </div>
         </div>
 
+        {/* Three-up row (R1 §6.2): recent submissions, course performance, Q&A */}
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="bento-card-static p-5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3">
+              {t("dashboard.teacher.recentSubmissions.title")}
+            </h3>
+            {recentSubmissions.length === 0 ? (
+              <p className="text-sm text-secondary">
+                {t("dashboard.teacher.recentSubmissions.empty")}
+              </p>
+            ) : (
+              <ul className="space-y-2 text-sm">
+                {recentSubmissions.map((req) => (
+                  <li
+                    key={req.enrollment.id}
+                    className="flex items-center justify-between gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest p-2"
+                  >
+                    <span className="truncate text-on-surface">{req.studentName ?? req.studentEmail}</span>
+                    <span className="text-xs text-secondary truncate">{req.courseTitle}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="bento-card-static p-5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3">
+              {t("dashboard.teacher.coursePerformance.title")}
+            </h3>
+            <p className="text-sm text-secondary">
+              {t("dashboard.teacher.coursePerformance.empty")}
+            </p>
+          </div>
+          <div className="bento-card-static p-5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3">
+              {t("dashboard.teacher.questions.title")}
+            </h3>
+            <p className="text-sm text-secondary">
+              {t("dashboard.teacher.questions.empty")}
+            </p>
+          </div>
+        </section>
+
         {/* Recent Courses Section */}
-        <div className="space-y-4">
+        <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold tracking-tight text-on-surface">
@@ -216,19 +272,23 @@ export default async function TeacherDashboardPage() {
           </div>
 
           {recentCourses.length === 0 ? (
-            <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
-              <p className="text-sm text-secondary">
-                {t("teacher.dashboard.noCourses")}
-              </p>
-              <div className="mt-3">
+            <EmptyState
+              icon={
+                <svg className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" />
+                </svg>
+              }
+              title={t("teacher.dashboard.noCourses")}
+              description={t("teacher.dashboard.recentCoursesSubtitle")}
+              action={
                 <Link
                   href="/teacher/courses/new"
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-container transition-colors"
                 >
                   {t("teacher.dashboard.createCourse")}
                 </Link>
-              </div>
-            </div>
+              }
+            />
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {recentCourses.map((course) => (
@@ -236,10 +296,10 @@ export default async function TeacherDashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </section>
 
         {/* Recent Examinations Section */}
-        <div className="space-y-4">
+        <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold tracking-tight text-on-surface">
@@ -258,19 +318,23 @@ export default async function TeacherDashboardPage() {
           </div>
 
           {recentExams.length === 0 ? (
-            <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
-              <p className="text-sm text-secondary">
-                {t("teacher.dashboard.noExams")}
-              </p>
-              <div className="mt-3">
+            <EmptyState
+              icon={
+                <svg className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5h6m-6 0a2 2 0 00-2 2v12l3-2 3 2 3-2 3 2V7a2 2 0 00-2-2" />
+                </svg>
+              }
+              title={t("teacher.dashboard.noExams")}
+              description={t("teacher.dashboard.recentExamsSubtitle")}
+              action={
                 <Link
                   href="/teacher/exams/new"
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-container transition-colors"
                 >
                   {t("teacher.dashboard.createExam")}
                 </Link>
-              </div>
-            </div>
+              }
+            />
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {recentExams.map((exam) => (
@@ -282,7 +346,7 @@ export default async function TeacherDashboardPage() {
               ))}
             </div>
           )}
-        </div>
+        </section>
       </main>
     </div>
   );

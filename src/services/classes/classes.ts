@@ -178,7 +178,7 @@ export async function getUpcomingSessionsForStudent(
 ): Promise<ClassSession[]> {
   const db = getDb();
   const now = new Date();
-  
+
   const rows = await db
     .select({ session: classSessions })
     .from(classSessions)
@@ -192,6 +192,33 @@ export async function getUpcomingSessionsForStudent(
         eq(classSessions.status, "upcoming"),
         gte(classSessions.scheduledAt, now)
       )
+    )
+    .orderBy(asc(classSessions.scheduledAt));
+
+  return rows.map((r) => r.session);
+}
+
+/**
+ * Upcoming sessions owned by the given teacher across all their
+ * courses. Used by the teacher dashboard "Today's classes" hero card
+ * (R1 §6.2) and the upcoming-sessions list inside the class section.
+ */
+export async function getUpcomingSessionsForTeacher(
+  teacherId: string
+): Promise<ClassSession[]> {
+  const db = getDb();
+  const now = new Date();
+
+  const rows = await db
+    .select({ session: classSessions })
+    .from(classSessions)
+    .innerJoin(courses, eq(classSessions.courseId, courses.id))
+    .where(
+      and(
+        eq(courses.teacherId, teacherId),
+        eq(classSessions.status, "upcoming"),
+        gte(classSessions.scheduledAt, now),
+      ),
     )
     .orderBy(asc(classSessions.scheduledAt));
 

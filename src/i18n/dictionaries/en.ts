@@ -91,6 +91,7 @@ export const en = {
   "nav.teacher.createCourse": "Create Course",
   "nav.teacher.createExam": "Create Exam",
   "nav.teacher.educatorBadge": "Educator",
+  "nav.parent": "Parent Panel",
 
   "footer.madeWith": "Made with ❤️ by",
   "footer.developedBy": "Developed by",
@@ -1693,6 +1694,81 @@ export const en = {
   // -------------------------------------------------------------------------
   "xp.events.qaUpvote": "+5 XP received for an upvote",
   "xp.events.qaAccepted": "+25 XP for an accepted answer",
+
+  // -------------------------------------------------------------------------
+  // R1 — Design System 2.0 + Dashboard Overhaul
+  // -------------------------------------------------------------------------
+  // System toast surfaces (R1 §7) — used by defineServerAction.
+  "system.toast.success.title": "Saved",
+  "system.toast.success.description": "Your changes have been saved.",
+  "system.toast.error.title": "Something went wrong",
+  "system.toast.error.description": "Please try again in a moment.",
+  "system.toast.warning.title": "Heads up",
+  "system.toast.info.title": "FYI",
+  "system.permissionDenied": "You don't have permission to do that.",
+
+  // Command palette (R1 §4)
+  "command.title": "Command palette",
+  "command.placeholder": "Jump to a course, lesson, exam or setting…",
+  "command.empty": "No matches found.",
+  "command.recent": "Recent",
+  "command.footer.hint": "Tip",
+  "command.footer.navigate": "to navigate",
+  "command.footer.select": "to select",
+  "command.footer.shortcuts": "for shortcuts",
+
+  // Keyboard shortcuts dialog (R1 §4)
+  "shortcuts.title": "Keyboard shortcuts",
+  "shortcuts.close": "Close",
+  "shortcuts.footer": "Press Esc to dismiss",
+
+  // Theme toggle (R1 §3)
+  "theme.light": "Light",
+  "theme.system": "System",
+  "theme.dark": "Dark",
+
+  // Generic empty-state (R1 §5)
+  "empty.title": "Nothing here yet",
+  "empty.description": "When there's something to show, it'll appear here.",
+
+  // Student dashboard hero (R1 §6.1)
+  "dashboard.student.hero.badge": "Today's routine",
+  "dashboard.student.hero.title": "Hi {name}, ready to keep going?",
+  "dashboard.student.hero.subtitle": "Pick up where you left off, or join your next live class.",
+
+  // Student dashboard sections
+  "dashboard.student.continue.title": "Continue learning",
+  "dashboard.student.continue.viewAll": "View all",
+  "dashboard.student.noContinue": "No active courses",
+  "dashboard.student.recentGrades.title": "Recent grades",
+  "dashboard.student.recentGrades.empty": "No graded exams yet.",
+  "dashboard.student.upcoming.title": "Upcoming",
+  "dashboard.student.upcoming.empty": "Nothing scheduled — discover a new course below.",
+
+  // Teacher dashboard hero (R1 §6.2)
+  "dashboard.teacher.hero.title": "Today's classes",
+  "dashboard.teacher.hero.subtitle": "Manage your live sessions, course content, and student questions from one place.",
+  "dashboard.teacher.stats.monthlyHours": "Monthly hours",
+  "dashboard.teacher.stats.studentsTaught": "Lessons shipped",
+  "dashboard.teacher.stats.aiUsage": "AI usage",
+
+  // Teacher dashboard sections
+  "dashboard.teacher.recentSubmissions.title": "Recent submissions",
+  "dashboard.teacher.recentSubmissions.empty": "No pending work yet.",
+  "dashboard.teacher.coursePerformance.title": "Course performance",
+  "dashboard.teacher.coursePerformance.empty": "Charts arrive in Phase R4.",
+  "dashboard.teacher.questions.title": "Q&A",
+  "dashboard.teacher.questions.empty": "No unanswered doubts right now.",
+
+  // Parent dashboard placeholder (R1 §6.3)
+  "dashboard.parent.placeholder.title": "Parent panel — coming soon",
+  "dashboard.parent.placeholder.description": "We're building a dedicated parent experience in Phase R7. You'll see your child's progress, attendance, and weekly digest here.",
+  "dashboard.parent.placeholder.cta": "Read the roadmap",
+
+  // Admin dashboard placeholder (R1 §6.4)
+  "dashboard.admin.placeholder.title": "Admin panel — coming soon",
+  "dashboard.admin.placeholder.description": "The admin experience is being reshaped in Phase R7. Per-user controls, role changes, and platform-wide metrics will live here.",
+  "dashboard.admin.placeholder.cta": "Read the roadmap",
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

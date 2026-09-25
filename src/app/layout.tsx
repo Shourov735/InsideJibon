@@ -1,16 +1,31 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Hind_Siliguri, Plus_Jakarta_Sans, Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { LanguageProvider } from "@/i18n/client";
 import { getLocale } from "@/i18n/server";
+import { getStoredThemePreference, resolveThemeFromPreference } from "@/lib/theme";
+import { ToastViewport } from "@/components/shared/feedback/toast-viewport";
 import "./globals.css";
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#003555",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0b0d" },
+  ],
 };
+
+// R1 §3 — Hind Siliguri is the Bangla-first display + body font.
+// We keep Inter and Plus Jakarta Sans for any legacy utilities that
+// still bind to --font-jakarta / --font-inter.
+const hind = Hind_Siliguri({
+  variable: "--font-hind",
+  subsets: ["latin", "bengali"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
 
 const jakartaSans = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -119,7 +134,12 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const locale = await getLocale();
+  const [locale, themePreference] = await Promise.all([
+    getLocale(),
+    getStoredThemePreference(),
+  ]);
+  const resolvedTheme = resolveThemeFromPreference(themePreference);
+
   return (
     <ClerkProvider
       signInFallbackRedirectUrl="/continue"
@@ -127,10 +147,30 @@ export default async function RootLayout({
     >
       <html
         lang={locale}
-        className={`${jakartaSans.variable} ${inter.variable} h-full antialiased`}
+        data-theme={resolvedTheme ?? undefined}
+        // System preference is honored via tokens.css media query when
+        // data-theme is unset. We attach an inline script that flips
+        // the attribute before paint if the cookie is missing —
+        // matching the cookie value on subsequent loads.
+        suppressHydrationWarning
+        className={`${hind.variable} ${jakartaSans.variable} ${inter.variable} h-full antialiased`}
       >
+        <head>
+          <script
+            // Inline pre-paint theme resolver. Reads the cookie and
+            // applies `data-theme` so the dark-mode tokens apply on
+            // first paint. Idempotent — the server already set it if
+            // a cookie was present.
+            dangerouslySetInnerHTML={{
+              __html: `(function(){try{var m=document.cookie.match(/(?:^|; )ij_theme=([^;]+)/);var v=m?m[1]:'system';if(v==='dark'||v==='light'){document.documentElement.setAttribute('data-theme',v);}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.setAttribute('data-theme','light');}}catch(e){}})();`,
+            }}
+          />
+        </head>
         <body className="min-h-full flex flex-col bg-surface text-on-surface font-sans">
-          <LanguageProvider locale={locale}>{children}</LanguageProvider>
+          <LanguageProvider locale={locale}>
+            <ToastViewport />
+            {children}
+          </LanguageProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -20,6 +20,7 @@
     "@clerk/nextjs": "^7.7.9",
     "@clerk/shared": "^4.29.2",
     "@neondatabase/serverless": "^1.1.0",
+    "cmdk": "^1.1.1",
     "drizzle-orm": "^0.45.2",
     "next": "16.3.1",
     "react": "19.2.8",

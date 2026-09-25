@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { ThemeToggle } from "@/components/shared/feedback";
+import { CommandTrigger } from "@/components/shared/command";
 import { useState } from "react";
+import { useTranslations } from "@/i18n/client";
 
 import type { CurrentUser } from "@/lib/auth";
 import { BrandLogo } from "@/components/shared/brand-logo";
@@ -14,6 +17,7 @@ interface TeacherNavClientProps {
 }
 
 export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherNavClientProps) {
+  const { t } = useTranslations();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -31,7 +35,7 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
                   : "text-secondary hover:text-primary"
               }`}
             >
-              Dashboard
+              {t("nav.teacher.dashboard")}
             </Link>
             <Link
               href="/teacher/courses"
@@ -41,7 +45,7 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
                   : "text-secondary hover:text-primary"
               }`}
             >
-              Courses
+              {t("nav.teacher.courses")}
             </Link>
             <Link
               href="/teacher/exams"
@@ -51,7 +55,7 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
                   : "text-secondary hover:text-primary"
               }`}
             >
-              Exams
+              {t("nav.teacher.exams")}
             </Link>
             <Link
               href="/teacher/assignments"
@@ -61,19 +65,23 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
                   : "text-secondary hover:text-primary"
               }`}
             >
-              Assignments
+              {t("nav.teacher.assignments")}
             </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden md:block">
+            <CommandTrigger />
+          </div>
+          <ThemeToggle showLabels={false} className="hidden md:inline-flex" />
           <LanguageSwitcher />
 
           <Link
             href="/teacher/courses/new"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
           >
-            + Create Course
+            + {t("nav.teacher.createCourse")}
           </Link>
 
           <div className="h-6 w-px bg-outline-variant hidden sm:block" />
@@ -112,7 +120,7 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
             }`}
           >
             <span className="text-base">📊</span>
-            <span>Dashboard</span>
+            <span>{t("nav.teacher.dashboard")}</span>
           </Link>
           <Link
             href="/teacher/courses"
@@ -124,7 +132,7 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
             }`}
           >
             <span className="text-base">📚</span>
-            <span>Courses</span>
+            <span>{t("nav.teacher.courses")}</span>
           </Link>
           <Link
             href="/teacher/exams"
@@ -136,7 +144,7 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
             }`}
           >
             <span className="text-base">📝</span>
-            <span>Exams</span>
+            <span>{t("nav.teacher.exams")}</span>
           </Link>
           <Link
             href="/teacher/assignments"
@@ -148,15 +156,18 @@ export function TeacherNavClient({ user, activeSection = "dashboard" }: TeacherN
             }`}
           >
             <span className="text-base">📋</span>
-            <span>Assignments</span>
+            <span>{t("nav.teacher.assignments")}</span>
           </Link>
+          <div className="pt-2 border-t border-outline-variant">
+            <ThemeToggle showLabels className="w-full justify-between" />
+          </div>
           <div className="pt-2">
             <Link
               href="/teacher/courses/new"
               onClick={() => setMobileOpen(false)}
               className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary text-center shadow-xs hover:bg-primary-container transition-colors"
             >
-              <span>+ Create New Course</span>
+              <span>+ {t("nav.teacher.createCourse")}</span>
             </Link>
           </div>
         </div>
