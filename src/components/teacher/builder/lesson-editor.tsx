@@ -247,7 +247,6 @@ export function LessonEditor({
             initialProvider={(lesson.videoProvider as VideoProviderType) || "youtube"}
             initialVideoUrl={lesson.videoUrl}
             initialYoutubeVideoId={lesson.youtubeVideoId}
-            initialVideoAssetId={lesson.videoAssetId}
             initialThumbnailKey={lesson.videoThumbnailKey}
             initialDurationS={lesson.videoDurationS}
             onVideoChange={handleVideoChange}

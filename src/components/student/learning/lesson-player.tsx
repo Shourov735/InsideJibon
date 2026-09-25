@@ -5,7 +5,6 @@ import type { VideoDescriptor as TypesVideoDescriptor, VideoProvider } from "@/t
 import type { VideoDescriptor as ServiceVideoDescriptor } from "@/services/lessons/video";
 import { updateLessonPositionAction, markLessonCompleteAction } from "@/app/student/actions";
 import { YouTubeEmbed } from "./youtube-embed";
-import { HlsPlayer } from "./hls-player";
 
 export type AnyVideoDescriptor = TypesVideoDescriptor | ServiceVideoDescriptor;
 
@@ -27,7 +26,6 @@ export interface LessonPlayerProps {
   // Backward compatibility convenience fields
   videoProvider?: VideoProvider | null;
   youtubeVideoId?: string | null;
-  manifestUrl?: string | null;
   videoUrl?: string | null;
 }
 
@@ -43,7 +41,6 @@ export function LessonPlayer({
   className,
   videoProvider,
   youtubeVideoId,
-  manifestUrl,
   videoUrl,
 }: LessonPlayerProps) {
   const [error, setError] = useState<string | null>(null);
@@ -56,16 +53,14 @@ export function LessonPlayer({
   const resolvedYoutubeId =
     extVideo?.videoId || extVideo?.youtubeVideoId || youtubeVideoId || null;
 
-  // Normalize video descriptor from either video prop or flattened props
+  // Normalize video descriptor from either video prop or flattened props.
+  // The app is link-only: a lesson is either a YouTube embed or a direct
+  // external HTTPS URL — there is no self-hosted HLS/manifest provider.
   const provider: VideoProvider | null =
     extVideo?.provider ||
     videoProvider ||
     (resolvedYoutubeId ? "youtube" : null) ||
-    (extVideo?.manifestUrl || manifestUrl ? "r2_hls" : null) ||
     (extVideo?.videoUrl || extVideo?.url || videoUrl ? "external" : null);
-
-  const resolvedManifestUrl =
-    extVideo?.manifestUrl || manifestUrl || (provider === "r2_hls" ? extVideo?.url : null) || null;
 
   const resolvedVideoUrl =
     extVideo?.videoUrl || extVideo?.url || videoUrl || null;
@@ -179,29 +174,7 @@ export function LessonPlayer({
     );
   }
 
-  // Provider branch 2: Self-hosted R2 HLS
-  if (provider === "r2_hls" && resolvedManifestUrl) {
-    return (
-      <div className="space-y-2">
-        <HlsPlayer
-          manifestUrl={resolvedManifestUrl}
-          initialPosition={initialPosition}
-          autoPlay={autoPlay}
-          onPositionUpdate={(pos) => {
-            handlePositionSync(pos);
-            if (video?.durationS && video.durationS > 0 && pos / video.durationS >= 0.9) {
-              handleAutoCompletion();
-            }
-          }}
-          onEnded={handleEnded}
-          className={containerClass}
-        />
-        {error && <p className="text-xs font-medium text-error">{error}</p>}
-      </div>
-    );
-  }
-
-  // Provider branch 3: External HTML5 video URL
+  // Provider branch 2: External HTML5 video URL
   if ((provider === "external" || resolvedVideoUrl) && resolvedVideoUrl) {
     return (
       <div className="space-y-2">

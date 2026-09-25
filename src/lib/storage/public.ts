@@ -41,7 +41,15 @@ export function getPublicCdnBase(): string {
 }
 
 /**
- * Resolves the public CDN URL for an asset key.
+ * Resolves the public URL for an asset reference.
+ *
+ * The app is link-only: teachers host media elsewhere (YouTube, an image
+ * host) and store the resulting HTTPS URL. Any value that is already an
+ * absolute http(s) URL is therefore returned verbatim — it is never prefixed
+ * with the CDN base, which would corrupt it.
+ *
+ * Plain relative keys are still resolved against the CDN base for backwards
+ * compatibility with rows written before the link-only model.
  *
  * For image assets with a requested variant ('webp-480', 'webp-720', 'webp-1080'),
  * generates the Cloudflare Image Resizing URL (/cdn-cgi/image/format=webp,width=...).
@@ -52,6 +60,14 @@ export function getPublicCdnBase(): string {
 export function publicUrl(key: string, options?: PublicUrlOptions): string {
   if (!key) return "";
   const cleanKey = key.replace(/^\/+/, "").trim();
+
+  // Link-only passthrough: an absolute http(s) URL is already its own public
+  // location. `data:`/`javascript:` deliberately do not qualify — they are
+  // rejected at input validation and must never be echoed into `src`/`href`.
+  if (/^https?:\/\/\S+$/i.test(cleanKey)) {
+    return cleanKey;
+  }
+
   const base = getPublicCdnBase();
   const variant = options?.variant || "original";
 

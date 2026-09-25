@@ -9,7 +9,7 @@ import {
   type YouTubeValidationResult,
 } from "@/lib/video/youtube";
 
-export type VideoProviderType = "youtube" | "r2_hls" | "external";
+export type VideoProviderType = "youtube" | "external";
 
 export interface VideoChangePayload {
   videoProvider: VideoProviderType;
@@ -24,7 +24,6 @@ export interface LessonVideoEditorProps {
   initialProvider?: VideoProviderType;
   initialVideoUrl?: string | null;
   initialYoutubeVideoId?: string | null;
-  initialVideoAssetId?: string | null;
   initialThumbnailKey?: string | null;
   initialDurationS?: number | null;
   onVideoChange?: (data: VideoChangePayload) => void;
@@ -33,7 +32,6 @@ export interface LessonVideoEditorProps {
 }
 
 const DEBOUNCE_DELAY_MS = 400;
-const MAX_VIDEO_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
 const MAX_THUMBNAIL_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 const CDN_BASE_DOMAIN = "https://cdn.insidejibon.com.bd";
 
@@ -54,7 +52,6 @@ export function LessonVideoEditor({
   initialProvider = "youtube",
   initialVideoUrl = "",
   initialYoutubeVideoId = null,
-  initialVideoAssetId = null,
   initialThumbnailKey = null,
   initialDurationS = null,
   onVideoChange,
@@ -63,7 +60,7 @@ export function LessonVideoEditor({
 }: LessonVideoEditorProps) {
   const { t } = useTranslations();
 
-  // Tab State: "youtube" | "r2_hls" | "external"
+  // Tab State: "youtube" | "external"
   const [activeTab, setActiveTab] = useState<VideoProviderType>(() => {
     if (initialProvider) return initialProvider;
     if (initialVideoUrl && !extractYouTubeVideoId(initialVideoUrl)) {
@@ -98,15 +95,6 @@ export function LessonVideoEditor({
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
   const [titleApplied, setTitleApplied] = useState(false);
 
-  // Self-Hosted R2 HLS State
-  const [hlsFile, setHlsFile] = useState<File | null>(null);
-  const [hlsUploadProgress, setHlsUploadProgress] = useState<number>(0);
-  const [isHlsUploading, setIsHlsUploading] = useState(false);
-  const [hlsUploadSuccess, setHlsUploadSuccess] = useState(false);
-  const [hlsError, setHlsError] = useState<string | null>(null);
-  const [videoAssetId, setVideoAssetId] = useState<string | null>(initialVideoAssetId);
-  const uploadTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   // External Video State
   const [externalUrl, setExternalUrl] = useState<string>(
     initialProvider === "external" ? (initialVideoUrl ?? "") : ""
@@ -133,7 +121,6 @@ export function LessonVideoEditor({
       const provider = overrides.videoProvider ?? activeTab;
       let yId: string | null = null;
       let url: string | null = null;
-      let assetId: string | null = null;
 
       if (provider === "youtube") {
         yId = overrides.youtubeVideoId !== undefined
@@ -142,19 +129,9 @@ export function LessonVideoEditor({
         url = overrides.videoUrl !== undefined
           ? overrides.videoUrl
           : (yId ? `https://www.youtube.com/watch?v=${yId}` : null);
-        assetId = null;
-      } else if (provider === "r2_hls") {
-        assetId = overrides.videoAssetId !== undefined
-          ? overrides.videoAssetId
-          : videoAssetId;
-        url = overrides.videoUrl !== undefined
-          ? overrides.videoUrl
-          : (assetId ? `${CDN_BASE_DOMAIN}/${assetId}` : null);
-        yId = null;
-      } else if (provider === "external") {
+      } else {
         url = overrides.videoUrl !== undefined ? overrides.videoUrl : externalUrl;
         yId = null;
-        assetId = null;
       }
 
       const activeThumbKey = overrides.videoThumbnailKey !== undefined
@@ -165,7 +142,8 @@ export function LessonVideoEditor({
         videoProvider: provider,
         youtubeVideoId: yId,
         videoUrl: url,
-        videoAssetId: assetId,
+        // Always null: the app is link-only and no longer self-hosts media.
+        videoAssetId: null,
         videoThumbnailKey: activeThumbKey,
         videoDurationS: overrides.videoDurationS ?? initialDurationS,
       });
@@ -175,7 +153,6 @@ export function LessonVideoEditor({
       activeTab,
       preview,
       youtubeInput,
-      videoAssetId,
       externalUrl,
       thumbnailSource,
       thumbnailKey,
@@ -283,7 +260,6 @@ export function LessonVideoEditor({
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      if (uploadTimerRef.current) clearInterval(uploadTimerRef.current);
     };
   }, []);
 
@@ -296,92 +272,11 @@ export function LessonVideoEditor({
     }
   };
 
-  // Switch Tabs with Confirmation if Unsaved Upload Exists (F18-B5)
+  // Switch Tabs
   const handleTabSwitch = (tab: VideoProviderType) => {
     if (tab === activeTab) return;
-
-    if (isHlsUploading || (hlsFile && !hlsUploadSuccess)) {
-      const confirmSwitch = window.confirm(
-        t("teacher.builder.remove_video_confirm") ||
-          "You have an incomplete or unsaved video upload. Switch tab and discard?"
-      );
-      if (!confirmSwitch) return;
-
-      // Abort upload (F18-B3)
-      if (uploadTimerRef.current) {
-        clearInterval(uploadTimerRef.current);
-        uploadTimerRef.current = null;
-      }
-      setIsHlsUploading(false);
-      setHlsFile(null);
-      setHlsUploadProgress(0);
-    }
-
     setActiveTab(tab);
     notifyChange({ videoProvider: tab });
-  };
-
-  // R2 HLS File Selection Handler
-  const handleFileSelection = (file: File) => {
-    setHlsError(null);
-    setHlsUploadSuccess(false);
-    setHlsUploadProgress(0);
-
-    // Validate video MIME / extension (F18-B1)
-    const validVideoPattern = /\.(mp4|mov|mkv|webm)$/i;
-    if (!validVideoPattern.test(file.name) && !file.type.startsWith("video/")) {
-      setHlsError(t("learning.upload.maxSizeNotice"));
-      return;
-    }
-
-    // Validate size (F18-B2)
-    if (file.size > MAX_VIDEO_SIZE_BYTES) {
-      setHlsError(t("learning.upload.maxSizeNotice"));
-      return;
-    }
-
-    setHlsFile(file);
-    startHlsUpload(file);
-  };
-
-  // Multipart R2 Upload Simulation with Real State Tracking
-  const startHlsUpload = (file: File) => {
-    setIsHlsUploading(true);
-    setHlsUploadProgress(5);
-    setHlsError(null);
-
-    const assetKey = `videos/lessons/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}/master.m3u8`;
-
-    let progress = 5;
-    if (uploadTimerRef.current) clearInterval(uploadTimerRef.current);
-
-    uploadTimerRef.current = setInterval(() => {
-      progress += Math.floor(Math.random() * 15) + 10;
-      if (progress >= 100) {
-        progress = 100;
-        if (uploadTimerRef.current) clearInterval(uploadTimerRef.current);
-        setIsHlsUploading(false);
-        setHlsUploadSuccess(true);
-        setVideoAssetId(assetKey);
-        notifyChange({
-          videoProvider: "r2_hls",
-          videoAssetId: assetKey,
-          videoUrl: `${CDN_BASE_DOMAIN}/${assetKey}`,
-        });
-      }
-      setHlsUploadProgress(progress);
-    }, 200);
-  };
-
-  // Abort R2 Upload (F18-B3)
-  const handleAbortUpload = () => {
-    if (uploadTimerRef.current) {
-      clearInterval(uploadTimerRef.current);
-      uploadTimerRef.current = null;
-    }
-    setIsHlsUploading(false);
-    setHlsUploadProgress(0);
-    setHlsFile(null);
   };
 
   // Custom Thumbnail Upload Handler
@@ -461,22 +356,6 @@ export function LessonVideoEditor({
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
             </svg>
             <span>{t("learning.upload.youtube_tab")}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabSwitch("r2_hls")}
-            disabled={disabled}
-            className={`flex items-center justify-center gap-2 rounded-md py-2 px-3 text-xs font-semibold transition-all ${
-              activeTab === "r2_hls"
-                ? "bg-surface-container-lowest text-primary shadow-xs border border-outline-variant"
-                : "text-secondary hover:text-on-surface hover:bg-surface-container-lowest/50"
-            }`}
-          >
-            <svg className="h-3.5 w-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            <span>{t("learning.upload.hls_tab")}</span>
           </button>
 
           <button
@@ -624,122 +503,6 @@ export function LessonVideoEditor({
         </div>
       )}
 
-      {/* TAB 2: SELF-HOSTED R2 HLS OPT-IN FLOW */}
-      {activeTab === "r2_hls" && (
-        <div className="space-y-4">
-          {/* Guidance Banner */}
-          <div className="rounded-lg border border-secondary/20 bg-surface-container-low p-3.5 text-xs text-on-surface space-y-1.5">
-            <div className="flex items-center gap-2 font-semibold text-on-surface">
-              <svg className="h-4 w-4 shrink-0 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-              <span>{t("teacher.builder.hls_fallback_advice")}</span>
-            </div>
-            <p className="text-secondary leading-relaxed pl-6">
-              {t("teacher.builder.hlsUploadDesc")}
-            </p>
-          </div>
-
-          {/* Upload Dropzone */}
-          <div
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              if (disabled || isHlsUploading) return;
-              const file = e.dataTransfer.files?.[0];
-              if (file) handleFileSelection(file);
-            }}
-            className="rounded-xl border-2 border-dashed border-outline-variant/80 hover:border-primary/60 bg-surface-container-lowest/50 p-6 text-center transition-colors"
-          >
-            <div className="mx-auto flex max-w-xs flex-col items-center justify-center space-y-2">
-              <div className="rounded-full bg-primary/10 p-3 text-primary">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-              </div>
-
-              <p className="text-xs font-semibold text-on-surface">
-                {t("learning.upload.drag_video_dropzone")}
-              </p>
-              <p className="text-[11px] text-secondary">
-                {t("learning.upload.maxSizeNotice")}
-              </p>
-
-              <label className="inline-flex cursor-pointer items-center rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container">
-                <span>{t("learning.upload.selectVideo")}</span>
-                <input
-                  type="file"
-                  accept=".mp4,.mov,.mkv,.webm"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileSelection(file);
-                  }}
-                  disabled={disabled || isHlsUploading}
-                  className="sr-only"
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Upload Progress Bar (F18-4) */}
-          {isHlsUploading && (
-            <div className="rounded-lg border border-outline-variant bg-surface-container-low p-4 space-y-2">
-              <div className="flex items-center justify-between text-xs font-medium text-on-surface">
-                <span>{t("learning.upload.uploading_progress", { percent: hlsUploadProgress })}</span>
-                <button
-                  type="button"
-                  onClick={handleAbortUpload}
-                  className="text-error hover:underline text-xs"
-                >
-                  {t("common.cancel")}
-                </button>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-outline-variant/40">
-                <div
-                  className="h-full bg-primary transition-all duration-200"
-                  style={{ width: `${hlsUploadProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Success Status */}
-          {hlsUploadSuccess && (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-3.5 text-xs text-emerald-800 space-y-1">
-              <div className="flex items-center gap-2 font-semibold">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>{t("learning.upload.upload_success")}</span>
-              </div>
-              <p className="text-secondary pl-6">
-                {t("teacher.builder.hlsProcessing")}
-              </p>
-              {videoAssetId && (
-                <p className="text-[11px] font-mono text-secondary pl-6">
-                  Key: {videoAssetId}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Error & Retry (F18-B4) */}
-          {hlsError && (
-            <div className="rounded-lg border border-error/30 bg-error-container/20 p-3 text-xs text-error font-medium flex items-center justify-between">
-              <span>{hlsError}</span>
-              {hlsFile && (
-                <button
-                  type="button"
-                  onClick={() => startHlsUpload(hlsFile)}
-                  className="rounded bg-error px-2 py-1 text-white hover:bg-error/80 text-[11px]"
-                >
-                  {t("common.actions.retry")}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* TAB 3: EXTERNAL DIRECT VIDEO (LEGACY) */}
       {activeTab === "external" && (

@@ -26,8 +26,13 @@
   //   wrangler queues create insidejibon-csv-exports
   //   wrangler vectorize create lessons_v1 --dimensions=384 --metric=cosine
   //
-  // R2 is the one exception: this account has no R2 subscription yet, so
-  // PUBLIC_BUCKET is not declared — see the r2_buckets block below.
+  // Object storage: NONE. This Cloudflare account has no R2 subscription
+  // (API code 10042 "Please enable R2 through the Cloudflare Dashboard") and
+  // the app is link-only by design — media lives on YouTube or an external
+  // host and the database stores plain HTTPS URLs. No `r2_buckets` block is
+  // declared, so `getMaterialsBucket()` / `getPublicBucket()` return null and
+  // the R2-backed paths in src/lib/storage degrade to StorageUnavailableError
+  // instead of pointing at a bucket that does not exist.
   // ---------------------------------------------------------------------------
   "kv_namespaces": [
     { "binding": "RATE_LIMIT_KV",    "id": "0b7161d21d2f41c6a5f2043aae69fd4d" },
@@ -47,28 +52,6 @@
       { "binding": "EXPORT_QUEUE",        "queue": "insidejibon-csv-exports" }
     ]
   },
-  "r2_buckets": [
-    {
-      "binding": "MATERIALS_BUCKET",
-      "bucket_name": "insidejibon-materials"
-    }
-    // PUBLIC_BUCKET is intentionally NOT declared: this Cloudflare account
-    // has no R2 subscription yet (`wrangler r2 bucket list` fails with API
-    // code 10042 "Please enable R2 through the Cloudflare Dashboard"), and
-    // wrangler hard-fails a deploy when a *newly added* r2_bucket binding
-    // cannot be resolved. Until R2 is enabled and `insidejibon-public` is
-    // created, public-asset uploads degrade to StorageUnavailableError at
-    // runtime (see src/lib/storage/public.ts) instead of blocking deploys.
-    //
-    // To re-enable:
-    //   1. Enable R2 in the Cloudflare dashboard for account
-    //      d02c23a9fea237c9db99e911edc0553e.
-    //   2. wrangler r2 bucket create insidejibon-public
-    //   3. Uncomment the binding below and set PUBLIC_BUCKET_PUBLIC_URL /
-    //      NEXT_PUBLIC_PUBLIC_BUCKET_URL to the bucket's public origin.
-    // { "binding": "PUBLIC_BUCKET", "bucket_name": "insidejibon-public" }
-  ],
-
   // ---------------------------------------------------------------------------
   // R3 remaster: live-class Durable Object (one instance per session).
   //

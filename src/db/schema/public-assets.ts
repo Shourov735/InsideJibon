@@ -20,7 +20,11 @@ export type PublicAssetOwnerKind = (typeof PUBLIC_ASSET_OWNER_KINDS)[number];
 
 /**
  * Public assets audit and catalog table.
- * Every object placed in the unauthenticated PUBLIC_BUCKET must be registered here.
+ *
+ * Historical: rows were registered for every object placed in an
+ * unauthenticated R2 bucket. The app is now link-only and no object storage
+ * is bound, so no new rows are written — external media is referenced by the
+ * plain HTTPS URL stored on the owning row (e.g. lessons.video_thumbnail_key).
  */
 export const publicAssets = pgTable(
   "public_assets",

@@ -15,10 +15,12 @@ export type {
 /**
  * Valid video backend providers.
  * - 'youtube': Default $0-cost Unlisted YouTube embed via youtube-nocookie.com
- * - 'r2_hls': Opt-in fallback self-hosted HLS via Cloudflare R2 and hls.js
- * - 'external': Legacy/direct video URL fallback
+ * - 'external': Direct HTTPS video URL fallback
+ *
+ * There is deliberately no self-hosted HLS provider: video is either YouTube
+ * or an external URL, so the app never needs object storage.
  */
-export const VIDEO_PROVIDERS = ["youtube", "r2_hls", "external"] as const;
+export const VIDEO_PROVIDERS = ["youtube", "external"] as const;
 export type VideoProvider = (typeof VIDEO_PROVIDERS)[number];
 
 /**
@@ -52,15 +54,6 @@ export interface YouTubeVideoDescriptor extends BaseVideoDescriptor {
 }
 
 /**
- * Self-hosted R2 HLS playback descriptor.
- */
-export interface R2HlsVideoDescriptor extends BaseVideoDescriptor {
-  provider: "r2_hls";
-  manifestUrl: string;
-  renditions?: VideoRendition[];
-}
-
-/**
  * Direct external video playback descriptor.
  */
 export interface ExternalVideoDescriptor extends BaseVideoDescriptor {
@@ -74,7 +67,6 @@ export interface ExternalVideoDescriptor extends BaseVideoDescriptor {
  */
 export type DiscriminatedVideoDescriptor =
   | YouTubeVideoDescriptor
-  | R2HlsVideoDescriptor
   | ExternalVideoDescriptor;
 
 /**
@@ -84,7 +76,6 @@ export type DiscriminatedVideoDescriptor =
 export interface VideoDescriptor {
   provider: VideoProvider;
   videoId?: string;
-  manifestUrl?: string;
   videoUrl?: string;
   url?: string;
   durationS?: number | null;

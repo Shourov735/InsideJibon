@@ -24,7 +24,6 @@ export interface VideoDescriptor {
   provider: VideoProvider;
   videoId?: string;
   youtubeVideoId?: string | null;
-  manifestUrl?: string;
   videoUrl?: string | null;
   url?: string | null;
   durationS?: number | null;
@@ -68,7 +67,6 @@ export interface LessonVideoResponse {
   provider?: VideoProvider;
   videoId?: string;
   youtubeVideoId?: string | null;
-  manifestUrl?: string;
   videoUrl?: string | null;
   url?: string | null;
   durationS?: number | null;
@@ -166,12 +164,8 @@ export async function setLessonVideo(
     youtubeCaptionLang = input.captionLang ?? input.youtubeCaptionLang ?? null;
     videoAssetId = input.videoAssetId ?? null;
     videoUrl = input.externalUrl ?? input.videoUrl ?? null;
-  } else if (provider === "r2_hls") {
-    videoAssetId = input.videoAssetId ?? null;
-    youtubeVideoId = null;
-    youtubeCaptionLang = null;
-    videoUrl = null;
-  } else if (provider === "external") {
+  } else {
+    // "external": a direct HTTPS URL supplied by the teacher.
     videoUrl = input.externalUrl ?? input.videoUrl ?? null;
     youtubeVideoId = null;
     youtubeCaptionLang = null;
@@ -267,18 +261,6 @@ export async function getLessonVideoForStudent(
       renditions: row.lesson.videoRenditions ?? [],
       videoRenditions: row.lesson.videoRenditions ?? [],
       url: null,
-    };
-  } else if (provider === "r2_hls" && row.lesson.videoAssetId) {
-    const manifest = publicUrl(row.lesson.videoAssetId);
-    videoDescriptor = {
-      provider: "r2_hls",
-      manifestUrl: manifest,
-      url: manifest,
-      durationS: row.lesson.videoDurationS,
-      videoDurationS: row.lesson.videoDurationS,
-      thumbnailUrl,
-      renditions: row.lesson.videoRenditions ?? [],
-      videoRenditions: row.lesson.videoRenditions ?? [],
     };
   } else if (provider === "external" && row.lesson.videoUrl) {
     videoDescriptor = {

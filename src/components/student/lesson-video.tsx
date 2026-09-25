@@ -14,7 +14,6 @@ export interface LessonVideoProps {
   video?: AnyVideoDescriptor | null;
   videoProvider?: VideoProvider | null;
   youtubeVideoId?: string | null;
-  videoAssetId?: string | null;
   videoUrl?: string | null;
   initialPosition?: number | null;
   autoPlay?: boolean;
@@ -33,7 +32,6 @@ export function LessonVideo({
   video,
   videoProvider,
   youtubeVideoId,
-  videoAssetId,
   videoUrl,
   initialPosition,
   autoPlay,
@@ -49,7 +47,6 @@ export function LessonVideo({
       video={resolvedVideo}
       videoProvider={videoProvider}
       youtubeVideoId={youtubeVideoId}
-      manifestUrl={videoAssetId}
       videoUrl={videoUrl}
       initialPosition={initialPosition}
       autoPlay={autoPlay}

@@ -241,7 +241,6 @@ export default async function LearnPage({
                 descriptor={videoData?.video ?? null}
                 videoProvider={videoData?.provider ?? (lesson.lesson.videoUrl ? "external" : "youtube")}
                 youtubeVideoId={videoData?.youtubeVideoId}
-                videoAssetId={videoData?.video?.manifestUrl}
                 videoUrl={videoData?.videoUrl ?? lesson.lesson.videoUrl}
                 initialPosition={lesson.progress?.lastPosition ?? null}
               />

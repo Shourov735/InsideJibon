@@ -121,9 +121,9 @@ export function chunkCaptions(
 }
 
 /**
- * Chunk plain text (used for the r2_hls fallback path: lesson content +
- * material excerpts). We split on sentence boundaries when possible to
- * keep chunks semantically coherent. startSec/endSec are null.
+ * Chunk plain text (used by the lesson_text and material fallback paths:
+ * lesson content + material excerpts). We split on sentence boundaries when
+ * possible to keep chunks semantically coherent. startSec/endSec are null.
  */
 export function chunkText(
   text: string,

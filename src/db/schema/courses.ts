@@ -89,7 +89,7 @@ export const courseModules = pgTable(
   ]
 );
 
-export const VIDEO_PROVIDERS = ["youtube", "r2_hls", "external"] as const;
+export const VIDEO_PROVIDERS = ["youtube", "external"] as const;
 export type VideoProvider = (typeof VIDEO_PROVIDERS)[number];
 
 export interface VideoRendition {
@@ -115,20 +115,20 @@ export const lessons = pgTable(
     position: integer("position").notNull().default(1),
     isFree: boolean("is_free").notNull().default(false),
 
-    // --- Remaster Phase R2: Video provider & asset references ---
-    /** 'youtube' (default, $0) | 'r2_hls' (opt-in fallback) | 'external' (legacy) */
+    // --- Video provider & asset references (link-only: no object storage) ---
+    /** 'youtube' (default, $0) | 'external' (direct HTTPS video URL) */
     videoProvider: text("video_provider").notNull().default("youtube"),
     /** Canonical 11-char YouTube ID (e.g. 'dQw4w9WgXcQ') */
     youtubeVideoId: text("youtube_video_id"),
     /** Auto-caption language code ('en' | 'bn' | null) for accessibility and R8 AI tutor */
     youtubeCaptionLang: text("youtube_caption_lang"),
-    /** R2 manifest key when provider='r2_hls' (e.g. 'videos/<lessonId>/master.m3u8') */
+    /** Unused in the link-only model; kept for backwards compatibility with pre-R2 rows. */
     videoAssetId: text("video_asset_id"),
     /** Video duration in seconds */
     videoDurationS: integer("video_duration_s"),
-    /** R2 storage key for custom thumbnail in PUBLIC_BUCKET */
+    /** External thumbnail URL, or a legacy R2 storage key resolved against the CDN base */
     videoThumbnailKey: text("video_thumbnail_key"),
-    /** HLS rendition metadata array (only populated for r2_hls) */
+    /** HLS rendition metadata array (legacy; always empty in the link-only model) */
     videoRenditions: jsonb("video_renditions")
       .$type<VideoRendition[]>()
       .notNull()

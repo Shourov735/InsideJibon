@@ -99,8 +99,8 @@ export type NewAiTutorMessage = typeof aiTutorMessages.$inferInsert;
 // ---------------------------------------------------------------------------
 // lesson_chunks — chunked text + Vectorize pointer for every indexed lesson.
 // Idempotent on (lesson_id, chunk_index). Source = youtube_caption by
-// default; r2_hls lessons use lesson_text. The Vectorize id is `${lesson_id}
-// :${chunk_index}` so reindex is a stable upsert.
+// default; lessons without captions use lesson_text. The Vectorize id is
+// `${lesson_id}:${chunk_index}` so reindex is a stable upsert.
 // ---------------------------------------------------------------------------
 
 export const lessonChunks = pgTable(

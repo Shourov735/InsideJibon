@@ -128,13 +128,12 @@ export type ServerMessage =
 
 export type ClassroomEnv = {
   CLASSROOM_TICKET_SECRET?: string;
-  // Bound via wrangler.jsonc — Workers Analytics + R2 + queue producers
-  // are not directly used inside the DO, but are listed here for typing.
+  // Bound via wrangler.jsonc — Workers Analytics + queue producers are not
+  // directly used inside the DO, but are listed here for typing. There are
+  // deliberately no R2 bindings: the app is link-only and has no bucket.
   NOTIFICATIONS_QUEUE?: { send(message: unknown): Promise<void> };
   AI?: unknown;
   VECTORIZE?: unknown;
-  MATERIALS_BUCKET?: unknown;
-  PUBLIC_BUCKET?: unknown;
   RATE_LIMIT_KV?: unknown;
   SESSION_KV?: unknown;
   FEATURE_FLAGS_KV?: unknown;
