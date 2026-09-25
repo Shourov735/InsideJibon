@@ -34,6 +34,12 @@ const envSchema = z.object({
   // Operator-tunable contact for VAPID `sub:` (mailto or https). Many push
   // services reject dispatches without a `sub:` claim.
   VAPID_SUBJECT: z.string().optional(),
+
+  // --- R3 Live Class (Durable Object + YouTube Live) ---
+  // Shared HMAC secret used by the Worker to sign short-lived WS
+  // tickets. The DO verifies with the same secret via its env binding.
+  // Operator action: `wrangler secret put CLASSROOM_TICKET_SECRET`.
+  CLASSROOM_TICKET_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

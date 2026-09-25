@@ -1,25 +1,36 @@
 import { NextResponse } from "next/server";
 
 import { refillTick } from "@/services/gamification";
+import { emitClassReminders } from "@/services/classes";
 
 /**
- * R5 Cron Trigger — energy / lives refill tick.
+ * R5 / R3 Cron Trigger — energy / lives refill tick + class reminder
+ * fan-out. Fires every 5 minutes via `wrangler.jsonc`'s `triggers.crons`.
  *
- * Fires every 5 minutes via `wrangler.jsonc`'s `triggers.crons`. Grants
- * +1 energy to every user whose `next_refill_at` has elapsed (capped at
- * `max_energy`), and pushes `next_refill_at` forward by 30 minutes.
+ * Two unrelated jobs share the slot because Cloudflare's Free plan is
+ * capped at 5 Cron Triggers per Worker (R9 fills the fifth slot).
  *
- * Idempotent under concurrent ticks: the conditional UPDATE keyed on
- * `next_refill_at < now` ensures each row is credited at most once per
- * tick.
+ *   1. `refillTick()` — credits +1 energy to every user whose
+ *      `next_refill_at` has elapsed (capped at `max_energy`).
+ *
+ *   2. `emitClassReminders()` — emits a one-shot `class.reminder`
+ *      notification per `class_sessions` row whose lobby has opened
+ *      and whose `scheduled_at` falls within the next 15 minutes. The
+ *      `class_reminder_sent_at` column guarantees no duplicate
+ *      notifications across consecutive ticks.
+ *
+ * Both functions are idempotent under concurrent ticks.
  */
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const updated = await refillTick();
+    const [credited, reminders] = await Promise.all([
+      refillTick(),
+      emitClassReminders(15),
+    ]);
     return NextResponse.json(
-      { ok: true, credited: updated },
+      { ok: true, credited, reminders },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {

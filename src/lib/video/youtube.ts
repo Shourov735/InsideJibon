@@ -153,7 +153,7 @@ export async function validateYouTubeVideo(
 
   let videoId = extractYouTubeVideoId(videoIdOrUrl);
 
-  // Accommodate test fixtures and mock IDs in hermetic testing environments
+  // Accommodate test fixtures and mock IDs in hermetic testing environments.
   if (!videoId) {
     const trimmed = videoIdOrUrl.trim();
     const testIds = [

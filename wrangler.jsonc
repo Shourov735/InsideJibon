@@ -62,6 +62,29 @@
   ],
 
   // ---------------------------------------------------------------------------
+  // R3 remaster: live-class Durable Object (one instance per session).
+//   We declare `CLASSROOM_ROOM` here, wired up by scripts/build-classroom-room.mjs
+//   which bundles `src/durable-objects/classroom-room.ts` into the Worker.
+//   The `migrations` block is what tells Cloudflare to back the DO with
+//   SQLite — required for the rolling chat buffer in §3.2.
+//
+// Operator action:
+//   1. `wrangler durable-objects:CLASSROOM_ROOM` does not require a
+//      pre-created class id when the binding points at the class
+//      declared in the same `durable_objects` block; the migration
+//      applies on the next deploy.
+//   2. `wrangler secret put CLASSROOM_TICKET_SECRET` — the HMAC key used
+//      by `src/lib/live-ticket.ts` to sign short-lived WS tickets.
+// ---------------------------------------------------------------------------
+"durable_objects": {
+  "bindings": [
+    { "name": "CLASSROOM_ROOM", "class_name": "ClassroomRoom" }
+  ]
+},
+"migrations": [
+  { "tag": "v1", "new_sqlite_classes": ["ClassroomRoom"] }
+],
+// ---------------------------------------------------------------------------
   // R4 remaster: weekly leaderboard cron.
   // R5 remaster: streak-freeze (Mon 00:00), weekly-leagues (Sun 23:59),
   // energy-refill tick (every 5 min).

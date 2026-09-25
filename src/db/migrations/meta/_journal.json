@@ -120,6 +120,20 @@
       "when": 1790330402127,
       "tag": "0016_remaster_r2_video",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790400000000,
+      "tag": "0018_remaster_r3_live_class",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790500000000,
+      "tag": "0019_remaster_r3_live_class_reminder",
+      "breakpoints": true
     }
   ]
 }
