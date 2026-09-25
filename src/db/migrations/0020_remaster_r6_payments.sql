@@ -152,8 +152,11 @@ CREATE INDEX IF NOT EXISTS "payment_submissions_status_idx" ON "payment_submissi
 CREATE INDEX IF NOT EXISTS "payment_submissions_scope_idx" ON "payment_submissions" USING btree ("scope_kind","scope_id");
 --> statement-breakpoint
 -- Anti-spam: one submission per (user, scope) per 10 minutes.
+-- date_bin() is IMMUTABLE; extract(epoch from <timestamptz>) is only STABLE and
+-- Postgres refuses to build an index on it, so the original extract/floor form
+-- could never be created.
 CREATE UNIQUE INDEX IF NOT EXISTS "payment_submissions_dedupe_idx"
-  ON "payment_submissions" ("user_id","scope_kind","scope_id", (floor(extract(epoch FROM "created_at") / 600)));
+  ON "payment_submissions" ("user_id","scope_kind","scope_id", date_bin(interval '600 seconds', "created_at", timestamptz 'epoch'));
 --> statement-breakpoint
 
 -- ---------------------------------------------------------------------------

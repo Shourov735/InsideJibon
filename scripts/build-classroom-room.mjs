@@ -34,6 +34,15 @@ const workerEntry = path.join(root, ".open-next", "worker.js");
 const outDir = path.join(root, ".open-next", ".build", "durable-objects");
 const outFile = path.join(outDir, "classroom-room.js");
 
+// `server-only` / `client-only` are build-time-only guard modules: their
+// module body throws when the graph is treated as a client graph. A Durable
+// Object is neither — it is its own entrypoint — so bundling the real module
+// makes the deployed worker throw error 10021 at instantiation
+// ("This module cannot be imported from a Client Component module").
+// Stub them out for the DO bundle; the Next.js build keeps enforcing the
+// guards for every app route.
+const guardStub = path.join(outDir, "next-guard-stub.js");
+
 function ensureDoSourceExists() {
   if (!fs.existsSync(doSource)) {
     console.error(`[build-classroom-room] missing source: ${doSource}`);
@@ -53,6 +62,7 @@ function ensureWorkerEntryExists() {
 
 async function bundle() {
   fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(guardStub, "export {};\n", "utf8");
   await esbuild.build({
     entryPoints: [doSource],
     bundle: true,
@@ -64,8 +74,19 @@ async function bundle() {
     // node_modules. The DO class also imports from `@/lib/live-ticket`,
     // which only references `crypto.subtle` and `getEnv` (Worker-safe).
     external: ["cloudflare:workers"],
+    alias: {
+      "server-only": guardStub,
+      "client-only": guardStub,
+    },
     logLevel: "warning",
   });
+  if (fs.readFileSync(outFile, "utf8").includes("cannot be imported from a Client Component")) {
+    console.error(
+      "[build-classroom-room] bundle still contains the server-only guard throw — " +
+        "the alias did not apply. The deployed worker would fail with error 10021."
+    );
+    process.exit(3);
+  }
   console.log(`[build-classroom-room] bundled → ${path.relative(root, outFile)}`);
 }
 

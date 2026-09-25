@@ -13,12 +13,10 @@
   // ---------------------------------------------------------------------------
   // R0 remaster infra bindings.
   //
-  // The IDs below are PLACEHOLDERS. The Cloudflare operator must create the
-  // real KV namespaces and Queues once via the Wrangler CLI before deploying
-  // (or before this JSON becomes valid). Until then, `wrangler deploy` will
-  // fail with a "namespace not found" error pointing at the missing resource.
-  //
-  // Commands to run from the project root:
+  // The KV namespaces, Queues and the Vectorize index below were created on
+  // account d02c23a9fea237c9db99e911edc0553e with the commands documented in
+  // docs/FREE-TIER-REFERENCE.md §1, §2, §4, §5, §6 (Workers Free plan — no
+  // subscription involved):
   //
   //   wrangler kv namespace create insidejibon-rate-limit
   //   wrangler kv namespace create insidejibon-session
@@ -28,21 +26,20 @@
   //   wrangler queues create insidejibon-csv-exports
   //   wrangler vectorize create lessons_v1 --dimensions=384 --metric=cosine
   //
-  // Paste the returned IDs back into this file under the corresponding
-  // `id` field. No subscriptions are involved; everything is on the Workers
-  // Free plan (FREE-TIER-REFERENCE.md §1, §2, §4, §5, §6).
+  // R2 is the one exception: this account has no R2 subscription yet, so
+  // PUBLIC_BUCKET is not declared — see the r2_buckets block below.
   // ---------------------------------------------------------------------------
   "kv_namespaces": [
-    { "binding": "RATE_LIMIT_KV",    "id": "REPLACE_ME_rate_limit" },
-    { "binding": "SESSION_KV",       "id": "REPLACE_ME_session" },
-    { "binding": "FEATURE_FLAGS_KV", "id": "REPLACE_ME_feature_flags" }
+    { "binding": "RATE_LIMIT_KV",    "id": "0b7161d21d2f41c6a5f2043aae69fd4d" },
+    { "binding": "SESSION_KV",       "id": "73ca1cee7fd74bf8bc56fd00dac74614" },
+    { "binding": "FEATURE_FLAGS_KV", "id": "e33a6c1c85dc4c99862bc71e8945b4fe" }
   ],
   "ai": {
     "binding": "AI"
   },
-  "vectorize": {
-    "binding": "VECTORIZE"
-  },
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "lessons_v1" }
+  ],
   "queues": {
     "producers": [
       { "binding": "NOTIFICATIONS_QUEUE", "queue": "insidejibon-notifications" },
@@ -54,37 +51,52 @@
     {
       "binding": "MATERIALS_BUCKET",
       "bucket_name": "insidejibon-materials"
-    },
-    {
-      "binding": "PUBLIC_BUCKET",
-      "bucket_name": "insidejibon-public"
     }
+    // PUBLIC_BUCKET is intentionally NOT declared: this Cloudflare account
+    // has no R2 subscription yet (`wrangler r2 bucket list` fails with API
+    // code 10042 "Please enable R2 through the Cloudflare Dashboard"), and
+    // wrangler hard-fails a deploy when a *newly added* r2_bucket binding
+    // cannot be resolved. Until R2 is enabled and `insidejibon-public` is
+    // created, public-asset uploads degrade to StorageUnavailableError at
+    // runtime (see src/lib/storage/public.ts) instead of blocking deploys.
+    //
+    // To re-enable:
+    //   1. Enable R2 in the Cloudflare dashboard for account
+    //      d02c23a9fea237c9db99e911edc0553e.
+    //   2. wrangler r2 bucket create insidejibon-public
+    //   3. Uncomment the binding below and set PUBLIC_BUCKET_PUBLIC_URL /
+    //      NEXT_PUBLIC_PUBLIC_BUCKET_URL to the bucket's public origin.
+    // { "binding": "PUBLIC_BUCKET", "bucket_name": "insidejibon-public" }
   ],
 
   // ---------------------------------------------------------------------------
   // R3 remaster: live-class Durable Object (one instance per session).
-//   We declare `CLASSROOM_ROOM` here, wired up by scripts/build-classroom-room.mjs
-//   which bundles `src/durable-objects/classroom-room.ts` into the Worker.
-//   The `migrations` block is what tells Cloudflare to back the DO with
-//   SQLite — required for the rolling chat buffer in §3.2.
-//
-// Operator action:
-//   1. `wrangler durable-objects:CLASSROOM_ROOM` does not require a
-//      pre-created class id when the binding points at the class
-//      declared in the same `durable_objects` block; the migration
-//      applies on the next deploy.
-//   2. `wrangler secret put CLASSROOM_TICKET_SECRET` — the HMAC key used
-//      by `src/lib/live-ticket.ts` to sign short-lived WS tickets.
-// ---------------------------------------------------------------------------
-"durable_objects": {
-  "bindings": [
-    { "name": "CLASSROOM_ROOM", "class_name": "ClassroomRoom" }
-  ]
-},
-"migrations": [
-  { "tag": "v1", "new_sqlite_classes": ["ClassroomRoom"] }
-],
-// ---------------------------------------------------------------------------
+  //
+  //   We declare `CLASSROOM_ROOM` here, wired up by scripts/build-classroom-room.mjs
+  //   which bundles `src/durable-objects/classroom-room.ts` into the Worker.
+  //   The `migrations` block is what tells Cloudflare to back the DO with
+  //   SQLite — required for the rolling chat buffer in §3.2.
+  //
+  // IMPORTANT: OpenNext only compiles its three built-in Durable Objects, so
+  // the bundle/patch step in scripts/build-classroom-room.mjs MUST run after
+  // `opennextjs-cloudflare build` and before `wrangler deploy`, otherwise
+  // Wrangler deploys a worker whose `ClassroomRoom` export does not exist
+  // (it only warns, then every DO call fails at runtime). Use
+  // `npm run build:cf` / `npm run deploy`, or set OPEN_NEXT_DEPLOY=true when
+  // invoking `wrangler deploy` on an already-built tree.
+  //
+  // Secret: `wrangler secret put CLASSROOM_TICKET_SECRET` — the HMAC key used
+  // by `src/lib/live-ticket.ts` to sign short-lived WS tickets.
+  // ---------------------------------------------------------------------------
+  "durable_objects": {
+    "bindings": [
+      { "name": "CLASSROOM_ROOM", "class_name": "ClassroomRoom" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["ClassroomRoom"] }
+  ],
+  // ---------------------------------------------------------------------------
   // R4 remaster: weekly leaderboard cron.
   // R5 remaster: streak-freeze (Mon 00:00), weekly-leagues (Sun 23:59),
   // energy-refill tick (every 5 min).
@@ -92,10 +104,16 @@
   //
   // The Cron Trigger fires the matching route in src/app/api/cron/*:
   //   - 13 */2 * * *      leaderboard        (R4 — every 2 hours)
-  //   - 0  0  * * 1       streak-freezes     (R5 — Mon 00:00 UTC)
-  //   - 59 23 * * 0       weekly-leagues     (R5 — Sun 23:59 UTC)
+  //   - 0  0  * * 2       streak-freezes     (R5 — Mon 00:00 UTC)
+  //   - 59 23 * * 1       weekly-leagues     (R5 — Sun 23:59 UTC)
   //   - */5 * * * *       energy-refill      (R5 — every 5 min)
   //   - 0  3  * * *       proctor-purge      (R9 — daily 03:00 UTC)
+  //
+  // NOTE the day-of-week numbering: Cloudflare cron uses 1-7 where
+  // 1 = Sunday and 7 = Saturday — NOT the 0-6 convention of stock cron.
+  // `59 23 * * 0` is rejected by the API with "invalid cron string"
+  // (code 10100) and aborts the whole deploy, so Monday is 2 and Sunday 1.
+  // Three-letter abbreviations (`MON`, `SUN`) are unambiguous if you prefer.
   //
   // Cloudflare's Free plan allows 5 Cron Triggers per worker — R9 fills
   // the fifth slot. See docs/remaster-phase-9-pwa-proctoring.md §3.6.
@@ -103,8 +121,8 @@
   "triggers": {
     "crons": [
       "13 */2 * * *",
-      "0 0 * * 1",
-      "59 23 * * 0",
+      "0 0 * * 2",
+      "59 23 * * 1",
       "*/5 * * * *",
       "0 3 * * *"
     ]

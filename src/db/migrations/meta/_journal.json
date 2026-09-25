@@ -124,15 +124,29 @@
     {
       "idx": 17,
       "version": "7",
-      "when": 1790400000000,
-      "tag": "0018_remaster_r3_live_class",
+      "when": 1790337283460,
+      "tag": "0017_remaster_r10_i18n_legal",
       "breakpoints": true
     },
     {
       "idx": 18,
       "version": "7",
+      "when": 1790400000000,
+      "tag": "0018_remaster_r3_live_class",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
       "when": 1790500000000,
       "tag": "0019_remaster_r3_live_class_reminder",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790503600000,
+      "tag": "0020_remaster_r6_payments",
       "breakpoints": true
     }
   ]

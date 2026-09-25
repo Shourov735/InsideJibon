@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "check:i18n": "node scripts/check-i18n.mjs",
-    "preview": "opennextjs-cloudflare build && node scripts/build-classroom-room.mjs && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && node scripts/build-classroom-room.mjs && opennextjs-cloudflare deploy",
+    "build:cf": "opennextjs-cloudflare build && node scripts/build-classroom-room.mjs",
+    "preview": "npm run build:cf && wrangler dev",
+    "deploy": "npm run build:cf && npm run deploy:only",
+    "deploy:only": "node scripts/build-classroom-room.mjs && OPEN_NEXT_DEPLOY=true wrangler deploy",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "NODE_OPTIONS=--require=./scripts/node-net-fix.cjs drizzle-kit migrate",
@@ -22,7 +24,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "cmdk": "^1.1.1",
     "drizzle-orm": "^0.45.2",
-    "next": "16.3.1",
+    "next": "^16.3.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "^0.0.1",
@@ -35,11 +37,17 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9",
-    "eslint-config-next": "16.3.1",
+    "eslint-config-next": "16.3.6",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "wrangler": "^4.124.0"
+    "wrangler": "^4.140.0"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.4": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.28.1": true
   }
 }

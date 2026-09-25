@@ -101,16 +101,15 @@ async function recomputeActiveCourses(weekStart: Date) {
   const db = getDb();
   const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  // A course is "active" if it has at least one active enrollment
-  // touched in the last 30 days OR was updated in the last 30 days.
-  // This query joins enrollments -> courses with a HAVING clause on
-  // recent activity.
+  // A course is "active" if it was updated in the last 30 days, or created
+  // in the last 30 days. One row per course, so the per-course timestamp is
+  // just GREATEST of the two columns — no aggregate, hence no GROUP BY.
   const rows = await db
     .select({
       courseId: courses.id,
-      recent: sql<number>`GREATEST(
-        COALESCE(MAX(${courses.updatedAt}::timestamptz), 'epoch'::timestamptz),
-        COALESCE(MAX(${courses.createdAt}::timestamptz), 'epoch'::timestamptz)
+      recent: sql<string>`GREATEST(
+        ${courses.updatedAt}::timestamptz,
+        ${courses.createdAt}::timestamptz
       )`,
     })
     .from(courses)
@@ -118,7 +117,7 @@ async function recomputeActiveCourses(weekStart: Date) {
     .limit(ACTIVE_COURSE_LIMIT);
 
   const activeRows = rows
-    .filter((r) => new Date((r.recent as unknown as string | number | Date)) > cutoff)
+    .filter((r) => new Date(r.recent as unknown as string) > cutoff)
     .slice(0, ACTIVE_COURSE_LIMIT);
 
   let computed = 0;

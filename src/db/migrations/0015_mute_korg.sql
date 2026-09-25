@@ -81,7 +81,7 @@ ALTER TABLE "user_energy" ADD CONSTRAINT "user_energy_user_id_users_id_fk" FOREI
 CREATE INDEX "badge_progress_user_idx" ON "badge_progress" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "badge_progress_unlocked_idx" ON "badge_progress" USING btree ("unlocked_at");--> statement-breakpoint
 CREATE INDEX "league_members_week_league_rank_idx" ON "league_members" USING btree ("week_start","league","rank");--> statement-breakpoint
-CREATE INDEX "league_members_user_idx" ON "league_members" USING btree ("user_id");
+CREATE INDEX "league_members_user_idx" ON "league_members" USING btree ("user_id");--> statement-breakpoint
 
 -- ----------------------------------------------------------------------------
 -- R5 seeds. drizzle-kit does not generate INSERT statements; the spec requires

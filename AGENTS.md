@@ -67,7 +67,39 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - **Webhook discipline:** the Clerk webhook route must never 400 on permanent
   conditions (missing email, bad shape) — acknowledge with 200 to stop retries.
   All payloads are zod-validated.
-- **Deploy & Push Workflow:** after successfully implementing and verifying any feature, agents must commit and push all changes to GitHub (`git push`). Every push to `main` is automatically built and deployed by **Cloudflare Workers Builds Git integration** (repo `Shourov735/InsideJibon` connected to the `insidejibon` Worker; build command `npx opennextjs-cloudflare build`, deploy command `npx wrangler deploy`, `NODE_VERSION=22`). GitHub Actions is NOT used — do not re-add `.github/workflows`. Verify the build went green via the Workers Builds API/dashboard; if the integration is broken, fall back to `npm run deploy` locally and run the README smoke checklist.
+- **Deploy & Push Workflow:** after successfully implementing and verifying any feature, agents must commit and push all changes to GitHub (`git push`). Every push to `main` is automatically built and deployed by **Cloudflare Workers Builds Git integration** (repo `Shourov735/InsideJibon` connected to the `insidejibon` Worker, deploy command `npx wrangler deploy`, `NODE_VERSION=22`). GitHub Actions is NOT used — do not re-add `.github/workflows`. Verify the build went green via the Workers Builds dashboard; if the integration is broken, fall back to `npm run deploy` locally and run the README smoke checklist.
+
+  **The Workers Builds DEPLOY command MUST be `npm run deploy:only`.**
+  `npx wrangler deploy` is not safe in CI even when the build step is
+  correct: wrangler detects the OpenNext project, prints "OpenNext project
+  detected, calling `opennextjs-cloudflare deploy`" and **re-runs the whole
+  build**, regenerating `.open-next/worker.js` without the DO export. The
+  deploy then succeeds but every live-class Durable Object call throws at
+  runtime. `deploy:only` re-runs the (idempotent) DO patch and sets
+  `OPEN_NEXT_DEPLOY=true`, which is what suppresses the delegation.
+
+  **The BUILD command should be `npm run build:cf`**
+  (`opennextjs-cloudflare build && node scripts/build-classroom-room.mjs`).
+  OpenNext only compiles its three built-in Durable Objects, so a bare
+  `opennextjs-cloudflare build` never exports `ClassroomRoom` from
+  `.open-next/worker.js`. This is defence in depth — `deploy:only` patches
+  again — but it also makes build artifacts correct for `wrangler dev`.
+
+  Dashboard path: Workers → insidejibon → Builds → Build configuration.
+  Do not re-add `.github/workflows`. Locally use `npm run deploy`
+  (= `build:cf` + `deploy:only`); never chain a bare
+  `opennextjs-cloudflare build` with `wrangler deploy`.
+
+  **DB migrations are NOT applied by the deploy.** Pushing code whose
+  migrations have not run in Neon ships routes that 500 on missing tables.
+  Apply pending migrations before deploying the phase that needs them, and
+  confirm `select max(created_at) from drizzle.__drizzle_migrations` is
+  `>= ` the newest `when` in `meta/_journal.json` afterwards. As of
+  2026-09-26 production is at `0020` and fully tracked (21 rows).
+  Caveat: several hand-written migrations are not safely re-runnable
+  (`DROP INDEX` without `IF EXISTS`, unguarded `CREATE TYPE`), so
+  `drizzle-kit migrate` can only ever be trusted from a clean baseline —
+  a partially applied file must be driven statement by statement.
 
   **Push cadence:** do NOT push after every micro-commit. Batch commits within a single phase and push once at the end of the phase (or at a clearly large checkpoint that crosses a module boundary, e.g. a service-layer sweep). Frequent small pushes waste Workers Builds minutes and clutter the deploy history.
 

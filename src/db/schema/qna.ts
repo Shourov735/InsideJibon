@@ -10,6 +10,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 import { sql } from "drizzle-orm";
@@ -50,7 +51,7 @@ export type QaStatus = QaThread["status"];
 export const qaVotes = pgTable(
   "qa_votes",
   {
-    threadId: text("thread_id")
+    threadId: uuid("thread_id")
       .notNull()
       .references(() => lessonComments.id, { onDelete: "cascade" }),
     userId: text("user_id")

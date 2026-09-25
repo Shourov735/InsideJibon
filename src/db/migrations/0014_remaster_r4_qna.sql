@@ -8,7 +8,7 @@ CREATE TABLE "leaderboard_snapshots" (
 );
 --> statement-breakpoint
 CREATE TABLE "qa_votes" (
-	"thread_id" text NOT NULL,
+	"thread_id" uuid NOT NULL,
 	"user_id" text NOT NULL,
 	"value" smallint NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
