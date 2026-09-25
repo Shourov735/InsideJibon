@@ -26,6 +26,9 @@ const eslintConfig = defineConfig([
     ".open-next/**",
     ".wrangler/**",
     "scripts/*.cjs",
+    // E2E tests use Node test runner with .ts import suffixes; run via `node --test`
+    // outside the Next.js compilation/lint pipeline.
+    "tests/**",
   ]),
 ]);
 

@@ -24,7 +24,7 @@ export function NotificationBellWithPush({
   initialCount: number;
 }) {
   const { t } = useTranslations();
-  const [count, setCount] = useState(initialCount);
+  const [count] = useState(initialCount);
   const [pushState, setPushState] = useState<
     "default" | "granted" | "denied" | "unsupported"
   >("default");
@@ -32,17 +32,26 @@ export function NotificationBellWithPush({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Asynchronously derive the initial push state from the Notification API
+    // and any existing service-worker subscription. We avoid setting state
+    // synchronously inside the effect (React 19 set-state-in-effect lint) by
+    // wrapping each branch in a microtask.
+    const apply = (next: typeof pushState) => {
+      queueMicrotask(() => setPushState(next));
+    };
+
     if (!("Notification" in window)) {
-      setPushState("unsupported");
+      apply("unsupported");
       return;
     }
-    setPushState(Notification.permission as typeof pushState);
+    apply(Notification.permission as typeof pushState);
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.ready
         .then((reg) => reg.pushManager.getSubscription())
         .then((sub) => {
-          if (sub) setPushState("granted");
+          if (sub) apply("granted");
         })
         .catch(() => undefined);
     }

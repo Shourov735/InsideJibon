@@ -84,6 +84,9 @@ const P256_SPKI_PREFIX = new Uint8Array([
   0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00,
 ]);
 
+// Encode Uint8Array to URL-safe base64 (RFC 4648 §5). Kept for parity with
+// the helpers in vapid.ts; consumers should prefer the runtime `btoa`
+// bridge or `crypto.subtle` exports where available.
 function base64urlEncodeBytes(input: Uint8Array): string {
   let binary = "";
   for (let i = 0; i < input.length; i++) binary += String.fromCharCode(input[i]!);
@@ -93,6 +96,7 @@ function base64urlEncodeBytes(input: Uint8Array): string {
       : Buffer.from(binary, "binary").toString("base64");
   return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
+void base64urlEncodeBytes;
 
 function base64DecodeToBytes(input: string): Uint8Array<ArrayBuffer> {
   const padded = input + "=".repeat((4 - (input.length % 4)) % 4);

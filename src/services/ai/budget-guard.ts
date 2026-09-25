@@ -1,7 +1,6 @@
 import "server-only";
 
-import { getRateLimitKv, type KvNamespaceLike } from "@/lib/cloudflare/kv";
-import { getFeatureFlagsKv } from "@/lib/cloudflare/kv";
+import { type KvNamespaceLike, getFeatureFlagsKv } from "@/lib/cloudflare/kv";
 
 /**
  * R8 §5 — Free-tier Neurons daily guard.

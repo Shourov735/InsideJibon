@@ -340,11 +340,5 @@ function safeParse(text: string): GeneratedQuiz | null {
   }
 }
 
-function extractAssistantText(resp: unknown): string | null {
-  // Unused locally; kept for parity with tutor.ts shape.
-  void resp;
-  return null;
-}
-
 // Re-export safety helpers so consumers can import from one place if needed.
 export { assertAnswerInContext, isAllowedQuestion };

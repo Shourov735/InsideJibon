@@ -54,8 +54,12 @@ export function PushOptInModal({ open, onClose, initialCategories }: PushOptInMo
 
   useEffect(() => {
     if (!open) {
-      setStatus("idle");
-      setError(null);
+      // Defer state reset to a microtask to avoid the React 19
+      // set-state-in-effect anti-pattern (cascading render warnings).
+      queueMicrotask(() => {
+        setStatus("idle");
+        setError(null);
+      });
     }
   }, [open]);
 

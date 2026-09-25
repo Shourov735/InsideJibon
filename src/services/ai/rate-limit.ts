@@ -5,7 +5,6 @@ import { sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { aiTutorUsage } from "@/db/schema";
 import { rateLimit } from "@/services/security/rate-limit";
-import { RATE_LIMIT_CONFIG } from "@/lib/security/rate-limit-config";
 
 /**
  * R8 §3.5 step 2 + R8 §5 — AI tutor rate limit.

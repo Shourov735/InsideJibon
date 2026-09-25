@@ -3,7 +3,7 @@ import "server-only";
 import { sql, and, eq } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { lessonChunks, lessons, courseModules, courses } from "@/db/schema";
+import { lessonChunks, lessons, courseModules } from "@/db/schema";
 import { CaptionsUnavailableError, fetchYoutubeCaptions, extractYouTubeVideoId } from "./captions";
 import { chunkCaptions, chunkText, type Chunk } from "./chunking";
 import { embedChunks, upsertChunks } from "./embeddings";
@@ -170,12 +170,9 @@ async function persistAndEmbed(args: {
       )
     );
 
-  // Compute vector ids for the prior set so we can purge them.
-  const priorVectorIds = args.chunks.map(
-    (c) => `${args.lessonId}:${args.sourceKind}:${c.index}`
-  );
-  // We only know the CURRENT chunk indices; previous runs may have had
-  // more chunks. The deletion above already removed the rows, but the
+  // Compute vector ids for the prior set so we can purge them. We only
+  // know the CURRENT chunk indices; previous runs may have had more
+  // chunks. The deletion above already removed the rows, but the
   // Vectorize vectors persist. To purge safely we widen the id list —
   // ids beyond the current count are no-ops in Vectorize.deleteByIds.
   const maxIdx = Math.max(args.chunks.length - 1, 0);

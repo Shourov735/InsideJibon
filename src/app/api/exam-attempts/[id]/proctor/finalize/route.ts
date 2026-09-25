@@ -16,6 +16,8 @@ export async function POST(
   _request: Request,
   _context: { params: Promise<{ id: string }> }
 ) {
+  void _request;
+  void _context;
   await requireUser();
   // Concatenation is queued by R9 §3.6 via the notifications queue.
   // Today's stub: 204 No Content, marker recorded by the queue

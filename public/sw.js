@@ -141,7 +141,10 @@ async function networkFirst(req, cacheName) {
   const cache = await caches.open(cacheName);
   try {
     const res = await fetch(req);
-    if (res && res.ok) await cache.put(req, res.clone());
+    if (res && res.ok) {
+      await cache.put(req, res.clone());
+      await trimCache(cacheName, MAX_RUNTIME_ENTRIES);
+    }
     return res;
   } catch {
     const cached = await cache.match(req);
@@ -156,7 +159,10 @@ async function cacheFirst(req, cacheName) {
   if (cached) return cached;
   try {
     const res = await fetch(req);
-    if (res && res.ok) await cache.put(req, res.clone());
+    if (res && res.ok) {
+      await cache.put(req, res.clone());
+      await trimCache(cacheName, MAX_RUNTIME_ENTRIES);
+    }
     return res;
   } catch {
     return new Response("", { status: 504, statusText: "Offline" });

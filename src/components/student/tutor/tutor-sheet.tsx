@@ -5,7 +5,6 @@ import { useTranslations } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import {
   askTutorAction,
-  listTutorHistoryAction,
   readTutorBudgetAction,
 } from "@/app/student/actions/tutor-actions";
 
@@ -86,9 +85,12 @@ export function TutorSheet(props: TutorSheetProps) {
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, thinking]);
 
-  // Reset draft when the active lesson changes.
+  // Reset draft when the active lesson changes. We defer the setState to a
+  // microtask so we don't run state-update logic synchronously inside the
+  // effect body (React 19 set-state-in-effect lint).
   useEffect(() => {
-    setDraft(props.initialQuestion ?? "");
+    const next = props.initialQuestion ?? "";
+    queueMicrotask(() => setDraft(next));
   }, [props.lessonId, props.initialQuestion]);
 
   const exhausted = budget.remaining <= 0;

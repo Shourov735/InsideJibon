@@ -9,7 +9,6 @@ import {
   enrollments,
   courses,
   lessons,
-  courseModules,
 } from "@/db/schema";
 import { aiRun, vectorizeQuery, type VectorizeMatch } from "@/lib/cloudflare/ai";
 import { EMBEDDING_MODEL } from "./embeddings";
