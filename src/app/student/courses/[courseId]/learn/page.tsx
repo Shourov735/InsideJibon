@@ -9,7 +9,8 @@ import {
   getLessonForStudent,
 } from "@/services/learning";
 import { getLessonMaterialsForStudent } from "@/services/materials";
-import { getLessonComments } from "@/services/learning/comments";
+import { listLessonQa } from "@/services/qna/threads";
+import type { QaQuestionView } from "@/components/student/qna/qna-panel";
 import { getStudentSessionsForCourse } from "@/services/classes/classes";
 import { getStudentAnnouncementsForCourse } from "@/services/announcements/announcements";
 import { LearningSidebar } from "@/components/student/learning-sidebar";
@@ -86,12 +87,20 @@ export default async function LearnPage({
   const lesson = await getLessonForStudent(user.id, activeLessonId);
   if (!lesson) notFound();
 
-  const [materials, sessions, announcements, comments] = await Promise.all([
+  const [materials, sessions, announcements, rawQaThreads] = await Promise.all([
     getLessonMaterialsForStudent(user.id, activeLessonId),
     getStudentSessionsForCourse(user.id, courseId),
     getStudentAnnouncementsForCourse(user.id, courseId),
-    getLessonComments(activeLessonId, user.id)
+    listLessonQa({
+      lessonId: activeLessonId,
+      currentUserId: user.id,
+      currentUserRole: user.role,
+    }),
   ]);
+  // The DB column is `text` so drizzle widens `kind` to `string`; the schema
+  // enum ('question' | 'answer' | 'comment' | 'comment_legacy') is enforced
+  // by the migration CHECK constraint, so narrowing here is safe.
+  const qaThreads = rawQaThreads as unknown as QaQuestionView[];
 
   const lessonHref = (lessonId: string) =>
     `/student/courses/${courseId}/learn?lesson=${lessonId}`;
@@ -245,13 +254,14 @@ export default async function LearnPage({
           <LessonResources materials={materials} className="mt-8" />
 
           {/* Classes & Announcements Tabs */}
-          <LearnPageTabs 
-            sessions={sessions} 
-            announcements={announcements} 
-            comments={comments}
+          <LearnPageTabs
+            sessions={sessions}
+            announcements={announcements}
+            qaThreads={qaThreads}
             lessonId={activeLessonId}
             courseId={courseId}
             currentUserId={user.id}
+            currentUserRole={user.role}
           />
 
           <div className="mt-8 flex items-center justify-between gap-3 border-t border-outline-variant pt-6 pb-2">

@@ -10,6 +10,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import { sql } from "drizzle-orm";
+
 import { courses, lessons, users } from "./index";
 
 /**
@@ -92,6 +94,26 @@ export type NewEnrollment = typeof enrollments.$inferInsert;
 
 export type LessonProgress = typeof lessonProgress.$inferSelect;
 export type NewLessonProgress = typeof lessonProgress.$inferInsert;
+
+/**
+ * R4 Doubt Q&A.
+ *
+ * The legacy flat comment thread (`lesson_comments`, Phase 8) has been
+ * extended in place into a Stack-Overflow-style Q&A model: questions
+ * with a `title`, threaded answers (`kind='answer'`), follow-up
+ * comments (`kind='comment'`), upvotes/downvotes, accepted answer,
+ * pin/lock/soft-delete. The DB table name stays `lesson_comments` for
+ * backward compatibility with existing index names and views; the
+ * service layer exposes it as `qaThreads` via the re-export in
+ * `@/db/schema/qna`.
+ *
+ * `kind` values (no DB-level enum to keep migrations simple — enforced
+ * in the service layer):
+ *   - 'question'       : top-level doubt posted by a student/teacher
+ *   - 'answer'         : reply to a question; can be accepted
+ *   - 'comment'        : follow-up chatter on a question OR an answer
+ *   - 'comment_legacy' : backfilled rows from the original flat thread
+ */
 export const lessonComments = pgTable(
   "lesson_comments",
   {
@@ -103,6 +125,35 @@ export const lessonComments = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     content: text("content").notNull(),
+    /** 'question' | 'answer' | 'comment' | 'comment_legacy' */
+    kind: text("kind").notNull().default("question"),
+    /** NULL on top-level questions; set on answers/comments. */
+    parentId: uuid("parent_id"),
+    /** Required for kind='question'; null on replies. */
+    title: text("title"),
+    /** 'open' | 'resolved' | 'closed' */
+    status: text("status").notNull().default("open"),
+    /** For question rows only; points to the chosen `kind='answer'` row. */
+    acceptedAnswerId: uuid("accepted_answer_id"),
+    upvotes: integer("upvotes").notNull().default(0),
+    downvotes: integer("downvotes").notNull().default(0),
+    pinned: boolean("pinned").notNull().default(false),
+    pinnedAt: timestamp("pinned_at", { withTimezone: true }),
+    pinnedBy: text("pinned_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    locked: boolean("locked").notNull().default(false),
+    lockedAt: timestamp("locked_at", { withTimezone: true }),
+    lockedBy: text("locked_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    deletedBy: text("deleted_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    tags: text("tags").array().notNull().default(sql`'{}'::text[]`),
+    /** Populated by the `qa_threads_search_update` trigger. Do not write directly. */
+    searchTsv: text("search_tsv"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -111,9 +162,19 @@ export const lessonComments = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("lesson_comments_lesson_id_idx").on(table.lessonId),
-    index("lesson_comments_lesson_created_idx").on(table.lessonId, table.createdAt),
-    index("lesson_comments_user_id_idx").on(table.userId),
+    index("lesson_comments_lesson_status_idx").on(
+      table.lessonId,
+      table.status,
+      table.createdAt
+    ),
+    index("lesson_comments_parent_idx").on(table.parentId, table.createdAt),
+    index("lesson_comments_user_idx").on(table.userId, table.createdAt),
+    index("lesson_comments_pinned_idx").on(
+      table.lessonId,
+      table.pinned,
+      table.createdAt
+    ),
+    index("lesson_comments_deleted_at_idx").on(table.deletedAt),
   ]
 );
 
