@@ -32,3 +32,5 @@ export * from "./exams";
 export * from "./assignments";
 export * from "./classes";
 export * from "./announcements";export * from "./notifications";
+export * from "./audit";
+export * from "./feature-flags";
