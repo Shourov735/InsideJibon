@@ -1,28 +1,31 @@
 import type { NextRequest } from "next/server";
 
 import { resolveCurrentUser } from "@/lib/auth";
-import { etagMatches } from "@/lib/http";
-import { getDefaultStorage } from "@/lib/storage";
-import { toContentDispositionFilename } from "@/schemas/material";
+import {
+  checkEtagForMaterial,
+  decideMaterialDownload,
+  signedRedirectResponse,
+  streamMaterialObject,
+} from "@/services/materials/download";
 import { resolveMaterialForUser } from "@/services/materials";
+import { toContentDispositionFilename } from "@/schemas/material";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Authorized material download.
+ * Authorized material download (R0 §7).
  *
- * Flow: authenticate → resolve the material for the requester through the
- * role-appropriate chain (teacher → course ownership, student → enrollment
- * in a published course) → stream the object from R2 → return it with
- * attachment headers.
+ * Flow:
+ *  1. authenticate (`resolveCurrentUser`)
+ *  2. authorize (`resolveMaterialForUser`)
+ *  3. HEAD-style conditional check via ETag — 304 short-circuits the rest.
+ *  4. decision:
+ *     - video/* OR >= 5 MB → 307 to a short-lived signed R2 URL
+ *     - otherwise          → stream through the Worker (immutable cache)
  *
- * Storage keys are immutable (server-generated UUIDs), so responses are
- * privately cacheable and conditional requests are answered with a 304 via a
- * cheap HEAD — repeat downloads skip the R2 body read entirely.
- *
- * The R2 object key never leaves the server and the bucket stays private.
- * "Unauthorized" and "missing" render the same sanitized 404 so material
- * existence cannot be probed across tenants.
+ * The R2 object key never leaves the server and the bucket stays
+ * private. "Unauthorized" and "missing" render the same sanitized 404
+ * so material existence cannot be probed across tenants.
  */
 export async function GET(
   request: NextRequest,
@@ -40,56 +43,36 @@ export async function GET(
   const material = await resolveMaterialForUser(user.id, user.role, materialId);
   if (!material) return notFound();
 
-  const storage = getDefaultStorage();
-  const immutableCache = "private, max-age=31536000, immutable";
-
-  // Conditional request: revalidate with a HEAD instead of pulling the body.
+  // Conditional request — short-circuit before the size classification.
   const ifNoneMatch = request.headers.get("if-none-match");
-  if (ifNoneMatch) {
-    try {
-      const head = await storage.headObject(material.storageKey);
-      if (head && etagMatches(ifNoneMatch, head.etag)) {
-        return new Response(null, {
-          status: 304,
-          headers: {
-            ETag: head.etag!,
-            "Cache-Control": immutableCache,
-          },
-        });
-      }
-    } catch {
-      // Fall through to the full GET path on storage errors.
-    }
+  const etagCheck = await checkEtagForMaterial(material.storageKey, ifNoneMatch);
+  if (etagCheck.match && etagCheck.etag) {
+    return new Response(null, {
+      status: 304,
+      headers: {
+        ETag: etagCheck.etag,
+        "Cache-Control": "private, max-age=31536000, immutable",
+      },
+    });
   }
 
-  let object;
-  try {
-    object = await storage.getObject(material.storageKey);
-  } catch {
-    // Storage failure — sanitized; never expose internal storage errors.
-    return new Response("Storage unavailable", { status: 503 });
-  }
-
-  if (!object) {
-    // Metadata row exists but the object is gone (e.g. a cleanup race).
-    // Same sanitized response as unauthorized — no internal state leaks.
-    return notFound();
-  }
-
-  if (object.contentLength !== material.sizeBytes) {
-    // Stored bytes disagree with metadata — do not stream mismatched data.
-    return notFound();
-  }
-
-  const dispositionFilename = toContentDispositionFilename(material.originalFilename);
-  const headers = new Headers({
-    "Content-Type": object.contentType,
-    "Content-Length": String(object.contentLength),
-    "Content-Disposition": `attachment; filename="${dispositionFilename}"`,
-    "Cache-Control": immutableCache,
-    "X-Content-Type-Options": "nosniff",
+  // Classify: signed-redirect vs proxy.
+  const decision = await decideMaterialDownload({
+    storageKey: material.storageKey,
+    sizeBytes: material.sizeBytes,
+    contentType: material.mimeType,
   });
-  if (object.etag) headers.set("ETag", object.etag);
 
-  return new Response(object.body as BodyInit, { status: 200, headers });
+  if (decision.kind === "signed") {
+    return signedRedirectResponse(decision.signedUrl, decision.ttlSeconds);
+  }
+
+  return streamMaterialObject({
+    storageKey: material.storageKey,
+    ifNoneMatch,
+    etag: etagCheck.etag,
+    contentDispositionFilename: toContentDispositionFilename(material.originalFilename),
+    contentType: material.mimeType,
+    contentLength: material.sizeBytes,
+  });
 }
