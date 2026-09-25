@@ -11,6 +11,7 @@ import {
   type Course,
   type Enrollment,
 } from "@/db/schema";
+import { dispatchEnrollmentDecision } from "@/services/email/dispatcher";
 
 /**
  * Student enrollment service. Enrollment is a request/approval flow:
@@ -447,6 +448,24 @@ export async function decideEnrollment(params: {
     });
   } catch (error) {
     console.error("Failed to notify student of enrollment decision", error);
+  }
+
+  // R10 — fire the transactional email. Errors are swallowed so the
+  // decision still resolves; the email is best-effort. The dispatcher
+  // dedupes via UNIQUE(dedupe_key) so retries are safe.
+  try {
+    await dispatchEnrollmentDecision({
+      studentId: updated.studentId,
+      enrollmentId: updated.id,
+      decision: params.decision,
+      decidedAt: (updated.decidedAt ?? new Date()).toISOString(),
+      ctaUrl:
+        params.decision === "approved"
+          ? `/courses/${row.courseSlug}`
+          : "/courses",
+    });
+  } catch (error) {
+    console.error("R10 enrollment-decision email failed", error);
   }
 
   return { enrollment: updated, courseSlug: row.courseSlug };
