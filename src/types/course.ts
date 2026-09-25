@@ -77,6 +77,10 @@ export interface PublicCourseSummary {
   teacher: PublicTeacher;
   moduleCount: number;
   lessonCount: number;
+  /** R6 — paid-course flag surfaced in catalog tiles. */
+  requiresPayment: boolean;
+  /** Numeric string from Postgres `numeric`; null for free courses. */
+  priceBdt: string | null;
 }
 
 /** Public lesson row — content and video URLs are never exposed. */

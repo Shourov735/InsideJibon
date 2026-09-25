@@ -3,7 +3,7 @@ import { AdminNavClient } from "./admin-nav-client";
 
 interface AdminNavProps {
   user: CurrentUser;
-  activeSection?: "dashboard" | "users";
+  activeSection?: "dashboard" | "users" | "payments" | "bundles" | "settings";
 }
 
 export function AdminNav({ user, activeSection = "dashboard" }: AdminNavProps) {

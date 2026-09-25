@@ -8,6 +8,7 @@ import { COURSE_CATEGORIES } from "@/schemas/course";
 import type { CourseCategory } from "@/db/schema";
 import { resolveCurrentUser } from "@/lib/auth";
 import { getStudentEnrollments } from "@/services/enrollments";
+import { listPublishedBundleCourseIds } from "@/services/payments";
 
 import { buildAlternates, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
@@ -67,17 +68,19 @@ export default async function PublicCoursesPage({ searchParams }: PublicCoursesP
   const category = params.category as CourseCategory | undefined;
 
   const { user } = await resolveCurrentUser();
-  const [coursesList, studentEnrollments] = await Promise.all([
+  const [coursesList, studentEnrollments, bundleCourseIds] = await Promise.all([
     getPublishedCourses({
       q: q || undefined,
       category: category || undefined,
     }),
     user?.role === "student" ? getStudentEnrollments(user.id) : Promise.resolve([]),
+    listPublishedBundleCourseIds(),
   ]);
 
   const enrollmentStatusMap = new Map(
     studentEnrollments.map((e) => [e.courseId, e.status])
   );
+  const bundleCourseIdSet = new Set(bundleCourseIds);
 
   const categoryOptions = COURSE_CATEGORIES.map((cat) => ({
     value: cat,
@@ -159,6 +162,7 @@ export default async function PublicCoursesPage({ searchParams }: PublicCoursesP
                 key={course.id}
                 course={course}
                 enrollmentStatus={enrollmentStatusMap.get(course.id)}
+                inBundle={bundleCourseIdSet.has(course.id)}
               />
             ))}
             </div>

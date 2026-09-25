@@ -4,6 +4,7 @@ import { requireStudent } from "@/lib/permissions";
 import { getStudentDashboard } from "@/services/learning";
 import { getPendingEnrollmentsForStudent } from "@/services/enrollments";
 import { getDiscoverCoursesForStudent } from "@/services/courses/public";
+import { listPublishedBundleCourseIds } from "@/services/payments";
 import { getUpcomingSessionsForStudent } from "@/services/classes/classes";
 import { getUserNotifications } from "@/services/notifications";
 import { UpcomingSessionsList } from "@/components/student/classes/upcoming-sessions-list";
@@ -22,13 +23,15 @@ export default async function StudentDashboardPage() {
   const user = await requireStudent();
   const t = await getTranslator();
 
-  const [courses, pendingEnrollments, discoverCourses, upcomingSessions, notifications] = await Promise.all([
+  const [courses, pendingEnrollments, discoverCourses, upcomingSessions, notifications, bundleCourseIds] = await Promise.all([
     getStudentDashboard(user.id),
     getPendingEnrollmentsForStudent(user.id),
     getDiscoverCoursesForStudent(user.id, 4),
     getUpcomingSessionsForStudent(user.id),
     getUserNotifications(user.id),
+    listPublishedBundleCourseIds(),
   ]);
+  const bundleCourseIdSet = new Set(bundleCourseIds);
 
   const sortedByAccess = [...courses].sort((a, b) => {
     const ta = a.lastLesson?.lastAccessedAt?.getTime() ?? 0;
@@ -360,7 +363,11 @@ export default async function StudentDashboardPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {discoverCourses.map((c) => (
-              <PublicCourseCard key={c.id} course={c} />
+              <PublicCourseCard
+                key={c.id}
+                course={c}
+                inBundle={bundleCourseIdSet.has(c.id)}
+              />
             ))}
           </div>
         </section>

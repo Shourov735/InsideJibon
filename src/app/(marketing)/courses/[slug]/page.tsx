@@ -6,6 +6,7 @@ import { resolveCurrentUser } from "@/lib/auth";
 import { getStudentEnrollment } from "@/services/enrollments";
 import { getPublishedCourseBySlugWithTeacher } from "@/services/courses";
 import { EnrollButton } from "@/components/student/enroll-button";
+import { getCheapestPublishedBundleForCourse } from "@/services/payments";
 import { getTranslator } from "@/i18n/server";
 import {
   buildAlternates,
@@ -119,6 +120,21 @@ export default async function PublicCourseDetailPage({
   const enrollmentStatus = canEnroll
     ? ((await getStudentEnrollment(user.id, course.id))?.status ?? "none")
     : "none";
+
+  const isPaidCourse = course.requiresPayment && course.priceBdt;
+  const cheapestBundle = isPaidCourse
+    ? await getCheapestPublishedBundleForCourse(course.id)
+    : null;
+  const formattedCoursePrice = isPaidCourse
+    ? new Intl.NumberFormat(t.locale === "bn" ? "bn-BD" : "en-US").format(
+        Number(course.priceBdt)
+      )
+    : null;
+  const formattedBundlePrice = cheapestBundle
+    ? new Intl.NumberFormat(t.locale === "bn" ? "bn-BD" : "en-US").format(
+        Number(cheapestBundle.priceBdt)
+      )
+    : null;
 
   const totalLessons = course.modules.reduce(
     (acc, mod) => acc + mod.lessons.length,
@@ -288,14 +304,68 @@ export default async function PublicCourseDetailPage({
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <EnrollButton
-              courseId={course.id}
-              courseSlug={course.slug}
-              courseTitle={course.title}
-              canEnroll={canEnroll}
-              enrollmentStatus={enrollmentStatus}
-            />
-            {enrollmentStatus === "active" && (
+            {!isPaidCourse && (
+              <EnrollButton
+                courseId={course.id}
+                courseSlug={course.slug}
+                courseTitle={course.title}
+                canEnroll={canEnroll}
+                enrollmentStatus={enrollmentStatus}
+              />
+            )}
+
+            {isPaidCourse && enrollmentStatus !== "active" && (
+              <>
+                {cheapestBundle ? (
+                  <Link
+                    href={`/checkout/bundle/${cheapestBundle.id}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
+                  >
+                    {t("payment.detail.cta.bundle", { price: formattedBundlePrice ?? "" })}
+                  </Link>
+                ) : canEnroll ? (
+                  <Link
+                    href={`/checkout/course/${course.id}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
+                  >
+                    {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/sign-in?redirect_url=${encodeURIComponent(`/courses/${course.slug}`)}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
+                  >
+                    {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
+                  </Link>
+                )}
+
+                {canEnroll && (
+                  <Link
+                    href={`/courses/${course.slug}#fallback`}
+                    className="text-xs font-semibold text-secondary hover:text-primary hover:underline"
+                  >
+                    {t("payment.actions.requestAccess")}
+                  </Link>
+                )}
+
+                {cheapestBundle && (
+                  <span className="rounded border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-900">
+                    {t("payment.detail.bundleAvailable")}
+                  </span>
+                )}
+              </>
+            )}
+
+            {isPaidCourse && enrollmentStatus === "active" && (
+              <Link
+                href={`/student/courses/${course.id}/learn`}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
+              >
+                {t("marketing.courseDetail.continueLearning")}
+              </Link>
+            )}
+
+            {enrollmentStatus === "active" && !isPaidCourse && (
               <span className="rounded border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                 {t("marketing.courseDetail.enrolled")}
               </span>

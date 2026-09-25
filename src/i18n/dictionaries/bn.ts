@@ -2274,4 +2274,137 @@ export const bn: Dictionary = {
   "schedule.nav": "শিডিউল",
   "schedule.hostBadge": "হোস্ট ভিউ — আপনার পড়ানো ক্লাসগুলো",
   "schedule.studentBadge": "আপনার enrolled ক্লাসগুলো",
+
+  // --- R6 — Payments, Bundles & Enrollment Gate ---
+  "payment.title": "পেমেন্ট",
+  "payment.subtitle": "bKash ম্যানুয়াল ট্রান্সফার + অ্যাডমিন অনুমোদন",
+
+  "payment.actions.buy": "এখনই কিনুন",
+  "payment.actions.payManually": "bKash-এ পেমেন্ট করুন",
+  "payment.actions.retry": "আবার চেষ্টা করুন",
+  "payment.actions.cancel": "বাতিল",
+  "payment.actions.requestAccess": "এনরোলমেন্ট রিকোয়েস্ট পাঠান",
+  "payment.actions.viewReceipt": "রিসিট দেখুন",
+  "payment.actions.submitProof": "পেমেন্ট প্রমাণ জমা দিন",
+  "payment.actions.resubmit": "আবার জমা দিন",
+
+  "payment.status.submitted": "জমা হয়েছে — পর্যালোচনাধীন",
+  "payment.status.under_review": "পর্যালোচনাধীন",
+  "payment.status.approved": "অনুমোদিত",
+  "payment.status.rejected": "বাতিল",
+  "payment.status.expired": "মেয়াদ শেষ — আবার জমা দিন",
+  "payment.status.refunded": "রিফান্ড হয়েছে",
+
+  "payment.checkout.summary": "অর্ডার সারাংশ",
+  "payment.checkout.amount": "প্রদেয় পরিমাণ",
+  "payment.checkout.sendTo": "টাকা পাঠান",
+  "payment.checkout.holder": "অ্যাকাউন্ট হোল্ডার",
+  "payment.checkout.instructions": "নির্দেশনা",
+  "payment.checkout.trxId": "bKash TrxID",
+  "payment.checkout.senderLast4": "প্রেরকের নম্বরের শেষ ৪ ডিজিট",
+  "payment.checkout.senderName": "প্রেরকের নাম (ঐচ্ছিক)",
+  "payment.checkout.payerNote": "নোট (ঐচ্ছিক)",
+  "payment.checkout.whatsappSent": "আমি WhatsApp কনফার্মেশন মেসেজ পাঠিয়েছি",
+  "payment.checkout.screenshotHelp": "bKash রিসিটের স্ক্রিনশট আপলোড করুন (ঐচ্ছিক, সর্বোচ্চ ২ MB)",
+  "payment.checkout.submit": "পেমেন্ট প্রমাণ জমা দিন",
+  "payment.checkout.submitted": "পেমেন্ট জমা হয়েছে — পর্যালোচনাধীন",
+  "payment.checkout.noActiveNumber":
+    "পেমেন্ট এখন অস্থায়ীভাবে বন্ধ আছে। এনরোল করতে আপনার শিক্ষকের সাথে যোগাযোগ করুন।",
+  "payment.checkout.copyNumber": "নম্বর কপি করুন",
+
+  "payment.success.heading": "পেমেন্ট পেয়েছি — ধন্যবাদ",
+  "payment.success.cta.goToCourse": "কোর্সে যান",
+  "payment.success.receiptNumber": "রিসিট নম্বর",
+
+  "payment.fallback.unavailable":
+    "পেমেন্ট এখন অস্থায়ীভাবে বন্ধ — আপনার শিক্ষকের সাথে যোগাযোগ করুন।",
+  "payment.fallback.requestSent":
+    "আপনার এনরোলমেন্ট রিকোয়েস্ট শিক্ষকের কাছে পাঠানো হয়েছে।",
+
+  "payment.refund.title": "রিফান্ড",
+  "payment.refund.reason": "রিফান্ডের কারণ",
+  "payment.refund.approved": "রিফান্ড অনুমোদিত",
+  "payment.refund.executed": "রিফান্ড সম্পন্ন",
+  "payment.refund.rejected": "রিফান্ড বাতিল",
+  "payment.refund.markExecuted": "রিফান্ড সম্পন্ন হিসেবে চিহ্নিত করুন",
+  "payment.refund.bkashTrxid": "প্রেরিত bKash TrxID",
+  "payment.refund.executionNote": "নোট (ঐচ্ছিক)",
+  "payment.refund.requestRefund": "রিফান্ড অনুরোধ",
+  "payment.refund.waitingForAdmin": "অ্যাডমিন অনুমোদনের অপেক্ষায়।",
+
+  "payment.admin.title": "পেমেন্ট অনুমোদন",
+  "payment.admin.todaysRevenue": "আজকের আয়",
+  "payment.admin.pendingApprovals": "অপেক্ষমাণ অনুমোদন",
+  "payment.admin.queue": "অনুমোদন সারি",
+  "payment.admin.claim": "পর্যালোচনার জন্য নিন",
+  "payment.admin.approve": "অনুমোদন",
+  "payment.admin.reject": "বাতিল",
+  "payment.admin.rejectNotePlaceholder":
+    "শিক্ষক/শিক্ষার্থীকে জানান কেন পেমেন্ট বাতিল হলো (ন্যূনতম ১০ অক্ষর)",
+  "payment.admin.auditLog": "অডিট লগ",
+  "payment.admin.row.receipt": "রিসিট",
+  "payment.admin.row.screenshot": "স্ক্রিনশট দেখুন",
+  "payment.admin.row.noScreenshot": "কোনো স্ক্রিনশট আপলোড করা হয়নি",
+  "payment.admin.empty": "এই ফিল্টারে কোনো সাবমিশন নেই।",
+  "payment.admin.detail.backToQueue": "সারিতে ফিরে যান",
+
+  "payment.admin.numbers.title": "bKash গ্রহণকারী নম্বর",
+  "payment.admin.numbers.add": "নম্বর যোগ করুন",
+  "payment.admin.numbers.edit": "সম্পাদনা",
+  "payment.admin.numbers.disable": "নিষ্ক্রিয় করুন",
+  "payment.admin.numbers.enable": "পুনরায় সক্রিয় করুন",
+  "payment.admin.numbers.audit": "ইতিহাস",
+  "payment.admin.numbers.whatsappTemplateHelp":
+    "{amount} এবং {trxid} placeholder ব্যবহার করে শিক্ষার্থীকে একটি কপি-পেস্ট মেসেজ দেখান যা WhatsApp-এ পাঠাতে পারবে।",
+  "payment.admin.numbers.form.label": "লেবেল",
+  "payment.admin.numbers.form.number": "bKash নম্বর",
+  "payment.admin.numbers.form.holder": "হোল্ডারের নাম",
+  "payment.admin.numbers.form.instructions": "নির্দেশনা",
+  "payment.admin.numbers.form.whatsappNumber": "WhatsApp নম্বর (ঐচ্ছিক)",
+  "payment.admin.numbers.form.whatsappTemplate": "WhatsApp মেসেজ টেমপ্লেট",
+  "payment.admin.numbers.empty": "কোনো bKash নম্বর কনফিগার করা হয়নি।",
+
+  "payment.admin.bundles.title": "কোর্স বান্ডেল",
+  "payment.admin.bundles.add": "বান্ডেল তৈরি করুন",
+  "payment.admin.bundles.publish": "প্রকাশ",
+  "payment.admin.bundles.archive": "আর্কাইভ",
+  "payment.admin.bundles.editItems": "কোর্স সম্পাদনা",
+  "payment.admin.bundles.empty": "কোনো বান্ডেল নেই।",
+  "payment.admin.bundles.status.draft": "খসড়া",
+  "payment.admin.bundles.status.published": "প্রকাশিত",
+  "payment.admin.bundles.status.archived": "আর্কাইভকৃত",
+
+  "payment.teacher.queue": "কোর্সের পেমেন্ট",
+  "payment.bundle.includes": "এই বান্ডেলে আছে",
+  "payment.bundle.savings": "আপনি সাশ্রয় করছেন",
+  "payment.bundle.compareAt": "তুলনামূলক মূল্য {price}",
+  "payment.bundle.courses_one": "{count}টি কোর্স",
+  "payment.bundle.courses_other": "{count}টি কোর্স",
+
+  "payment.courseCard.free": "ফ্রি",
+  "payment.courseCard.paid": "৳{price}",
+  "payment.courseCard.inBundle": "বান্ডেলে পাওয়া যায়",
+  "payment.detail.price": "মূল্য",
+  "payment.detail.cta.buy": "৳{price} এ কিনুন",
+  "payment.detail.cta.enrollFree": "ফ্রি ভর্তি হন",
+  "payment.detail.cta.bundle": "বান্ডেল ৳{price} এ নিন",
+  "payment.detail.bundleAvailable": "এটি বান্ডেলে পাওয়া যায়",
+
+  "payment.errors.amountMismatch":
+    "আপনার দেওয়া পরিমাণ নির্ধারিত মূল্যের সাথে মিলছে না।",
+  "payment.errors.trxIdInvalid":
+    "TrxID অবশ্যই ৮–২০টি অ্যালফানিউমেরিক অক্ষরের হতে হবে।",
+  "payment.errors.last4Invalid": "প্রেরকের শেষ ৪ ডিজিট অবশ্যই ঠিক ৪ সংখ্যার হতে হবে।",
+  "payment.errors.noActiveNumber":
+    "এই মুহূর্তে কোনো সক্রিয় bKash নম্বর নেই।",
+  "payment.errors.duplicate":
+    "আপনি ইতিমধ্যে সম্প্রতি একটি পেমেন্ট জমা দিয়েছেন। ১০ মিনিট অপেক্ষা করুন।",
+  "payment.errors.bundleNoItems":
+    "এই বান্ডেলে কোনো কোর্স নেই — কেনা যাবে না।",
+  "payment.errors.invalidFileType":
+    "স্ক্রিনশট অবশ্যই PNG, JPG বা WebP হতে হবে।",
+  "payment.errors.fileTooLarge":
+    "স্ক্রিনশট অবশ্যই ২ MB বা তার কম হতে হবে।",
+  "payment.errors.uploadUnavailable":
+    "স্ক্রিনশট আপলোড অস্থায়ীভাবে বন্ধ — স্ক্রিনশট ছাড়াই জমা দিন।",
 };

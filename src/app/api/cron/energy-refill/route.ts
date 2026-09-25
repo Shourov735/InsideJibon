@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 
 import { refillTick } from "@/services/gamification";
 import { emitClassReminders } from "@/services/classes";
+import { expireStaleSubmissions } from "@/services/payments";
 
 /**
- * R5 / R3 Cron Trigger — energy / lives refill tick + class reminder
- * fan-out. Fires every 5 minutes via `wrangler.jsonc`'s `triggers.crons`.
+ * R5 / R3 / R6 Cron Trigger — energy / lives refill tick + class reminder
+ * fan-out + payment submission expiration. Fires every 5 minutes via
+ * `wrangler.jsonc`'s `triggers.crons`.
  *
- * Two unrelated jobs share the slot because Cloudflare's Free plan is
+ * Three unrelated jobs share the slot because Cloudflare's Free plan is
  * capped at 5 Cron Triggers per Worker (R9 fills the fifth slot).
  *
  *   1. `refillTick()` — credits +1 energy to every user whose
@@ -19,18 +21,23 @@ import { emitClassReminders } from "@/services/classes";
  *      `class_reminder_sent_at` column guarantees no duplicate
  *      notifications across consecutive ticks.
  *
- * Both functions are idempotent under concurrent ticks.
+ *   3. `expireStaleSubmissions()` — flips any `payment_submissions`
+ *      whose `expires_at` has elapsed to `status='expired'`. Same
+ *      idempotency pattern as #1 and #2.
+ *
+ * All three functions are idempotent under concurrent ticks.
  */
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const [credited, reminders] = await Promise.all([
+    const [credited, reminders, expiredSubmissions] = await Promise.all([
       refillTick(),
       emitClassReminders(15),
+      expireStaleSubmissions(),
     ]);
     return NextResponse.json(
-      { ok: true, credited, reminders },
+      { ok: true, credited, reminders, expiredSubmissions },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {

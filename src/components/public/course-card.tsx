@@ -1,10 +1,13 @@
 import Link from "next/link";
 import type { PublicCourseSummary } from "@/types/course";
 import { CategoryBadge } from "@/components/shared/category-badge";
+import { formatBDT } from "@/lib/utils";
 
 interface PublicCourseCardProps {
   course: PublicCourseSummary;
   enrollmentStatus?: "active" | "pending" | "rejected" | null;
+  /** When true, the course appears in at least one published bundle. */
+  inBundle?: boolean;
 }
 
 function TeacherAvatar({ course }: PublicCourseCardProps) {
@@ -24,7 +27,20 @@ function TeacherAvatar({ course }: PublicCourseCardProps) {
   );
 }
 
-export function PublicCourseCard({ course, enrollmentStatus }: PublicCourseCardProps) {
+export function PublicCourseCard({ course, enrollmentStatus, inBundle }: PublicCourseCardProps) {
+  const isPaid = course.requiresPayment && course.priceBdt;
+  const priceLabel = !isPaid
+    ? "Free"
+    : inBundle
+      ? "In a bundle"
+      : formatBDT(Number(course.priceBdt));
+
+  const priceBadgeClass = !isPaid
+    ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+    : inBundle
+      ? "bg-amber-100 text-amber-900 border-amber-200"
+      : "bg-primary-container text-on-primary-container border-primary/30";
+
   return (
     <Link
       href={`/courses/${course.slug}`}
@@ -82,9 +98,16 @@ export function PublicCourseCard({ course, enrollmentStatus }: PublicCourseCardP
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-lg font-bold tracking-tight text-on-surface line-clamp-1 group-hover:text-primary transition-colors">
-          {course.title}
-        </h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-display text-lg font-bold tracking-tight text-on-surface line-clamp-1 group-hover:text-primary transition-colors">
+            {course.title}
+          </h3>
+          <span
+            className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${priceBadgeClass}`}
+          >
+            {priceLabel}
+          </span>
+        </div>
         <p className="mt-2 line-clamp-2 text-sm text-on-surface-variant">
           {course.description || "A structured course from InsideJibon."}
         </p>

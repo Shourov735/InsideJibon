@@ -176,6 +176,8 @@ export const getTeacherCourseById = cache(
         category: courses.category,
         status: courses.status,
         publishedAt: courses.publishedAt,
+        requiresPayment: courses.requiresPayment,
+        priceBdt: courses.priceBdt,
         createdAt: courses.createdAt,
         updatedAt: courses.updatedAt,
       })
@@ -209,6 +211,8 @@ export const getTeacherCourseWithCurriculum = cache(
       category: courses.category,
       status: courses.status,
       publishedAt: courses.publishedAt,
+      requiresPayment: courses.requiresPayment,
+      priceBdt: courses.priceBdt,
       createdAt: courses.createdAt,
       updatedAt: courses.updatedAt,
     })
@@ -552,6 +556,8 @@ export async function getPublishedCourseBySlug(
       category: courses.category,
       status: courses.status,
       publishedAt: courses.publishedAt,
+      requiresPayment: courses.requiresPayment,
+      priceBdt: courses.priceBdt,
       createdAt: courses.createdAt,
       updatedAt: courses.updatedAt,
     })

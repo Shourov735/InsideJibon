@@ -2283,6 +2283,139 @@ export const en = {
   "schedule.nav": "Schedule",
   "schedule.hostBadge": "Host view — classes you teach",
   "schedule.studentBadge": "Your enrolled classes",
+
+  // --- R6 — Payments, Bundles & Enrollment Gate ---
+  "payment.title": "Payments",
+  "payment.subtitle": "Manual bKash transfer + admin approval",
+
+  "payment.actions.buy": "Buy now",
+  "payment.actions.payManually": "Pay via bKash",
+  "payment.actions.retry": "Retry",
+  "payment.actions.cancel": "Cancel",
+  "payment.actions.requestAccess": "Request access instead",
+  "payment.actions.viewReceipt": "View receipt",
+  "payment.actions.submitProof": "Submit payment proof",
+  "payment.actions.resubmit": "Resubmit payment",
+
+  "payment.status.submitted": "Submitted — under review",
+  "payment.status.under_review": "Under review",
+  "payment.status.approved": "Approved",
+  "payment.status.rejected": "Rejected",
+  "payment.status.expired": "Expired — please resubmit",
+  "payment.status.refunded": "Refunded",
+
+  "payment.checkout.summary": "Order summary",
+  "payment.checkout.amount": "Amount due",
+  "payment.checkout.sendTo": "Send money to",
+  "payment.checkout.holder": "Account holder",
+  "payment.checkout.instructions": "Instructions",
+  "payment.checkout.trxId": "bKash TrxID",
+  "payment.checkout.senderLast4": "Last 4 digits of sender number",
+  "payment.checkout.senderName": "Sender name (optional)",
+  "payment.checkout.payerNote": "Note (optional)",
+  "payment.checkout.whatsappSent": "I sent the WhatsApp confirmation message",
+  "payment.checkout.screenshotHelp": "Upload a screenshot of your bKash receipt (optional, max 2 MB)",
+  "payment.checkout.submit": "Submit payment proof",
+  "payment.checkout.submitted": "Payment submitted — under review",
+  "payment.checkout.noActiveNumber":
+    "Payments are temporarily unavailable. Please contact your teacher to enroll.",
+  "payment.checkout.copyNumber": "Copy number",
+
+  "payment.success.heading": "Payment received — thank you",
+  "payment.success.cta.goToCourse": "Go to course",
+  "payment.success.receiptNumber": "Receipt number",
+
+  "payment.fallback.unavailable":
+    "Payments are temporarily unavailable — contact your teacher.",
+  "payment.fallback.requestSent":
+    "Your enrollment request was sent to the teacher.",
+
+  "payment.refund.title": "Refund",
+  "payment.refund.reason": "Reason for refund",
+  "payment.refund.approved": "Refund approved",
+  "payment.refund.executed": "Refund executed",
+  "payment.refund.rejected": "Refund rejected",
+  "payment.refund.markExecuted": "Mark refund as executed",
+  "payment.refund.bkashTrxid": "Outgoing bKash TrxID",
+  "payment.refund.executionNote": "Execution note (optional)",
+  "payment.refund.requestRefund": "Request refund",
+  "payment.refund.waitingForAdmin": "Waiting for admin approval.",
+
+  "payment.admin.title": "Payment approvals",
+  "payment.admin.todaysRevenue": "Today's revenue",
+  "payment.admin.pendingApprovals": "Pending approvals",
+  "payment.admin.queue": "Approval queue",
+  "payment.admin.claim": "Claim for review",
+  "payment.admin.approve": "Approve",
+  "payment.admin.reject": "Reject",
+  "payment.admin.rejectNotePlaceholder":
+    "Tell the student why this payment was rejected (min 10 chars)",
+  "payment.admin.auditLog": "Audit log",
+  "payment.admin.row.receipt": "Receipt",
+  "payment.admin.row.screenshot": "View screenshot",
+  "payment.admin.row.noScreenshot": "No screenshot uploaded",
+  "payment.admin.empty": "No submissions matching this filter.",
+  "payment.admin.detail.backToQueue": "Back to queue",
+
+  "payment.admin.numbers.title": "bKash receiving numbers",
+  "payment.admin.numbers.add": "Add number",
+  "payment.admin.numbers.edit": "Edit",
+  "payment.admin.numbers.disable": "Disable",
+  "payment.admin.numbers.enable": "Re-enable",
+  "payment.admin.numbers.audit": "History",
+  "payment.admin.numbers.whatsappTemplateHelp":
+    "Use {amount} and {trxid} placeholders to show the student a copy-paste message they can send via WhatsApp.",
+  "payment.admin.numbers.form.label": "Label",
+  "payment.admin.numbers.form.number": "bKash number",
+  "payment.admin.numbers.form.holder": "Holder name",
+  "payment.admin.numbers.form.instructions": "Instructions",
+  "payment.admin.numbers.form.whatsappNumber": "WhatsApp number (optional)",
+  "payment.admin.numbers.form.whatsappTemplate": "WhatsApp message template",
+  "payment.admin.numbers.empty": "No bKash numbers configured yet.",
+
+  "payment.admin.bundles.title": "Course bundles",
+  "payment.admin.bundles.add": "Create bundle",
+  "payment.admin.bundles.publish": "Publish",
+  "payment.admin.bundles.archive": "Archive",
+  "payment.admin.bundles.editItems": "Edit courses",
+  "payment.admin.bundles.empty": "No bundles yet.",
+  "payment.admin.bundles.status.draft": "Draft",
+  "payment.admin.bundles.status.published": "Published",
+  "payment.admin.bundles.status.archived": "Archived",
+
+  "payment.teacher.queue": "Course payments",
+  "payment.bundle.includes": "This bundle includes",
+  "payment.bundle.savings": "You save",
+  "payment.bundle.compareAt": "Compare at {price}",
+  "payment.bundle.courses_one": "{count} course",
+  "payment.bundle.courses_other": "{count} courses",
+
+  "payment.courseCard.free": "Free",
+  "payment.courseCard.paid": "৳{price}",
+  "payment.courseCard.inBundle": "In a bundle",
+  "payment.detail.price": "Price",
+  "payment.detail.cta.buy": "Buy for ৳{price}",
+  "payment.detail.cta.enrollFree": "Enroll free",
+  "payment.detail.cta.bundle": "Get bundle ৳{price}",
+  "payment.detail.bundleAvailable": "Available in a bundle",
+
+  "payment.errors.amountMismatch":
+    "The amount you entered does not match the listed price.",
+  "payment.errors.trxIdInvalid":
+    "TrxID must be 8–20 alphanumeric characters.",
+  "payment.errors.last4Invalid": "Sender last-4 must be exactly 4 digits.",
+  "payment.errors.noActiveNumber":
+    "There is no active bKash number accepting payments right now.",
+  "payment.errors.duplicate":
+    "You already submitted a payment for this recently. Please wait 10 minutes.",
+  "payment.errors.bundleNoItems":
+    "This bundle has no courses yet and cannot be purchased.",
+  "payment.errors.invalidFileType":
+    "Screenshot must be a PNG, JPG, or WebP image.",
+  "payment.errors.fileTooLarge":
+    "Screenshot must be 2 MB or smaller.",
+  "payment.errors.uploadUnavailable":
+    "Screenshot upload is temporarily unavailable — submit without one.",
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

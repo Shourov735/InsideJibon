@@ -3,6 +3,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   text,
@@ -52,6 +53,9 @@ export const courses = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    // R6: paid course flag and BDT price (free courses leave both null/false).
+    requiresPayment: boolean("requires_payment").notNull().default(false),
+    priceBdt: numeric("price_bdt", { precision: 10, scale: 2 }),
   },
   (table) => [
     uniqueIndex("courses_slug_unique").on(table.slug),

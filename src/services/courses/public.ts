@@ -83,6 +83,8 @@ export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise
       teacherImageUrl: users.imageUrl,
       moduleCount: moduleCountSql,
       lessonCount: lessonCountSql,
+      requiresPayment: courses.requiresPayment,
+      priceBdt: courses.priceBdt,
     })
     .from(courses)
     .innerJoin(users, eq(courses.teacherId, users.id))
@@ -100,6 +102,8 @@ export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise
     teacher: toPublicTeacher(row.teacherId, row.teacherName, row.teacherImageUrl),
     moduleCount: row.moduleCount ?? 0,
     lessonCount: row.lessonCount ?? 0,
+    requiresPayment: row.requiresPayment,
+    priceBdt: row.priceBdt,
   }));
 }
 
@@ -128,6 +132,8 @@ export async function getDiscoverCoursesForStudent(
       teacherImageUrl: users.imageUrl,
       moduleCount: moduleCountSql,
       lessonCount: lessonCountSql,
+      requiresPayment: courses.requiresPayment,
+      priceBdt: courses.priceBdt,
     })
     .from(courses)
     .innerJoin(users, eq(courses.teacherId, users.id))
@@ -156,6 +162,8 @@ export async function getDiscoverCoursesForStudent(
     teacher: toPublicTeacher(row.teacherId, row.teacherName, row.teacherImageUrl),
     moduleCount: row.moduleCount ?? 0,
     lessonCount: row.lessonCount ?? 0,
+    requiresPayment: row.requiresPayment,
+    priceBdt: row.priceBdt,
   }));
 }
 
@@ -179,6 +187,8 @@ export const getPublishedCourseBySlugWithTeacher = cache(
       thumbnailUrl: courses.thumbnailUrl,
       category: courses.category,
       publishedAt: courses.publishedAt,
+      requiresPayment: courses.requiresPayment,
+      priceBdt: courses.priceBdt,
       teacherId: users.id,
       teacherName: users.name,
       teacherImageUrl: users.imageUrl,
@@ -245,6 +255,8 @@ export const getPublishedCourseBySlugWithTeacher = cache(
     thumbnailUrl: row.thumbnailUrl,
     category: row.category,
     publishedAt: row.publishedAt,
+    requiresPayment: row.requiresPayment,
+    priceBdt: row.priceBdt,
     teacher: toPublicTeacher(row.teacherId, row.teacherName, row.teacherImageUrl),
     moduleCount: modules.length,
     lessonCount: lessonRows.length,
