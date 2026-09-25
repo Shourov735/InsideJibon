@@ -5,6 +5,8 @@ import { z } from "zod";
 
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
+import { readRequestContext } from "@/lib/request-context";
+import { enforceRateLimit } from "@/services/security/rate-limit";
 
 const emailAddressSchema = z.object({
   id: z.string(),
@@ -32,6 +34,15 @@ export async function POST(request: NextRequest) {
   if (!webhookSecret) {
     return new Response("Webhook secret not configured", { status: 503 });
   }
+
+  // R0 rate limit: 60 events/minute per source IP (or "unknown" when
+  // the request didn't carry one). Clerk signs events so this isn't a
+  // spam vector from outside, but it limits misconfigured retry storms
+  // and dev-environment replay floods.
+  const ctx = readRequestContext(request);
+  const rateKey = `ip:${ctx.connectingIp ?? ctx.ip ?? "unknown"}`;
+  const blocked = await enforceRateLimit("webhooks.clerk", rateKey);
+  if (blocked) return blocked;
 
   let event;
   try {
