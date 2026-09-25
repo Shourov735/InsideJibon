@@ -9,10 +9,48 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+
+  // ---------------------------------------------------------------------------
+  // R0 remaster infra bindings.
+  //
+  // The IDs below are PLACEHOLDERS. The Cloudflare operator must create the
+  // real KV namespaces and Queues once via the Wrangler CLI before deploying
+  // (or before this JSON becomes valid). Until then, `wrangler deploy` will
+  // fail with a "namespace not found" error pointing at the missing resource.
+  //
+  // Commands to run from the project root:
+  //
+  //   wrangler kv namespace create insidejibon-rate-limit
+  //   wrangler kv namespace create insidejibon-session
+  //   wrangler kv namespace create insidejibon-feature-flags
+  //   wrangler queues create insidejibon-notifications
+  //   wrangler queues create insidejibon-embeddings
+  //   wrangler queues create insidejibon-csv-exports
+  //
+  // Paste the returned IDs back into this file under the corresponding
+  // `id` field. No subscriptions are involved; everything is on the Workers
+  // Free plan (FREE-TIER-REFERENCE.md §1, §2, §4).
+  // ---------------------------------------------------------------------------
+  "kv_namespaces": [
+    { "binding": "RATE_LIMIT_KV",    "id": "REPLACE_ME_rate_limit" },
+    { "binding": "SESSION_KV",       "id": "REPLACE_ME_session" },
+    { "binding": "FEATURE_FLAGS_KV", "id": "REPLACE_ME_feature_flags" }
+  ],
+  "queues": {
+    "producers": [
+      { "binding": "NOTIFICATIONS_QUEUE", "queue": "insidejibon-notifications" },
+      { "binding": "EMBEDDINGS_QUEUE",    "queue": "insidejibon-embeddings" },
+      { "binding": "EXPORT_QUEUE",        "queue": "insidejibon-csv-exports" }
+    ]
+  },
   "r2_buckets": [
     {
       "binding": "MATERIALS_BUCKET",
       "bucket_name": "insidejibon-materials"
+    },
+    {
+      "binding": "PUBLIC_BUCKET",
+      "bucket_name": "insidejibon-public"
     }
   ],
   "observability": {

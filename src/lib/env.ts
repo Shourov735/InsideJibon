@@ -10,6 +10,18 @@ const envSchema = z.object({
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
   // Required for Clerk webhook user sync in deployed environments.
   CLERK_WEBHOOK_SECRET: z.string().optional(),
+
+  // --- R0 remaster infra (optional; see wrangler.jsonc) ---
+  // KV mirror URLs used by `wrangler dev` to talk to remote KV from a
+  // local machine. Workers runtime accesses the bindings directly via
+  // `getCloudflareContext`, so these are not consulted in production.
+  RATE_LIMIT_KV_URL: z.string().optional(),
+  SESSION_KV_URL: z.string().optional(),
+  FEATURE_FLAGS_KV_URL: z.string().optional(),
+  // Public origin configured for the insidejibon-public R2 bucket.
+  // Required to construct asset URLs once the bucket has a custom domain.
+  PUBLIC_BUCKET_PUBLIC_URL: z.string().optional(),
+  NEXT_PUBLIC_PUBLIC_BUCKET_URL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
