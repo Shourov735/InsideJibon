@@ -39,6 +39,19 @@ export const en = {
   "common.markCountUpper_other": "{count} Marks",
   "common.markCountLower_one": "{count} mark",
   "common.markCountLower_other": "{count} marks",
+  "common.actions.retry": "Retry",
+  "common.actions.discardChanges": "Discard changes",
+
+  "system.requestError": "Something went wrong. Please try again.",
+  "system.unauthorized": "You need to sign in to continue.",
+  "system.forbidden": "You don't have permission to perform this action.",
+  "system.rateLimited": "Too many requests. Please slow down and try again.",
+  "system.serverError": "A server error occurred. Please try again later.",
+  "system.audit.roleChanged": "Role changed",
+  "system.audit.examPublished": "Exam published",
+  "system.audit.enrollmentGranted": "Enrollment granted",
+
+  "csp.violationReport.fallback": "Content Security Policy violation detected.",
 
   "common.totalMarks": "{count} total marks",
   "common.marksAwarded": "{score} out of {total} marks awarded",

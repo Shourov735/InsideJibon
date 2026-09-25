@@ -138,7 +138,7 @@ export async function togglePinAnnouncement(
 export async function getTeacherAnnouncementsForCourse(
   teacherId: string,
   courseId: string
-): Promise<Announcement[]> {
+): Promise<TeacherAnnouncementSummary[]> {
   const course = await verifyCourseOwnership(teacherId, courseId);
   if (!course) throw new AnnouncementNotFoundError();
 
@@ -151,11 +151,28 @@ export async function getTeacherAnnouncementsForCourse(
       content: announcements.content,
       isPinned: announcements.isPinned,
       createdAt: announcements.createdAt,
+      updatedAt: announcements.updatedAt,
+      publishedAt: announcements.publishedAt,
     })
     .from(announcements)
     .where(eq(announcements.courseId, courseId))
     .orderBy(desc(announcements.isPinned), desc(announcements.createdAt));
 }
+
+/** Narrowed projection: storageKey is server-only and never returned.
+ * `publishedAt` and `updatedAt` are included so the directory component can
+ * render ordering hints and edit timestamps without an extra round-trip. */
+export type TeacherAnnouncementSummary = Pick<
+  Announcement,
+  | "id"
+  | "courseId"
+  | "title"
+  | "content"
+  | "isPinned"
+  | "createdAt"
+  | "updatedAt"
+  | "publishedAt"
+>;
 
 export async function getStudentAnnouncementsForCourse(
   studentId: string,

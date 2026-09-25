@@ -12,8 +12,8 @@ import {
 import type {
   Assignment,
   AssignmentSubmission,
-  AssignmentSubmissionFile,
 } from "@/db/schema";
+import type { SubmissionFileSummary } from "@/services/assignments";
 import { useTranslations } from "@/i18n/client";
 
 import { AssignmentSubmissionForm } from "./assignment-submission-form";
@@ -22,7 +22,7 @@ interface StudentAssignmentWorkspaceProps {
   assignment: Assignment;
   courseTitle: string;
   submission: AssignmentSubmission | null;
-  files: AssignmentSubmissionFile[];
+  files: SubmissionFileSummary[];
   isLateSubmission: boolean;
   canResubmit: boolean;
 }

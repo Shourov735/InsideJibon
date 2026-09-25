@@ -58,7 +58,7 @@ export interface TeacherSubmissionSummary {
 
 export interface SubmissionDetail extends TeacherSubmissionSummary {
   assignment: Assignment;
-  files: AssignmentSubmissionFile[];
+  files: SubmissionFileSummary[];
 }
 
 export interface SubmissionStatistics {
@@ -145,6 +145,7 @@ export async function getSubmissionDetailForTeacher(
     db
       .select({
         id: assignmentSubmissionFiles.id,
+        submissionId: assignmentSubmissionFiles.submissionId,
         originalFilename: assignmentSubmissionFiles.originalFilename,
         mimeType: assignmentSubmissionFiles.mimeType,
         sizeBytes: assignmentSubmissionFiles.sizeBytes,
@@ -273,11 +274,20 @@ export async function getAssignmentStatistics(
   };
 }
 
+/**
+ * Narrowed projection: storageKey is server-only and never returned. submissionId
+ * is included because the UI uses it to construct per-file download URLs.
+ */
+export type SubmissionFileSummary = Pick<
+  AssignmentSubmissionFile,
+  "id" | "submissionId" | "originalFilename" | "mimeType" | "sizeBytes" | "createdAt"
+>;
+
 /** Files of a teacher-owned submission (null when unauthorized). */
 export async function getSubmissionFilesForTeacher(
   teacherId: string,
   submissionId: string
-): Promise<AssignmentSubmissionFile[] | null> {
+): Promise<SubmissionFileSummary[] | null> {
   if (!isUuid(submissionId)) return null;
   const resolved = await verifySubmissionForTeacher(teacherId, submissionId);
   if (!resolved) return null;
@@ -286,6 +296,7 @@ export async function getSubmissionFilesForTeacher(
   return db
     .select({
       id: assignmentSubmissionFiles.id,
+      submissionId: assignmentSubmissionFiles.submissionId,
       originalFilename: assignmentSubmissionFiles.originalFilename,
       mimeType: assignmentSubmissionFiles.mimeType,
       sizeBytes: assignmentSubmissionFiles.sizeBytes,

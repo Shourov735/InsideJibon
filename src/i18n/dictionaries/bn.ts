@@ -41,6 +41,19 @@ export const bn: Dictionary = {
   "common.markCountUpper_other": "{count} নম্বর",
   "common.markCountLower_one": "{count} নম্বর",
   "common.markCountLower_other": "{count} নম্বর",
+  "common.actions.retry": "আবার চেষ্টা করুন",
+  "common.actions.discardChanges": "পরিবর্তন বাতিল করুন",
+
+  "system.requestError": "কিছু সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  "system.unauthorized": "চালিয়ে যেতে আপনাকে সাইন ইন করতে হবে।",
+  "system.forbidden": "এই কাজটি করার অনুমতি আপনার নেই।",
+  "system.rateLimited": "অনেক বেশি অনুরোধ। অনুগ্রহ করে একটু ধীরে চেষ্টা করুন।",
+  "system.serverError": "সার্ভারে সমস্যা হয়েছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন।",
+  "system.audit.roleChanged": "ভূমিকা পরিবর্তিত হয়েছে",
+  "system.audit.examPublished": "পরীক্ষা প্রকাশিত হয়েছে",
+  "system.audit.enrollmentGranted": "এনরোলমেন্ট অনুমোদিত হয়েছে",
+
+  "csp.violationReport.fallback": "কনটেন্ট সিকিউরিটি পলিসি লঙ্ঘন শনাক্ত হয়েছে।",
 
   "common.totalMarks": "মোট {count} নম্বর",
   "common.marksAwarded": "{total} এর মধ্যে {score} নম্বর অর্জিত",

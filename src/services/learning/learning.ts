@@ -214,8 +214,13 @@ export const getLearningCourse = cache(
   const progressRows = lessonIds.length
     ? await db
         .select({
+          id: lessonProgress.id,
+          studentId: lessonProgress.studentId,
           lessonId: lessonProgress.lessonId,
           completed: lessonProgress.completed,
+          completedAt: lessonProgress.completedAt,
+          lastPosition: lessonProgress.lastPosition,
+          updatedAt: lessonProgress.updatedAt,
         })
         .from(lessonProgress)
         .where(

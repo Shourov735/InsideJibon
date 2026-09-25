@@ -1,11 +1,11 @@
 "use client";
 
 import { SubmissionFileItem } from "@/components/assignments/submission-file-item";
-import type { AssignmentSubmissionFile } from "@/db/schema";
+import type { SubmissionFileSummary } from "@/services/assignments";
 import { useTranslations } from "@/i18n/client";
 
 interface AssignmentFileListProps {
-  files: AssignmentSubmissionFile[];
+  files: SubmissionFileSummary[];
   canDelete: boolean;
   onDelete: (fileId: string) => void;
 }

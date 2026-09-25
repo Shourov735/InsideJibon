@@ -17,7 +17,19 @@ export interface MaterialSummary {
   updatedAt: Date;
 }
 
-export function toMaterialSummary(material: Material): MaterialSummary {
+export function toMaterialSummary(
+  material: Pick<
+    Material,
+    | "id"
+    | "lessonId"
+    | "name"
+    | "originalFilename"
+    | "mimeType"
+    | "sizeBytes"
+    | "createdAt"
+    | "updatedAt"
+  >
+): MaterialSummary {
   return {
     id: material.id,
     lessonId: material.lessonId,

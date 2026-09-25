@@ -13,17 +13,15 @@ import {
   getAllowedTypesSummary,
   getAcceptStringFromMimeTypes,
 } from "@/components/assignments/file-type-helper";
-import type {
-  Assignment,
-  AssignmentSubmissionFile,
-} from "@/db/schema";
+import type { Assignment } from "@/db/schema";
+import type { SubmissionFileSummary } from "@/services/assignments";
 import { useTranslations } from "@/i18n/client";
 
 import { AssignmentFileList } from "./assignment-file-list";
 
 interface AssignmentSubmissionFormProps {
   assignment: Assignment;
-  files: AssignmentSubmissionFile[];
+  files: SubmissionFileSummary[];
   isLateSubmission: boolean;
   canModifyFiles: boolean;
   isSubmitted: boolean;

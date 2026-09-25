@@ -7,10 +7,10 @@ import {
   getSubmissionFilesForStudent,
   isLateSubmission,
   canResubmit,
+  type SubmissionFileSummary,
 } from "@/services/assignments";
 import { getLearningCourse } from "@/services/learning";
 import { StudentAssignmentWorkspace } from "@/components/student/assignments";
-import type { AssignmentSubmissionFile } from "@/db/schema";
 
 interface StudentAssignmentWorkspacePageProps {
   params: Promise<{ courseId: string; assignmentId: string }>;
@@ -52,7 +52,7 @@ export default async function StudentAssignmentWorkspacePage({
 
   const submission = await getStudentSubmission(user.id, assignmentId);
 
-  let files: AssignmentSubmissionFile[] = [];
+  let files: SubmissionFileSummary[] = [];
   if (submission) {
     const fetchedFiles = await getSubmissionFilesForStudent(user.id, submission.id);
     if (fetchedFiles) {

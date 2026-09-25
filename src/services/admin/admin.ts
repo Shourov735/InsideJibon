@@ -48,6 +48,7 @@ export async function getAllUsers() {
       imageUrl: users.imageUrl,
       role: users.role,
       createdAt: users.createdAt,
+      updatedAt: users.updatedAt,
     })
     .from(users)
     .orderBy(users.createdAt);

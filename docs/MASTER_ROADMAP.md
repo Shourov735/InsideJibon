@@ -37,6 +37,18 @@ InsideJibon is a completely free personal educational platform. Key conventions 
 
 ---
 
+## 2b. Remaster Era (Phases R0–R10) — *in planning*
+
+> The current MVP is complete. The **masterclass remaster** is a separate, free-tier-only track: faster, more secure, more featureful, and Bangla-first. See:
+>
+> - [`MASTER_REMASTER.md`](./MASTER_REMASTER.md) — vision, stack additions, success metrics.
+> - [`FREE-TIER-REFERENCE.md`](./FREE-TIER-REFERENCE.md) — quotas for every service (every remaster phase is $0/month subscriptions).
+> - Phase specs: `remaster-phase-0-foundation.md` → `remaster-phase-10-i18n-legal-email.md`.
+>
+> Critical-path teams should run R0 → R1 → R2 → R3 → R6 → R7; the remaining phases can be parallelized after R0.
+
+---
+
 ## 3. Database Schema Map (18 Tables)
 
 ```

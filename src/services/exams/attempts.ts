@@ -154,6 +154,7 @@ export async function getStudentCourseExams(
 
   const attemptRows = await db
     .select({
+      id: examAttempts.id,
       examId: examAttempts.examId,
       status: examAttempts.status,
       percentage: examAttempts.percentage,
@@ -507,6 +508,9 @@ export async function getAttemptResult(
 
   const [attempt] = await db
     .select({
+      id: examAttempts.id,
+      attemptNumber: examAttempts.attemptNumber,
+      examId: examAttempts.examId,
       studentId: examAttempts.studentId,
       status: examAttempts.status,
       score: examAttempts.score,

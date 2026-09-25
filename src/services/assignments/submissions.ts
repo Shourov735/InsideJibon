@@ -31,6 +31,7 @@ import {
   verifySubmissionForTeacher,
   verifySubmissionOwnership,
 } from "./access";
+import type { SubmissionFileSummary } from "./grading";
 
 /** Narrowed projection used by getStudentSubmission / startOrResumeSubmission. */
 export interface StudentSubmissionStatus {
@@ -40,6 +41,12 @@ export interface StudentSubmissionStatus {
   status: AssignmentSubmission["status"];
   isLate: boolean;
   submittedAt: Date | null;
+  gradedAt: Date | null;
+  points: number | null;
+  feedback: string | null;
+  gradedBy: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /** Narrowed projection used by internal checks where only id+status matter. */
@@ -93,8 +100,14 @@ export interface UploadableSubmissionFile {
   arrayBuffer(): Promise<ArrayBuffer>;
 }
 
+/** Full Assignment row surfaced to the student UI. We avoid a narrower Pick
+ * here because the call sites (`isAssignmentOpen`, the workspace component)
+ * consume several other columns (`publishedAt`, `lessonId`, `closedAt`, etc.)
+ * — a narrower type would force every consumer to widen again. */
+export type StudentAssignmentRow = Assignment;
+
 export interface StudentAssignmentSummary {
-  assignment: Assignment;
+  assignment: StudentAssignmentRow;
   submission: AssignmentSubmission | null;
   /** Student may create/save a draft or submit right now. */
   canSubmit: boolean;
@@ -106,7 +119,7 @@ export interface StudentAssignmentSummary {
 async function listVisibleAssignmentsForEnrolledCourse(
   studentId: string,
   courseId: string
-): Promise<Assignment[] | null> {
+): Promise<StudentAssignmentRow[] | null> {
   if (!isUuid(courseId)) return null;
   const db = getDb();
 
@@ -128,12 +141,19 @@ async function listVisibleAssignmentsForEnrolledCourse(
     .select({
       id: assignments.id,
       courseId: assignments.courseId,
+      lessonId: assignments.lessonId,
       title: assignments.title,
       instructions: assignments.instructions,
       dueAt: assignments.dueAt,
       maxPoints: assignments.maxPoints,
       allowLateSubmission: assignments.allowLateSubmission,
+      allowedFileTypes: assignments.allowedFileTypes,
+      maxFileSize: assignments.maxFileSize,
       status: assignments.status,
+      publishedAt: assignments.publishedAt,
+      closedAt: assignments.closedAt,
+      createdAt: assignments.createdAt,
+      updatedAt: assignments.updatedAt,
     })
     .from(assignments)
     .where(
@@ -163,8 +183,16 @@ export async function getStudentCourseAssignmentsWithStatus(
         .select({
           id: assignmentSubmissions.id,
           assignmentId: assignmentSubmissions.assignmentId,
+          studentId: assignmentSubmissions.studentId,
           status: assignmentSubmissions.status,
           isLate: assignmentSubmissions.isLate,
+          submittedAt: assignmentSubmissions.submittedAt,
+          gradedAt: assignmentSubmissions.gradedAt,
+          points: assignmentSubmissions.points,
+          feedback: assignmentSubmissions.feedback,
+          gradedBy: assignmentSubmissions.gradedBy,
+          createdAt: assignmentSubmissions.createdAt,
+          updatedAt: assignmentSubmissions.updatedAt,
         })
         .from(assignmentSubmissions)
         .where(
@@ -215,6 +243,12 @@ export async function getStudentSubmission(
       status: assignmentSubmissions.status,
       isLate: assignmentSubmissions.isLate,
       submittedAt: assignmentSubmissions.submittedAt,
+      gradedAt: assignmentSubmissions.gradedAt,
+      points: assignmentSubmissions.points,
+      feedback: assignmentSubmissions.feedback,
+      gradedBy: assignmentSubmissions.gradedBy,
+      createdAt: assignmentSubmissions.createdAt,
+      updatedAt: assignmentSubmissions.updatedAt,
     })
     .from(assignmentSubmissions)
     .where(
@@ -235,7 +269,7 @@ export async function getStudentSubmission(
 export async function startOrResumeSubmission(
   studentId: string,
   assignmentId: string
-): Promise<AssignmentSubmission> {
+): Promise<StudentSubmissionStatus> {
   const resolved = await verifyStudentAssignmentAccess(studentId, assignmentId);
   if (!resolved) throw new AssignmentNotFoundError();
 
@@ -255,6 +289,12 @@ export async function startOrResumeSubmission(
       status: assignmentSubmissions.status,
       isLate: assignmentSubmissions.isLate,
       submittedAt: assignmentSubmissions.submittedAt,
+      gradedAt: assignmentSubmissions.gradedAt,
+      points: assignmentSubmissions.points,
+      feedback: assignmentSubmissions.feedback,
+      gradedBy: assignmentSubmissions.gradedBy,
+      createdAt: assignmentSubmissions.createdAt,
+      updatedAt: assignmentSubmissions.updatedAt,
     })
     .from(assignmentSubmissions)
     .where(
@@ -296,6 +336,12 @@ export async function startOrResumeSubmission(
       status: assignmentSubmissions.status,
       isLate: assignmentSubmissions.isLate,
       submittedAt: assignmentSubmissions.submittedAt,
+      gradedAt: assignmentSubmissions.gradedAt,
+      points: assignmentSubmissions.points,
+      feedback: assignmentSubmissions.feedback,
+      gradedBy: assignmentSubmissions.gradedBy,
+      createdAt: assignmentSubmissions.createdAt,
+      updatedAt: assignmentSubmissions.updatedAt,
     })
     .from(assignmentSubmissions)
     .where(
@@ -540,7 +586,7 @@ export async function deleteSubmissionFile(
 export async function getSubmissionFilesForStudent(
   studentId: string,
   submissionId: string
-): Promise<AssignmentSubmissionFile[] | null> {
+): Promise<SubmissionFileSummary[] | null> {
   if (!isUuid(submissionId)) return null;
   const submission = await verifySubmissionOwnership(studentId, submissionId);
   if (!submission) return null;
@@ -549,6 +595,7 @@ export async function getSubmissionFilesForStudent(
   return db
     .select({
       id: assignmentSubmissionFiles.id,
+      submissionId: assignmentSubmissionFiles.submissionId,
       originalFilename: assignmentSubmissionFiles.originalFilename,
       mimeType: assignmentSubmissionFiles.mimeType,
       sizeBytes: assignmentSubmissionFiles.sizeBytes,

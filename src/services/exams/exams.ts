@@ -160,6 +160,8 @@ export async function getTeacherExamWithQuestions(
         questionType: questions.questionType,
         questionText: questions.questionText,
         explanation: questions.explanation,
+        createdAt: questions.createdAt,
+        updatedAt: questions.updatedAt,
       })
       .from(questions)
       .where(inArray(questions.id, questionIds)),
@@ -170,6 +172,8 @@ export async function getTeacherExamWithQuestions(
         optionText: questionOptions.optionText,
         isCorrect: questionOptions.isCorrect,
         position: questionOptions.position,
+        createdAt: questionOptions.createdAt,
+        updatedAt: questionOptions.updatedAt,
       })
       .from(questionOptions)
       .where(inArray(questionOptions.questionId, questionIds))

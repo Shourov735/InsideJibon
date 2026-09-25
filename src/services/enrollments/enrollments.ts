@@ -203,7 +203,17 @@ export async function isStudentEnrolled(
 
 export interface StudentEnrollmentStatus {
   id: string;
-  status: "active" | "pending" | "rejected" | "withdrawn" | "completed";
+  studentId: string;
+  courseId: string;
+  /** Decision-relevant statuses only — `withdrawn` / `completed` are
+   * derived states that are surfaced through their own UI (course progress,
+   * withdrawal flow) and intentionally excluded from this projection so the
+   * marketing-page EnrollButton union stays narrow. */
+  status: "active" | "pending" | "rejected";
+  decidedAt: Date | null;
+  decidedBy: string | null;
+  enrolledAt: Date;
+  completedAt: Date | null;
 }
 
 export async function getStudentEnrollment(
@@ -215,7 +225,13 @@ export async function getStudentEnrollment(
   const [row] = await db
     .select({
       id: enrollments.id,
+      studentId: enrollments.studentId,
+      courseId: enrollments.courseId,
       status: enrollments.status,
+      decidedAt: enrollments.decidedAt,
+      decidedBy: enrollments.decidedBy,
+      enrolledAt: enrollments.enrolledAt,
+      completedAt: enrollments.completedAt,
     })
     .from(enrollments)
     .where(
