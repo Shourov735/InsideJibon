@@ -194,6 +194,22 @@ export async function publishCourseAction(
     revalidatePath("/teacher/courses");
     revalidatePath(`/teacher/courses/${parsed.data.courseId}`);
     revalidatePath(`/teacher/courses/${parsed.data.courseId}/builder`);
+    // R0 §8: invalidate the public edge cache so the change is reflected
+    // on the marketing landing and catalog immediately. The course
+    // detail page (where it lives) is also invalidated.
+    revalidatePath("/");
+    revalidatePath("/courses");
+    if (course.slug) revalidatePath(`/courses/${course.slug}`);
+    // Best-effort async purge via Workers Queues for downstream caches
+    // that do not honor Next.js revalidatePath (e.g. external CDNs). We
+    // reuse the notifications queue to avoid adding a fourth binding.
+    try {
+      const { enqueuePurgeByTag } = await import("@/lib/cloudflare/cache");
+      void enqueuePurgeByTag(`course:${course.slug}`);
+      void enqueuePurgeByTag("courses:list");
+    } catch {
+      // No-op if the helper or queue is unavailable (Node dev).
+    }
     return { success: true, data: course };
   } catch (error) {
     return {

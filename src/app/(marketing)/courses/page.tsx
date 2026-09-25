@@ -12,6 +12,12 @@ import { getStudentEnrollments } from "@/services/enrollments";
 import { buildAlternates, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 
+// R0 §8: course catalog edge-cache is deferred to a follow-up because the
+// page currently renders enrollment status inline. The right shape is to
+// split the listing (cacheable, 60s/10min) from the enrollment badges
+// (per-user, dynamic via Suspense). Until that split lands we keep
+// `force-dynamic` so existing users see no behavior change.
+// export const revalidate = 60;
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {

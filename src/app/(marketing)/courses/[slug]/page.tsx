@@ -14,6 +14,15 @@ import {
 } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 
+// R0 §8: course detail edge-cache. The per-user `resolveCurrentUser()`
+// call inside the page component still runs on every request — Next.js
+// handles this by suspending the per-user subtree and serving the rest
+// from the route cache. We tag the page with `course:<slug>` so a
+// `revalidateTag('course:<slug>')` call from the publish/update flow
+// purges the entry. Stale-while-revalidate window is the default Next.js
+// behavior on Cloudflare.
+export const revalidate = 120;
+
 interface PublicCourseDetailPageProps {
   params: Promise<{ slug: string }>;
 }

@@ -6,6 +6,14 @@ import { getTranslator } from "@/i18n/server";
 import { buildWebsiteJsonLd, buildAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 
+// R0 §8: marketing landing is read-mostly and benefits from edge caching.
+// 60s TTL, 10min stale-while-revalidate. Tag invalidation is fired when
+// marketing-owned content changes (course publish on the marketing hero,
+// site-wide banners, etc.). The header/footer that wraps this page are
+// resolved on every request so the marketing layout already pays the
+// per-user fetch cost; the cached portion here is just the static body.
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslator();
   const isBn = t.locale === "bn";
