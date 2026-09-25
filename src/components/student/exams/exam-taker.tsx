@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { submitExamAction } from "@/app/student/actions";
 import type { ExamTakingQuestion } from "@/types/exam";
 import { useTranslations } from "@/i18n/client";
+
+import { useExamTimer } from "./hooks/use-exam-timer";
+import { useExamKeyboardNav } from "./hooks/use-exam-keyboard-nav";
+import { useExamAutosave } from "./hooks/use-exam-autosave";
+import { ExamTakerQuestion } from "./exam-taker-question";
+import { ExamTakerPalette } from "./exam-taker-palette";
+import { ExamTakerControls } from "./exam-taker-controls";
 
 interface ExamTakerProps {
   courseId: string;
@@ -17,6 +24,24 @@ interface ExamTakerProps {
   startedAt?: string;
 }
 
+/**
+ * R0 §4.1: orchestrator. Owns the four pieces of state that drive the
+ * exam UI:
+ *   - `currentIndex` — active question.
+ *   - `selections`   — { questionId -> optionId }.
+ *   - `markedForReview` — { questionId -> boolean }.
+ *   - submit modal + submitting flag + submit error.
+ *
+ * Render responsibilities delegated to:
+ *   - <ExamTakerControls />  — header row + bottom navigation.
+ *   - <ExamTakerQuestion />  — the active question card.
+ *   - <ExamTakerPalette />   — desktop rail + mobile drawer.
+ *
+ * Hooks:
+ *   - useExamTimer()        — secondsRemaining + formattedTime.
+ *   - useExamKeyboardNav()   — arrow keys + number jump.
+ *   - useExamAutosave()     — scaffold; no real persistence yet.
+ */
 export function ExamTaker({
   courseId,
   examId,
@@ -29,110 +54,73 @@ export function ExamTaker({
   const { t, tn } = useTranslations();
   const router = useRouter();
 
-  // Active question index (0-indexed)
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Student answer selections: questionId -> selectedOptionId
   const [selections, setSelections] = useState<Record<string, string>>({});
+  const [markedForReview, setMarkedForReview] = useState<
+    Record<string, boolean>
+  >({});
 
-  // Marked for review flags: questionId -> boolean
-  const [markedForReview, setMarkedForReview] = useState<Record<string, boolean>>({});
-
-  // UI state
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isMobileNavigatorOpen, setIsMobileNavigatorOpen] = useState(false);
 
-  // Live Timer
-  const [secondsRemaining, setSecondsRemaining] = useState<number | null>(() => {
-    if (durationMinutes && startedAt) {
-      const endMs = new Date(startedAt).getTime() + durationMinutes * 60 * 1000;
-      const nowMs = Date.now();
-      return Math.max(0, Math.floor((endMs - nowMs) / 1000));
-    }
-    return null;
-  });
+  const timer = useExamTimer(durationMinutes, startedAt);
+  useExamKeyboardNav(currentIndex, questions.length, setCurrentIndex);
 
-  useEffect(() => {
-    if (durationMinutes && startedAt) {
-      const endMs = new Date(startedAt).getTime() + durationMinutes * 60 * 1000;
-      const interval = setInterval(() => {
-        const remaining = Math.max(0, Math.floor((endMs - Date.now()) / 1000));
-        setSecondsRemaining(remaining);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [durationMinutes, startedAt]);
+  // Autosave is intentionally a no-op stub for R0 — see hook for the
+  // persistence seam. The serialize callback captures selections by
+  // reference; it will be replaced in R9 when the autosave endpoint
+  // lands.
+  useExamAutosave(
+    () => Object.entries(selections).map(([qid, oid]) => ({ qid, oid })),
+    undefined,
+    30_000
+  );
 
   const currentQuestion = questions[currentIndex] ?? questions[0];
   const totalQuestions = questions.length;
   const answeredCount = Object.keys(selections).length;
   const unansweredCount = Math.max(0, totalQuestions - answeredCount);
   const markedCount = Object.values(markedForReview).filter(Boolean).length;
-  const progressPercent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
 
-  const currentSelectedOptionId = currentQuestion ? selections[currentQuestion.id] : undefined;
-  const isCurrentMarked = currentQuestion ? Boolean(markedForReview[currentQuestion.id]) : false;
+  const currentSelectedOptionId = currentQuestion
+    ? selections[currentQuestion.id]
+    : undefined;
+  const isCurrentMarked = currentQuestion
+    ? Boolean(markedForReview[currentQuestion.id])
+    : false;
 
-  // Format timer
-  const formattedTime = useMemo(() => {
-    if (secondsRemaining == null) return null;
-    const hours = Math.floor(secondsRemaining / 3600);
-    const minutes = Math.floor((secondsRemaining % 3600) / 60);
-    const seconds = secondsRemaining % 60;
-    const pad = (n: number) => n.toString().padStart(2, "0");
-    if (hours > 0) {
-      return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-    }
-    return `${pad(minutes)}:${pad(seconds)}`;
-  }, [secondsRemaining]);
-
-  const isLowTime = secondsRemaining != null && secondsRemaining <= 900; // < 15 mins
-  const isUrgentTime = secondsRemaining != null && secondsRemaining <= 300; // < 5 mins
-
-  // Option selection
-  const handleSelectOption = (optionId: string) => {
+  function handleSelectOption(optionId: string) {
     if (!currentQuestion) return;
-    setSelections((prev) => ({
-      ...prev,
-      [currentQuestion.id]: optionId,
-    }));
-  };
+    setSelections((prev) => ({ ...prev, [currentQuestion.id]: optionId }));
+  }
 
-  // Clear current selection
-  const handleClearSelection = () => {
+  function handleClearSelection() {
     if (!currentQuestion) return;
     setSelections((prev) => {
       const next = { ...prev };
       delete next[currentQuestion.id];
       return next;
     });
-  };
+  }
 
-  // Toggle review flag
-  const handleToggleMark = () => {
+  function handleToggleMark() {
     if (!currentQuestion) return;
     setMarkedForReview((prev) => ({
       ...prev,
       [currentQuestion.id]: !prev[currentQuestion.id],
     }));
-  };
+  }
 
-  // Submit Exam
-  const handleConfirmSubmit = async () => {
+  async function handleConfirmSubmit() {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    const answersPayload = Object.entries(selections).map(([questionId, selectedOptionId]) => ({
-      questionId,
-      selectedOptionId,
-    }));
+    const answersPayload = Object.entries(selections).map(
+      ([questionId, selectedOptionId]) => ({ questionId, selectedOptionId })
+    );
 
-    const res = await submitExamAction({
-      attemptId,
-      answers: answersPayload,
-    });
+    const res = await submitExamAction({ attemptId, answers: answersPayload });
 
     if (!res.success) {
       setSubmitError(res.error);
@@ -144,7 +132,7 @@ export function ExamTaker({
       `/student/courses/${courseId}/exams/${examId}/result?attempt=${attemptId}`
     );
     router.refresh();
-  };
+  }
 
   if (totalQuestions === 0) {
     return (
@@ -158,44 +146,65 @@ export function ExamTaker({
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-140px)] w-full">
-      {/* Top Examination Status Header */}
-      <header className="sticky top-16 z-30 mb-4 sm:mb-6 rounded-2xl border border-outline-variant bg-surface-container-lowest/95 px-4 sm:px-5 py-3 shadow-xs backdrop-blur-md">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-on-primary shadow-xs">
-              Q{currentIndex + 1}
-            </span>
-            <div className="min-w-0 max-w-[140px] sm:max-w-xs md:max-w-md">
-              <h2 className="text-xs sm:text-sm font-bold text-on-surface truncate">
-                {examTitle || t("student.exam.assessmentFallback")}
-              </h2>
-              <p className="text-[11px] text-secondary truncate">
-                {t("student.exam.questionProgressAnswered", {
-                  current: currentIndex + 1,
-                  total: totalQuestions,
-                  answered: answeredCount,
-                })}
-              </p>
-            </div>
-          </div>
+      <ExamTakerControls
+        examTitle={examTitle}
+        currentIndex={currentIndex}
+        totalQuestions={totalQuestions}
+        answeredCount={answeredCount}
+        isCurrentMarked={isCurrentMarked}
+        isLastQuestion={currentIndex >= totalQuestions - 1}
+        formattedTime={timer.formattedTime}
+        isLowTime={timer.isLowTime}
+        isUrgentTime={timer.isUrgentTime}
+        isUntimed={durationMinutes == null}
+        onPrev={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+        onNext={() =>
+          setCurrentIndex((prev) => Math.min(totalQuestions - 1, prev + 1))
+        }
+        onToggleMark={handleToggleMark}
+        onRequestSubmit={() => setIsSubmitModalOpen(true)}
+      />
 
-          {/* Center / Right actions: Timer & Submit */}
-          <div className="flex items-center gap-2 sm:gap-3 ml-auto">
-            {/* Timer Display */}
-            {formattedTime ? (
-              <div
-                className={`flex items-center gap-1.5 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs font-bold transition-colors ${
-                  isUrgentTime
-                    ? "border border-error/30 bg-error-container text-on-error-container animate-pulse"
-                    : isLowTime
-                    ? "border border-amber-300 bg-amber-50 text-amber-900"
-                    : "border border-outline-variant bg-surface-container-low text-on-surface"
-                }`}
-              >
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 flex-1">
+        <main className="lg:col-span-8 flex flex-col justify-between space-y-6">
+          <div className="space-y-4">
+            {currentQuestion ? (
+              <ExamTakerQuestion
+                question={currentQuestion}
+                currentIndex={currentIndex}
+                totalQuestions={totalQuestions}
+                selectedOptionId={currentSelectedOptionId}
+                isMarked={isCurrentMarked}
+                onSelect={handleSelectOption}
+                onClear={handleClearSelection}
+                onToggleMark={handleToggleMark}
+              />
+            ) : null}
+          </div>
+        </main>
+
+        <ExamTakerPalette
+          questions={questions}
+          currentIndex={currentIndex}
+          selections={selections}
+          markedForReview={markedForReview}
+          onJump={setCurrentIndex}
+          onRequestSubmit={() => setIsSubmitModalOpen(true)}
+        />
+      </div>
+
+      {isSubmitModalOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="submit-modal-title"
+        >
+          <div className="w-full max-w-md rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3 border-b border-outline-variant pb-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <svg
-                  className={`h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 ${
-                    isUrgentTime ? "text-error" : isLowTime ? "text-amber-700" : "text-primary"
-                  }`}
+                  className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -204,515 +213,15 @@ export function ExamTaker({
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span className="font-mono">{formattedTime}</span>
               </div>
-            ) : (
-              <div className="hidden sm:flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-secondary">
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{t("common.status.untimed")}</span>
-              </div>
-            )}
-
-            {/* Mark for review header button */}
-            <button
-              type="button"
-              onClick={handleToggleMark}
-              title={
-                isCurrentMarked
-                  ? t("student.exam.unmarkQuestion")
-                  : t("student.exam.markQuestionTitle")
-              }
-              className={`inline-flex items-center gap-1 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
-                isCurrentMarked
-                  ? "border-tertiary bg-amber-50 text-amber-900 shadow-2xs"
-                  : "border-outline-variant bg-surface-container-low text-secondary hover:bg-surface-container hover:text-on-surface"
-              }`}
-            >
-              <svg
-                className={`h-3.5 w-3.5 ${isCurrentMarked ? "text-amber-800" : "text-secondary"}`}
-                fill={isCurrentMarked ? "currentColor" : "none"}
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
-                />
-              </svg>
-              <span className="hidden sm:inline">
-                {isCurrentMarked ? t("student.exam.markedShort") : t("student.exam.flag")}
-              </span>
-            </button>
-
-            {/* Submit Button */}
-            <button
-              type="button"
-              onClick={() => setIsSubmitModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
-            >
-              <span>{t("student.exam.submitExam")}</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Two-Column Layout (Desktop) */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 flex-1">
-        {/* LEFT / CENTER: Question Canvas (8 cols on desktop) */}
-        <main className="lg:col-span-8 flex flex-col justify-between space-y-6">
-          <div className="space-y-4">
-            {/* Question Header Card */}
-            <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 sm:p-8 shadow-xs">
-              {/* Question Metadata */}
-              <div className="flex items-center justify-between border-b border-outline-variant pb-4 mb-5">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">
-                    {currentQuestion.position}
-                  </span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-secondary">
-                    {t("student.exam.questionOf", {
-                      current: currentIndex + 1,
-                      total: totalQuestions,
-                    })}
-                  </span>
-                  {currentQuestion.questionType === "true_false" && (
-                    <span className="rounded bg-surface-container-high px-2 py-0.5 text-[10px] font-semibold text-secondary">
-                      {t("exam.questionType.trueFalse")}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-surface-container-high px-2.5 py-1 text-xs font-semibold text-secondary">
-                    {currentQuestion.marks}{" "}
-                    {tn("student.exam.marks", currentQuestion.marks)}
-                  </span>
-
-                  {isCurrentMarked && (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-amber-300 bg-amber-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
-                      <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                      </svg>
-                      {t("student.exam.flagged")}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Question Prompt */}
-              <div className="mb-6">
-                <h3 className="text-base sm:text-lg font-semibold leading-relaxed text-on-surface whitespace-pre-wrap">
-                  {currentQuestion.questionText}
-                </h3>
-              </div>
-
-              {/* MCQ Options Stack */}
-              <div
-                className="space-y-3"
-                role="radiogroup"
-                aria-label={t("student.exam.optionsAria", {
-                  n: currentQuestion.position,
-                })}
-              >
-                {currentQuestion.options.map((option, optIdx) => {
-                  const isSelected = currentSelectedOptionId === option.id;
-                  const letter = String.fromCharCode(65 + optIdx);
-
-                  return (
-                    <label
-                      key={option.id}
-                      onClick={() => handleSelectOption(option.id)}
-                      className={`group relative flex items-center gap-3.5 rounded-xl border p-4 transition-all duration-150 cursor-pointer ${
-                        isSelected
-                          ? "border-2 border-primary bg-secondary-container/35 text-on-surface shadow-2xs"
-                          : "border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:border-outline hover:bg-surface-container-low"
-                      }`}
-                    >
-                      {/* Hidden Accessible Radio Input */}
-                      <input
-                        type="radio"
-                        name={`question-${currentQuestion.id}`}
-                        value={option.id}
-                        checked={isSelected}
-                        onChange={() => handleSelectOption(option.id)}
-                        className="sr-only"
-                      />
-
-                      {/* Custom Academic Radio Indicator */}
-                      <div
-                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
-                          isSelected
-                            ? "border-primary bg-primary text-on-primary"
-                            : "border-outline-variant bg-surface-container-lowest group-hover:border-primary/60"
-                        }`}
-                      >
-                        {isSelected && <div className="h-2 w-2 rounded-full bg-white" />}
-                      </div>
-
-                      {/* Letter Identifier (A, B, C, D) */}
-                      <span
-                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
-                          isSelected
-                            ? "bg-primary text-on-primary"
-                            : "bg-surface-container-high text-secondary group-hover:bg-surface-container-highest"
-                        }`}
-                      >
-                        {letter}
-                      </span>
-
-                      {/* Option Text */}
-                      <span
-                        className={`flex-1 text-sm leading-relaxed ${
-                          isSelected ? "font-semibold text-on-surface" : "text-on-surface-variant"
-                        }`}
-                      >
-                        {option.optionText}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-
-              {/* In-Card Action Toolbar */}
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant pt-4 text-xs">
-                <button
-                  type="button"
-                  onClick={handleToggleMark}
-                  className={`inline-flex items-center gap-1.5 font-semibold transition-colors cursor-pointer ${
-                    isCurrentMarked
-                      ? "text-amber-800 hover:text-amber-900"
-                      : "text-secondary hover:text-on-surface"
-                  }`}
+              <div>
+                <h3
+                  id="submit-modal-title"
+                  className="text-base font-bold text-on-surface"
                 >
-                  <svg
-                    className="h-4 w-4"
-                    fill={isCurrentMarked ? "currentColor" : "none"}
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
-                    />
-                  </svg>
-                  <span>
-                    {isCurrentMarked
-                      ? t("student.exam.removeFlag")
-                      : t("student.exam.markForReview")}
-                  </span>
-                </button>
-
-                {currentSelectedOptionId && (
-                  <button
-                    type="button"
-                    onClick={handleClearSelection}
-                    className="inline-flex items-center gap-1 font-semibold text-secondary hover:text-error transition-colors cursor-pointer"
-                  >
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span>{t("student.exam.clearSelection")}</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Navigation Buttons */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 pt-2">
-            <button
-              type="button"
-              disabled={currentIndex === 0}
-              onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 sm:px-5 py-2.5 text-xs font-bold text-on-surface shadow-2xs transition-colors hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>{t("student.learn.previous")}</span>
-            </button>
-
-            {/* Mobile Navigator Toggle Button */}
-            <button
-              type="button"
-              onClick={() => setIsMobileNavigatorOpen(true)}
-              className="inline-flex lg:hidden items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-2.5 text-xs font-semibold text-primary cursor-pointer hover:bg-surface-container"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-              <span>
-                {t("student.exam.navigatorCount", {
-                  answered: answeredCount,
-                  total: totalQuestions,
-                })}
-              </span>
-            </button>
-
-            {currentIndex < totalQuestions - 1 ? (
-              <button
-                type="button"
-                onClick={() => setCurrentIndex((prev) => Math.min(totalQuestions - 1, prev + 1))}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 sm:px-5 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
-              >
-                <span>{t("student.exam.nextQuestion")}</span>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsSubmitModalOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 sm:px-6 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
-              >
-                <span>{t("student.exam.reviewAndSubmit")}</span>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </button>
-            )}
-          </div>
-        </main>
-
-        {/* RIGHT PANEL: Question Navigator (4 cols on desktop) */}
-        <aside className="hidden lg:flex lg:col-span-4 flex-col">
-          <div className="sticky top-32 rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-xs space-y-5">
-            <div>
-              <h3 className="text-sm font-bold text-on-surface">
-                {t("student.exam.questionNavigator")}
-              </h3>
-              <p className="text-xs text-secondary mt-0.5">
-                {t("student.exam.progressAnswered", {
-                  answered: answeredCount,
-                  total: totalQuestions,
-                  percent: progressPercent,
-                })}
-              </p>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-300"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-
-            {/* Legend */}
-            <div className="grid grid-cols-2 gap-2 border-y border-outline-variant/60 py-3 text-[11px]">
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-xs bg-primary" />
-                <span className="text-secondary font-medium">
-                  {t("student.exam.legendAnswered", { count: answeredCount })}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-xs border border-outline-variant bg-surface-container-lowest" />
-                <span className="text-secondary font-medium">
-                  {t("student.exam.legendUnanswered", { count: unansweredCount })}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-3 w-3 items-center justify-center rounded-xs border border-amber-500 bg-amber-50 text-amber-700">
-                  <div className="h-1.5 w-1.5 rounded-full bg-amber-600" />
-                </div>
-                <span className="text-secondary font-medium">
-                  {t("student.exam.legendMarked", { count: markedCount })}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-xs border-2 border-primary bg-primary/20" />
-                <span className="text-secondary font-medium">
-                  {t("student.exam.legendCurrent")}
-                </span>
-              </div>
-            </div>
-
-            {/* Question Grid */}
-            <div className="grid grid-cols-5 gap-2 max-h-[420px] overflow-y-auto pr-1">
-              {questions.map((q, idx) => {
-                const isAnswered = Boolean(selections[q.id]);
-                const isCurrent = idx === currentIndex;
-                const isMarked = Boolean(markedForReview[q.id]);
-
-                let buttonStyle = "border-outline-variant bg-surface-container-lowest text-secondary hover:bg-surface-container-low hover:text-on-surface";
-                if (isCurrent) {
-                  buttonStyle = "border-2 border-primary bg-primary/10 text-primary font-bold shadow-2xs";
-                } else if (isAnswered) {
-                  buttonStyle = "bg-primary text-on-primary border-primary font-semibold hover:opacity-90";
-                } else if (isMarked) {
-                  buttonStyle = "border-amber-400 bg-amber-50 text-amber-900 font-semibold";
-                }
-
-                return (
-                  <button
-                    key={q.id}
-                    type="button"
-                    onClick={() => setCurrentIndex(idx)}
-                    title={
-                      t("student.exam.questionShort", { n: idx + 1 }) +
-                      (isAnswered ? t("student.exam.answeredSuffix") : "") +
-                      (isMarked ? t("student.exam.markedSuffix") : "")
-                    }
-                    className={`relative aspect-square rounded-xl border text-xs transition-all flex items-center justify-center cursor-pointer ${buttonStyle}`}
-                  >
-                    <span>{idx + 1}</span>
-                    {isMarked && (
-                      <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-500 text-[8px] text-white">
-                        ★
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Quick Submit CTA */}
-            <div className="pt-2 border-t border-outline-variant">
-              <button
-                type="button"
-                onClick={() => setIsSubmitModalOpen(true)}
-                className="w-full rounded-xl bg-primary py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
-              >
-                {t("student.exam.submitExamination")}
-              </button>
-            </div>
-          </div>
-        </aside>
-      </div>
-
-      {/* Mobile Slide-Over / Bottom Sheet for Question Navigator */}
-      {isMobileNavigatorOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs lg:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-navigator-title">
-          <div className="flex max-h-[80vh] flex-col rounded-t-3xl border-t border-outline-variant bg-surface-container-lowest p-6 shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200">
-            <div className="flex items-center justify-between border-b border-outline-variant pb-4">
-              <div>
-                <h3 id="mobile-navigator-title" className="text-base font-bold text-on-surface">
-                  {t("student.exam.questionNavigator")}
-                </h3>
-                <p className="text-xs text-secondary mt-0.5">
-                  {t("student.exam.progressAnswered", {
-                    answered: answeredCount,
-                    total: totalQuestions,
-                    percent: progressPercent,
-                  })}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsMobileNavigatorOpen(false)}
-                className="rounded-lg p-2 text-secondary hover:bg-surface-container hover:text-on-surface"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto py-4 space-y-4">
-              {/* Legend */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-xs bg-primary" />
-                  <span className="text-secondary">
-                    {t("student.exam.legendAnswered", { count: answeredCount })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-xs border border-outline-variant bg-surface-container-lowest" />
-                  <span className="text-secondary">
-                    {t("student.exam.legendUnanswered", { count: unansweredCount })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-xs border border-amber-500 bg-amber-50 text-amber-700" />
-                  <span className="text-secondary">
-                    {t("student.exam.legendMarked", { count: markedCount })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-xs border-2 border-primary bg-primary/20" />
-                  <span className="text-secondary">
-                    {t("student.exam.legendCurrent")}
-                  </span>
-                </div>
-              </div>
-
-              {/* Grid */}
-              <div className="grid grid-cols-5 gap-2.5">
-                {questions.map((q, idx) => {
-                  const isAnswered = Boolean(selections[q.id]);
-                  const isCurrent = idx === currentIndex;
-                  const isMarked = Boolean(markedForReview[q.id]);
-
-                  let buttonStyle = "border-outline-variant bg-surface-container-lowest text-secondary";
-                  if (isCurrent) {
-                    buttonStyle = "border-2 border-primary bg-primary/10 text-primary font-bold";
-                  } else if (isAnswered) {
-                    buttonStyle = "bg-primary text-on-primary border-primary font-semibold";
-                  } else if (isMarked) {
-                    buttonStyle = "border-amber-400 bg-amber-50 text-amber-900 font-semibold";
-                  }
-
-                  return (
-                    <button
-                      key={q.id}
-                      type="button"
-                      onClick={() => {
-                        setCurrentIndex(idx);
-                        setIsMobileNavigatorOpen(false);
-                      }}
-                      className={`relative aspect-square rounded-xl border text-sm transition-all flex items-center justify-center ${buttonStyle}`}
-                    >
-                      <span>{idx + 1}</span>
-                      {isMarked && (
-                        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-500 text-[8px] text-white">
-                          ★
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-outline-variant">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMobileNavigatorOpen(false);
-                  setIsSubmitModalOpen(true);
-                }}
-                className="w-full rounded-xl bg-primary py-3 text-xs font-bold text-on-primary shadow-xs"
-              >
-                {t("student.exam.submitExam")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* SUBMISSION CONFIRMATION MODAL */}
-      {isSubmitModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">
-          <div className="w-full max-w-md rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="flex items-center gap-3 border-b border-outline-variant pb-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 id="submit-modal-title" className="text-base font-bold text-on-surface">
                   {t("student.exam.submitConfirmTitle")}
                 </h3>
                 <p className="text-xs text-secondary">
@@ -721,28 +230,33 @@ export function ExamTaker({
               </div>
             </div>
 
-            {submitError && (
+            {submitError ? (
               <div className="rounded-xl border border-error-container bg-error-container/40 p-3.5 text-xs text-on-error-container">
                 <p className="font-semibold">
                   {t("student.exam.submissionFailed")}
                 </p>
                 <p className="mt-0.5">{submitError}</p>
               </div>
-            )}
+            ) : null}
 
-            {/* Answer Summary Stats */}
             <div className="grid grid-cols-3 gap-2 rounded-xl border border-outline-variant bg-surface-container-low p-3.5 text-center">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
                   {t("student.exam.statAnswered")}
                 </span>
-                <p className="mt-0.5 text-lg font-extrabold text-primary">{answeredCount}</p>
+                <p className="mt-0.5 text-lg font-extrabold text-primary">
+                  {answeredCount}
+                </p>
               </div>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
                   {t("student.exam.statUnanswered")}
                 </span>
-                <p className={`mt-0.5 text-lg font-extrabold ${unansweredCount > 0 ? "text-amber-700" : "text-secondary"}`}>
+                <p
+                  className={`mt-0.5 text-lg font-extrabold ${
+                    unansweredCount > 0 ? "text-amber-700" : "text-secondary"
+                  }`}
+                >
                   {unansweredCount}
                 </p>
               </div>
@@ -750,16 +264,27 @@ export function ExamTaker({
                 <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
                   {t("student.exam.statMarked")}
                 </span>
-                <p className="mt-0.5 text-lg font-extrabold text-secondary">{markedCount}</p>
+                <p className="mt-0.5 text-lg font-extrabold text-secondary">
+                  {markedCount}
+                </p>
               </div>
             </div>
 
-            {/* Warning notices */}
             <div className="space-y-2 text-xs text-on-surface-variant">
-              {unansweredCount > 0 && (
+              {unansweredCount > 0 ? (
                 <div className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50/80 p-3 text-amber-900">
-                  <svg className="h-4 w-4 shrink-0 text-amber-700 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  <svg
+                    className="h-4 w-4 shrink-0 text-amber-700 mt-0.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
                   </svg>
                   <p>
                     {t("student.exam.unansweredWarning", {
@@ -768,13 +293,10 @@ export function ExamTaker({
                     })}
                   </p>
                 </div>
-              )}
-              <p className="text-xs text-secondary">
-                {t("student.exam.finalNote")}
-              </p>
+              ) : null}
+              <p className="text-xs text-secondary">{t("student.exam.finalNote")}</p>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center justify-end gap-3 border-t border-outline-variant pt-4">
               <button
                 type="button"
@@ -793,9 +315,24 @@ export function ExamTaker({
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    <svg
+                      className="h-3.5 w-3.5 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
                     </svg>
                     <span>{t("student.exam.submitting")}</span>
                   </>
@@ -806,7 +343,7 @@ export function ExamTaker({
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
