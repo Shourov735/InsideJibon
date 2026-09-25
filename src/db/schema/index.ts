@@ -22,3 +22,4 @@ export * from "./energy";
 export * from "./ai-tutor";
 export * from "./proctoring";
 export * from "./pwa";
+export * from "./legal-email";

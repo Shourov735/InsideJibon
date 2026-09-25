@@ -1980,6 +1980,91 @@ export const en = {
   "proctor.review.actions.accepting": "Accepting…",
   "proctor.review.actions.void": "Void attempt",
   "proctor.review.reviewedAt": "Reviewed at {date}",
+
+  // R10 — i18n, legal & email templates.
+  "legal.footerLink": "Legal",
+  "legal.footerTerms": "Terms",
+  "legal.footerPrivacy": "Privacy",
+  "legal.footerRefund": "Refunds",
+  "legal.footerCookies": "Cookies",
+  "legal.lastUpdated": "Last updated",
+  "legal.version": "Version {version}",
+  "legal.acceptTermsLabel": "I agree to the {terms} and {privacy}",
+  "legal.terms": "Terms",
+  "legal.privacy": "Privacy",
+  "legal.signupRequired": "Please agree to the terms and privacy policy before continuing.",
+  "legal.termsTitle": "Terms of Service",
+  "legal.privacyTitle": "Privacy Policy",
+  "legal.refundTitle": "Refund Policy",
+  "legal.cookiesTitle": "Cookie Policy",
+
+  "email.common.viewInApp": "View in app",
+  "email.common.managePreferences": "Manage preferences",
+  "email.common.unsubscribe": "Unsubscribe",
+  "email.common.greeting": "Hi {name},",
+  "email.common.signature": "— The InsideJibon team",
+  "email.common.category.transactional": "Account & receipts",
+  "email.common.category.engagement": "Learning engagement",
+  "email.common.category.marketing": "Announcements & news",
+  "email.common.category.parent_digest": "Weekly parent digest",
+  "email.footer.copyright": "© {year} InsideJibon",
+
+  "email.preferences.title": "Email preferences",
+  "email.preferences.description":
+    "Choose which kinds of email we send you. Transactional emails (receipts, refund confirmations, grade notices) are required by law and can't be turned off.",
+  "email.preferences.saved": "Preferences saved",
+  "email.preferences.saveAction": "Save preferences",
+  "email.preferences.engagement.help":
+    "Live class reminders, Q&A activity, streak repairs.",
+  "email.preferences.marketing.help":
+    "Product updates, announcements, and the InsideJibon newsletter.",
+  "email.preferences.parent_digest.help":
+    "Weekly progress summary sent to your linked parent account.",
+
+  "validation.required": "This field is required",
+  "validation.tooShort": "Must be at least {minimum} characters",
+  "validation.tooLong": "Must be at most {maximum} characters",
+  "validation.invalidEmail": "Enter a valid email address",
+  "validation.invalidUrl": "Enter a valid URL",
+  "validation.mustMatch": "Values do not match",
+  "validation.outOfRange": "Must be between {minimum} and {maximum}",
+  "validation.invalidType": "Invalid value",
+  "validation.tooSmall": "Value is too small",
+  "validation.tooBig": "Value is too large",
+  "validation.invalidString": "Invalid format",
+  "validation.invalidEnumValue": "Pick one of the allowed values",
+  "validation.unrecognizedKeys": "Unknown fields were provided",
+  "validation.invalidArguments": "Invalid arguments",
+  "validation.invalidReturnType": "Returned value is invalid",
+  "validation.invalidDate": "Invalid date",
+  "validation.invalidLiteral": "Value does not match expected",
+  "validation.custom": "Value is invalid",
+  "validation.notMultipleOf": "Value must be a multiple of {multiple}",
+  "validation.invalidUnion": "Value matches none of the allowed shapes",
+  "validation.invalidUnionDiscriminator": "Could not determine which option to use",
+  "validation.invalidIntersectionTypes": "Value does not match all required shapes",
+  "validation.notFinite": "Must be a finite number",
+
+  "numbers.formatBangla": "Bengali numerals",
+  "numbers.formatBDT": "Taka",
+  "numbers.digitMode.label": "Number format",
+  "numbers.digitMode.western": "Western (1, 2, 3)",
+  "numbers.digitMode.bengali": "Bengali (১, ২, ৩)",
+
+  "dates.relative.justNow": "Just now",
+  "dates.relative.today": "Today",
+  "dates.relative.yesterday": "Yesterday",
+  "dates.relative.thisWeek": "This week",
+  "dates.relative.lastWeek": "Last week",
+
+  "account.emails.title": "Email notifications",
+  "account.emails.description":
+    "Choose which categories of email you want to receive. Required emails (receipts, refunds, grades) cannot be turned off.",
+  "account.emails.unsubscribeAll": "Unsubscribe from all optional emails",
+  "account.emails.resubscribeAll": "Resubscribe to all optional emails",
+
+  "signup.legalNotice": "By creating an account you agree to our {terms} and {privacy}.",
+  "signup.legalCheckboxRequired": "Please accept the terms and privacy policy to continue.",
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

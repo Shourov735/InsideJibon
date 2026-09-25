@@ -1,0 +1,371 @@
+import * as React from "react";
+
+import {
+  EmailButton,
+  EmailHeading,
+  EmailLayout,
+  EmailMuted,
+  EmailParagraph,
+} from "./layout";
+
+/**
+ * R10 — every transactional email template lives here.
+ *
+ * Each template is a pure function: given `(data, locale)` it returns a
+ * React element rendered server-side by `react-dom/server`. The shared
+ * `EmailLayout` provides header / footer / unsubscribe. No SaaS, no
+ * third-party template engines — keeps the dependency surface tiny.
+ *
+ * Templates cover the 11 events listed in phase R10 §3.2:
+ *   enrollment-decision, class-reminder, recording-ready, grade-posted,
+ *   qa-replied, qa-accepted, streak-repair, ai-tutor-answer,
+ *   payment-receipt, refund-executed, parent-digest.
+ *
+ * The category drives both the footer unsubscribe link and the accent
+ * color. Receipts/refunds/grade-posted are `transactional` and have a
+ * disabled unsubscribe (footer shows only "manage preferences", which
+ * still lets the user see but not toggle off transactional).
+ */
+
+export type TemplateName =
+  | "enrollment-decision"
+  | "class-reminder"
+  | "recording-ready"
+  | "grade-posted"
+  | "qa-replied"
+  | "qa-accepted"
+  | "streak-repair"
+  | "ai-tutor-answer"
+  | "payment-receipt"
+  | "refund-executed"
+  | "parent-digest";
+
+export type TemplateCategory =
+  | "transactional"
+  | "engagement"
+  | "marketing"
+  | "parent_digest";
+
+export type LocalizedStrings = Record<string, string>;
+
+const APP_NAME = "InsideJibon";
+
+function unsubscribeable(category: TemplateCategory): boolean {
+  // Transactional emails cannot be unsubscribed from (compliance).
+  return category !== "transactional";
+}
+
+function buildProps(
+  locale: "en" | "bn",
+  category: TemplateCategory,
+  t: LocalizedStrings,
+  data: {
+    appUrl: string;
+    manageToken: string;
+    ctaUrl: string;
+    ctaLabel: string;
+  }
+) {
+  const manageUrl = `${data.appUrl}/account/emails?token=${encodeURIComponent(
+    data.manageToken
+  )}`;
+  const unsubscribeUrl = unsubscribeable(category)
+    ? `${data.appUrl}/account/emails/unsubscribe?token=${encodeURIComponent(
+        data.manageToken
+      )}&category=${category}`
+    : "";
+  return {
+    locale,
+    category,
+    appName: APP_NAME,
+    year: new Date().getUTCFullYear(),
+    previewText: t["preview"] ?? t["title"] ?? "",
+    children: (
+      <>
+        <EmailHeading>{t["title"]}</EmailHeading>
+        {t["intro"] ? <EmailParagraph>{t["intro"]}</EmailParagraph> : null}
+        {data.ctaUrl ? (
+          <EmailParagraph>
+            <EmailButton
+              href={data.ctaUrl}
+              label={data.ctaLabel || (locale === "bn" ? "দেখুন" : "View")}
+            />
+          </EmailParagraph>
+        ) : null}
+        {t["outro"] ? (
+          <EmailParagraph>
+            <EmailMuted>{t["outro"]}</EmailMuted>
+          </EmailParagraph>
+        ) : null}
+      </>
+    ),
+    manageUrl,
+    unsubscribeUrl,
+  };
+}
+
+export type TemplateInput = {
+  locale: "en" | "bn";
+  category: TemplateCategory;
+  appUrl: string;
+  manageToken: string;
+  ctaUrl: string;
+  ctaLabel?: string;
+  t: LocalizedStrings;
+};
+
+export function renderTemplate(name: TemplateName, input: TemplateInput) {
+  const props = buildProps(
+    input.locale,
+    input.category,
+    input.t,
+    {
+      appUrl: input.appUrl,
+      manageToken: input.manageToken,
+      ctaUrl: input.ctaUrl,
+      ctaLabel: input.ctaLabel ?? "",
+    }
+  );
+  switch (name) {
+    case "enrollment-decision":
+    case "class-reminder":
+    case "recording-ready":
+    case "grade-posted":
+    case "qa-replied":
+    case "qa-accepted":
+    case "streak-repair":
+    case "ai-tutor-answer":
+    case "payment-receipt":
+    case "refund-executed":
+    case "parent-digest":
+      return <EmailLayout {...props} />;
+    default: {
+      const _exhaustive: never = name;
+      return _exhaustive;
+    }
+  }
+}
+
+/**
+ * Localized copy for each template / locale. Kept in one place so the
+ * i18n keys in §6 of the phase doc are the single source of truth and
+ * this file never holds Bangla strings the dictionary doesn't have.
+ *
+ * `subject` is intentionally short (RFC 5322 line-length safe).
+ */
+export const TEMPLATE_STRINGS: Record<
+  TemplateName,
+  { category: TemplateCategory; en: LocalizedStrings; bn: LocalizedStrings; subject: { en: string; bn: string } }
+> = {
+  "enrollment-decision": {
+    category: "engagement",
+    en: {
+      title: "Your enrollment request was reviewed",
+      preview: "Enrollment update from InsideJibon",
+      intro:
+        "A teacher reviewed your enrollment request. Open the app to see the decision and continue.",
+      outro:
+        "If you have questions, reply to this email — it goes to our support inbox.",
+    },
+    bn: {
+      title: "আপনার এনরোলমেন্ট রিকোয়েস্ট পর্যালোচনা হয়েছে",
+      preview: "InsideJibon থেকে এনরোলমেন্ট আপডেট",
+      intro:
+        "একজন শিক্ষক আপনার এনরোলমেন্ট রিকোয়েস্ট পর্যালোচনা করেছেন। সিদ্ধান্ত দেখতে অ্যাপ খুলুন।",
+      outro:
+        "প্রশ্ন থাকলে এই ইমেইলে রিপ্লাই দিন — সেটা আমাদের সাপোর্ট ইনবক্সে যাবে।",
+    },
+    subject: { en: "Enrollment decision / এনরোলমেন্ট আপডেট", bn: "এনরোলমেন্ট সিদ্ধান্ত" },
+  },
+  "class-reminder": {
+    category: "engagement",
+    en: {
+      title: "Live class starts soon",
+      preview: "Class reminder from InsideJibon",
+      intro:
+        "Your live class begins shortly. Open the app a few minutes early to settle in.",
+      outro: "You can mute notifications for live classes in /account/emails.",
+    },
+    bn: {
+      title: "লাইভ ক্লাস শীঘ্রই শুরু হবে",
+      preview: "InsideJibon থেকে ক্লাসের রিমাইন্ডার",
+      intro:
+        "আপনার লাইভ ক্লাস একটু পরেই শুরু হবে। কয়েক মিনিট আগে অ্যাপ খুলুন।",
+      outro:
+        "/account/emails থেকে লাইভ ক্লাস নোটিফিকেশন বন্ধ করতে পারবেন।",
+    },
+    subject: { en: "Class starting soon / ক্লাস শুরু হচ্ছে", bn: "ক্লাস শুরু হচ্ছে" },
+  },
+  "recording-ready": {
+    category: "engagement",
+    en: {
+      title: "Class recording is ready",
+      preview: "Replay available now",
+      intro:
+        "The recording of today's live class is ready to watch — even offline once you've loaded it once.",
+      outro: "Catch up on missed lessons anytime from the course page.",
+    },
+    bn: {
+      title: "ক্লাসের রেকর্ডিং প্রস্তুত",
+      preview: "রিপ্লে এখনই দেখা যাবে",
+      intro:
+        "আজকের লাইভ ক্লাসের রেকর্ডিং দেখার জন্য প্রস্তুত — একবার লোড করলে অফলাইনেও দেখা যাবে।",
+      outro: "যেকোনো সময় কোর্স পেজ থেকে মিস করা লেসন দেখে নিন।",
+    },
+    subject: { en: "Recording ready / রেকর্ডিং প্রস্তুত", bn: "রেকর্ডিং প্রস্তুত" },
+  },
+  "grade-posted": {
+    category: "transactional",
+    en: {
+      title: "Your grade has been posted",
+      preview: "New grade on InsideJibon",
+      intro:
+        "Your teacher posted a grade for a recent submission. Open the app to review the score and feedback.",
+      outro:
+        "Receipts and grades cannot be unsubscribed from — they're part of your learning record.",
+    },
+    bn: {
+      title: "আপনার গ্রেড প্রকাশিত হয়েছে",
+      preview: "InsideJibon-এ নতুন গ্রেড",
+      intro:
+        "আপনার শিক্ষক সাম্প্রতিক সাবমিশনের গ্রেড প্রকাশ করেছেন। স্কোর ও ফিডব্যাক দেখতে অ্যাপ খুলুন।",
+      outro:
+        "রিসিট ও গ্রেড থেকে আনসাবস্ক্রাইব করা যায় না — এগুলো আপনার লার্নিং রেকর্ডের অংশ।",
+    },
+    subject: { en: "Grade posted / গ্রেড প্রকাশিত", bn: "গ্রেড প্রকাশিত" },
+  },
+  "qa-replied": {
+    category: "engagement",
+    en: {
+      title: "Someone replied to your question",
+      preview: "New reply on your Q&A thread",
+      intro:
+        "A peer or your teacher replied to your question. Open the lesson to read the answer and continue the thread.",
+      outro: "Mark the answer as accepted if it solved your doubt.",
+    },
+    bn: {
+      title: "আপনার প্রশ্নের উত্তর দিয়েছেন কেউ",
+      preview: "Q&A থ্রেডে নতুন উত্তর",
+      intro:
+        "একজন সহপাঠী বা আপনার শিক্ষক আপনার প্রশ্নের উত্তর দিয়েছেন। উত্তর পড়তে লেসন খুলুন।",
+      outro: "উত্তর যদি আপনার সন্দেহ দূর করে থাকে, একসেপ্টেড হিসেবে মার্ক করুন।",
+    },
+    subject: { en: "Reply to your question / প্রশ্নের উত্তর", bn: "প্রশ্নের উত্তর" },
+  },
+  "qa-accepted": {
+    category: "engagement",
+    en: {
+      title: "Your answer was accepted",
+      preview: "Your Q&A answer was marked accepted",
+      intro:
+        "The teacher accepted your answer as the best on the thread. Nice work.",
+      outro: "Keep helping peers — your XP grows with each accepted answer.",
+    },
+    bn: {
+      title: "আপনার উত্তর একসেপ্টেড হয়েছে",
+      preview: "আপনার উত্তর একসেপ্টেড হিসেবে মার্ক হয়েছে",
+      intro:
+        "শিক্ষক আপনার উত্তরকে সেরা হিসেবে একসেপ্ট করেছেন। চমৎকার কাজ।",
+      outro:
+        "সহপাঠীদের সাহায্য করতে থাকুন — প্রতিটি একসেপ্টেড উত্তরে আপনার XP বাড়ে।",
+    },
+    subject: { en: "Answer accepted / উত্তর একসেপ্টেড", bn: "উত্তর একসেপ্টেড" },
+  },
+  "streak-repair": {
+    category: "engagement",
+    en: {
+      title: "Your streak is at risk",
+      preview: "One small step keeps your streak alive",
+      intro:
+        "You haven't opened InsideJibon today. A 10-minute lesson is enough to keep your streak going.",
+      outro: "Streak freeze tokens are used automatically when you miss a day.",
+    },
+    bn: {
+      title: "আপনার স্ট্রিক ঝুঁকিতে আছে",
+      preview: "একটি ছোট পদক্ষেপ স্ট্রিক বাঁচিয়ে রাখে",
+      intro:
+        "আজকে InsideJibon খুলেননি। ১০ মিনিটের একটি লেসনই স্ট্রিক ধরে রাখার জন্য যথেষ্ট।",
+      outro:
+        "স্ট্রিক ফ্রিজ টোকেন একদিন মিস করলে স্বয়ংক্রিয়ভাবে ব্যবহৃত হয়।",
+    },
+    subject: { en: "Streak at risk / স্ট্রিক ঝুঁকিতে", bn: "স্ট্রিক ঝুঁকিতে" },
+  },
+  "ai-tutor-answer": {
+    category: "engagement",
+    en: {
+      title: "Your AI tutor answered",
+      preview: "New answer from the AI tutor",
+      intro:
+        "The AI tutor answered your question and cited the exact moment in the lesson video.",
+      outro:
+        "Use the citation to jump straight to the part of the video that explains your doubt.",
+    },
+    bn: {
+      title: "AI টিউটর উত্তর দিয়েছে",
+      preview: "AI টিউটরের নতুন উত্তর",
+      intro:
+        "AI টিউটর আপনার প্রশ্নের উত্তর দিয়েছে এবং ভিডিওর নির্দিষ্ট মুহূর্তটি সিটেশন হিসেবে দিয়েছে।",
+      outro:
+        "সিটেশনে ক্লিক করলে ভিডিওর সেই অংশে চলে যাবেন যেখানে আপনার সন্দেহ ব্যাখ্যা করা আছে।",
+    },
+    subject: { en: "AI tutor answer / AI টিউটরের উত্তর", bn: "AI টিউটরের উত্তর" },
+  },
+  "payment-receipt": {
+    category: "transactional",
+    en: {
+      title: "Payment received — thank you",
+      preview: "Receipt for your enrollment",
+      intro:
+        "We received your bKash payment and your enrollment is active. This email is your receipt.",
+      outro:
+        "Keep this email for your records. Refund requests are handled in /account/emails.",
+    },
+    bn: {
+      title: "পেমেন্ট পেয়েছি — ধন্যবাদ",
+      preview: "আপনার এনরোলমেন্টের রিসিট",
+      intro:
+        "আমরা আপনার bKash পেমেন্ট পেয়েছি এবং আপনার এনরোলমেন্ট সক্রিয় আছে। এই ইমেইলটি আপনার রিসিট।",
+      outro:
+        "এই ইমেইলটি রেকর্ডের জন্য রাখুন। রিফান্ড অনুরোধ /account/emails থেকে করা যাবে।",
+    },
+    subject: { en: "Payment receipt / পেমেন্ট রিসিট", bn: "পেমেন্ট রিসিট" },
+  },
+  "refund-executed": {
+    category: "transactional",
+    en: {
+      title: "Your refund was sent",
+      preview: "Refund processed via bKash",
+      intro:
+        "Your refund has been sent to your bKash account. Funds typically arrive within 1–2 business days.",
+      outro:
+        "If the refund doesn't arrive within 3 business days, reply to this email.",
+    },
+    bn: {
+      title: "আপনার রিফান্ড পাঠানো হয়েছে",
+      preview: "bKash-এ রিফান্ড প্রসেস হয়েছে",
+      intro:
+        "আপনার রিফান্ড আপনার bKash অ্যাকাউন্টে পাঠানো হয়েছে। সাধারণত ১–২ কার্যদিবসের মধ্যে পৌঁছে যায়।",
+      outro:
+        "৩ কার্যদিবসের মধ্যে রিফান্ড না পেলে এই ইমেইলে রিপ্লাই দিন।",
+    },
+    subject: { en: "Refund sent / রিফান্ড পাঠানো হয়েছে", bn: "রিফান্ড পাঠানো হয়েছে" },
+  },
+  "parent-digest": {
+    category: "parent_digest",
+    en: {
+      title: "Your child's weekly learning digest",
+      preview: "InsideJibon weekly progress digest",
+      intro:
+        "Here's what your child learned this week — lessons completed, quizzes taken, streak status, and any teacher notes.",
+      outro: "Reply to this email to reach the support inbox.",
+    },
+    bn: {
+      title: "আপনার সন্তানের সাপ্তাহিক লার্নিং ডাইজেস্ট",
+      preview: "InsideJibon সাপ্তাহিক অগ্রগতি সারাংশ",
+      intro:
+        "এই সপ্তাহে আপনার সন্তান কী শিখেছে — সম্পন্ন লেসন, নেওয়া কুইজ, স্ট্রিকের অবস্থা, এবং শিক্ষকের নোট।",
+      outro: "এই ইমেইলে রিপ্লাই দিলে সাপোর্ট ইনবক্সে পৌঁছাবে।",
+    },
+    subject: { en: "Weekly digest / সাপ্তাহিক সারাংশ", bn: "সাপ্তাহিক সারাংশ" },
+  },
+};

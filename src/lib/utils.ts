@@ -80,3 +80,26 @@ export function formatBDT(
     minimumFractionDigits: fractionDigits,
   }).format(amount);
 }
+
+/**
+ * R10 — Format a number with Bengali digits (১,২৩৪.৫).
+ *
+ * Convenience wrapper for the common "force Bengali digits" path used by
+ * the language toggle and the `numbers.formatBangla` UI label. Returns
+ * the same value if the locale isn't `bn` (Bengali digits only apply
+ * for the Bangla UI).
+ */
+export function formatBanglaNumber(
+  value: number,
+  options: {
+    maximumFractionDigits?: number;
+    minimumFractionDigits?: number;
+  } = {},
+): string {
+  return formatNumber(value, {
+    locale: "bn",
+    useBengaliDigits: true,
+    maximumFractionDigits: options.maximumFractionDigits,
+    minimumFractionDigits: options.minimumFractionDigits,
+  });
+}
