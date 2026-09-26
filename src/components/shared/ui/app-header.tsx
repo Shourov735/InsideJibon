@@ -179,11 +179,10 @@ export function AppHeader({
         <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-4 sm:px-6">
           {/* Brand - shrink-0 to guarantee it never gets crushed */}
           <div className="flex shrink-0 items-center gap-3">
-            {variant === "marketing" ? (
-              <BrandLogo href="/" />
-            ) : (
-              <BrandLogo href={dashboardHref} badge={roleBadge} />
-            )}
+            <BrandLogo
+              href="/"
+              badge={variant === "marketing" ? undefined : roleBadge}
+            />
           </div>
 
           {/* Desktop nav links - clean, streamlined, no overflow */}

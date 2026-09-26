@@ -14,6 +14,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont
 SRC_PATH = "/home/shourov/.gemini/antigravity/brain/f8cb4859-84a3-475c-b79e-049b8017bdb1/.user_uploaded/media_1790431064777.png"
 PUBLIC_DIR = "/home/shourov/Projects/insidejibon/public"
 IMAGES_DIR = os.path.join(PUBLIC_DIR, "images")
+SRC_APP_DIR = "/home/shourov/Projects/insidejibon/src/app"
 
 os.makedirs(PUBLIC_DIR, exist_ok=True)
 os.makedirs(IMAGES_DIR, exist_ok=True)
@@ -125,10 +126,16 @@ fav48.save(os.path.join(PUBLIC_DIR, "favicon-48x48.png"), optimize=True)
 
 # icon.png is standard 32x32
 fav32.save(os.path.join(PUBLIC_DIR, "icon.png"), optimize=True)
+fav32.save(os.path.join(SRC_APP_DIR, "icon.png"), optimize=True)
 
 # Multi-resolution favicon.ico containing 16x16, 32x32, and 48x48
 fav48.save(
     os.path.join(PUBLIC_DIR, "favicon.ico"),
+    format="ICO",
+    sizes=[(16, 16), (32, 32), (48, 48)]
+)
+fav48.save(
+    os.path.join(SRC_APP_DIR, "favicon.ico"),
     format="ICO",
     sizes=[(16, 16), (32, 32), (48, 48)]
 )
@@ -137,6 +144,7 @@ fav48.save(
 print("Generating apple-touch-icon.png...")
 ati = make_square_mark(mark_crop, size=180, padding_ratio=0.15, bg_color=(255, 255, 255, 255))
 ati.convert("RGB").save(os.path.join(PUBLIC_DIR, "apple-touch-icon.png"), optimize=True)
+ati.convert("RGB").save(os.path.join(SRC_APP_DIR, "apple-icon.png"), optimize=True)
 
 # 8. Generate PWA / Android Icons (192x192 & 512x512)
 print("Generating PWA icons...")
