@@ -113,72 +113,84 @@ function FilterBar({
   activeSearch: string;
 }) {
   const { t } = useTranslations();
-  const baseClasses =
-    "rounded-md border border-outline-variant bg-surface px-3 py-1.5 text-xs font-semibold hover:bg-surface-container-low";
-  const activeClasses =
-    "border-primary bg-primary text-on-primary hover:opacity-90";
-
-  const statusOptions = [
-    { value: null, label: "All" },
-    { value: "submitted", label: t("payment.status.submitted") },
-    { value: "under_review", label: t("payment.status.under_review") },
-    { value: "approved", label: t("payment.status.approved") },
-    { value: "rejected", label: t("payment.status.rejected") },
-    { value: "expired", label: t("payment.status.expired") },
-    { value: "refunded", label: t("payment.status.refunded") },
-  ];
-
-  const scopeOptions = [
-    { value: null, label: "All scopes" },
-    { value: "course", label: "Course" },
-    { value: "bundle", label: "Bundle" },
-  ];
 
   return (
-    <form className="flex flex-wrap items-center gap-2" method="get">
-      <input
-        name="search"
-        defaultValue={activeSearch}
-        placeholder="TrxID…"
-        aria-label="Search by transaction ID"
-        className="rounded-md border border-outline-variant bg-surface px-3 py-1.5 text-xs"
-      />
-      <div className="flex flex-wrap items-center gap-1">
-        {statusOptions.map((opt) => {
-          const isActive = (activeStatus ?? null) === opt.value;
-          return (
-            <button
-              key={`status-${opt.value ?? "all"}`}
-              name="status"
-              value={opt.value ?? ""}
-              className={`${baseClasses} ${isActive ? activeClasses : ""}`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
+    <form
+      className="flex flex-col gap-3 rounded-2xl border border-outline-variant bg-surface-0 p-4 shadow-academic sm:flex-row sm:items-center sm:justify-between"
+      method="get"
+    >
+      <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Search input */}
+        <div className="relative flex-1 min-w-[200px]">
+          <svg
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            name="search"
+            defaultValue={activeSearch}
+            placeholder="Search TrxID, email or sender..."
+            aria-label="Search transaction or student"
+            className="w-full rounded-xl border border-outline-variant bg-surface-1 py-2 pl-9 pr-4 text-xs text-ink-900 transition-colors placeholder:text-ink-500 focus:border-primary focus:bg-surface-0 focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+
+        {/* Status Dropdown */}
+        <div className="flex items-center gap-2">
+          <select
+            name="status"
+            defaultValue={activeStatus ?? ""}
+            aria-label="Filter by payment status"
+            className="rounded-xl border border-outline-variant bg-surface-1 px-3 py-2 text-xs font-semibold text-ink-900 transition-colors focus:border-primary focus:bg-surface-0 focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            <option value="">All Statuses</option>
+            <option value="submitted">{t("payment.status.submitted")}</option>
+            <option value="under_review">{t("payment.status.under_review")}</option>
+            <option value="approved">{t("payment.status.approved")}</option>
+            <option value="rejected">{t("payment.status.rejected")}</option>
+            <option value="expired">{t("payment.status.expired")}</option>
+            <option value="refunded">{t("payment.status.refunded")}</option>
+          </select>
+
+          {/* Scope Dropdown */}
+          <select
+            name="scope"
+            defaultValue={activeScope ?? ""}
+            aria-label="Filter by scope"
+            className="rounded-xl border border-outline-variant bg-surface-1 px-3 py-2 text-xs font-semibold text-ink-900 transition-colors focus:border-primary focus:bg-surface-0 focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            <option value="">All Scopes</option>
+            <option value="course">Course</option>
+            <option value="bundle">Bundle</option>
+          </select>
+        </div>
       </div>
-      <div className="flex flex-wrap items-center gap-1">
-        {scopeOptions.map((opt) => {
-          const isActive = (activeScope ?? null) === opt.value;
-          return (
-            <button
-              key={`scope-${opt.value ?? "all"}`}
-              name="scope"
-              value={opt.value ?? ""}
-              className={`${baseClasses} ${isActive ? activeClasses : ""}`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
+
+      <div className="flex items-center gap-2">
+        <button
+          type="submit"
+          className="inline-flex h-9 items-center justify-center rounded-xl bg-primary px-4 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary/90 cursor-pointer"
+        >
+          Filter / ফিল্টার
+        </button>
+        {(activeStatus || activeScope || activeSearch) ? (
+          <Link
+            href="/admin/payments"
+            className="inline-flex h-9 items-center justify-center rounded-xl border border-outline-variant bg-surface-0 px-3 text-xs font-medium text-ink-500 hover:bg-surface-1 hover:text-ink-900"
+          >
+            Clear
+          </Link>
+        ) : null}
       </div>
-      <button
-        type="submit"
-        className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-on-primary hover:opacity-90"
-      >
-        Apply
-      </button>
     </form>
   );
 }
@@ -202,30 +214,30 @@ function QueueRow({
   const isDecidable = row.status === "submitted" || row.status === "under_review";
 
   return (
-    <li className="rounded-xl border border-outline-variant bg-surface-container-lowest shadow-2xs">
+    <li className="overflow-hidden rounded-2xl border border-outline-variant bg-surface-0 shadow-academic transition-[box-shadow] duration-200 hover:shadow-md">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-start justify-between gap-3 px-5 py-4 text-left"
+        className="flex w-full flex-col sm:flex-row sm:items-start sm:justify-between gap-3 p-4 sm:p-5 text-left cursor-pointer"
       >
-        <div className="space-y-1">
+        <div className="space-y-1.5 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-on-surface">{row.title}</span>
-            <span className="rounded-full bg-surface-container-low px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-secondary">
+            <span className="font-display font-bold text-ink-900 text-sm sm:text-base">{row.title}</span>
+            <span className="rounded-full bg-surface-1 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-500">
               {row.scopeKind}
             </span>
             <span className={statusBadge.class}>{statusBadge.label}</span>
           </div>
-          <p className="text-sm text-on-surface-variant">
+          <p className="text-sm font-semibold text-primary">
             {row.payerName || row.payerEmail} · {formatBDT(row.amountBdt)}
           </p>
-          <p className="text-xs text-on-surface-variant">
-            Sent to {row.holderName} ({row.bkashNumber}) · last-4 {row.senderLast4}
+          <p className="text-xs text-ink-500">
+            Sent to {row.holderName} ({row.bkashNumber}) · last-4 <span className="font-mono font-bold text-ink-700">{row.senderLast4}</span>
           </p>
         </div>
-        <div className="text-right text-xs text-on-surface-variant">
-          <p>{new Date(row.createdAt).toLocaleString()}</p>
-          <p>TrxID: <span className="font-mono">{row.trxId}</span></p>
+        <div className="sm:text-right text-xs text-ink-500 shrink-0">
+          <p>{new Date(row.createdAt).toLocaleDateString()} {new Date(row.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          <p className="mt-0.5">TrxID: <span className="font-mono font-bold text-ink-900">{row.trxId}</span></p>
         </div>
       </button>
 

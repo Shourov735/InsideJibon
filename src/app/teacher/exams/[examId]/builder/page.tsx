@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherExamWithQuestions } from "@/services/exams";
 import { getTeacherCourseById } from "@/services/courses";
-import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamBuilder } from "@/components/teacher/exams/builder/exam-builder";
 
 interface ExamBuilderPageProps {
@@ -33,9 +32,7 @@ export default async function ExamBuilderPage({ params }: ExamBuilderPageProps) 
   const course = await getTeacherCourseById(teacher.id, exam.courseId);
 
   return (
-    <div className="h-screen bg-surface flex flex-col overflow-hidden">
-      <TeacherNav user={teacher} activeSection="exams" />
-
+    <div className="flex-1 bg-surface flex flex-col overflow-hidden">
       <main id="main-content" className="flex-1 overflow-hidden">
         <ExamBuilder exam={exam} courseTitle={course?.title} />
       </main>

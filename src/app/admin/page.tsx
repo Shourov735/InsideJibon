@@ -11,15 +11,15 @@ import { Container } from "@/components/shared/ui/container";
 import { PageHeader } from "@/components/shared/ui/page-header";
 import { SectionHeader } from "@/components/shared/ui/section-header";
 import { Stat } from "@/components/shared/ui/stat";
-import { Alert } from "@/components/shared/ui/alert";
 import { Badge } from "@/components/shared/ui/badge";
-import { Button } from "@/components/shared/ui/button";
 import { ResponsiveTable } from "@/components/shared/ui/responsive-table";
 import {
   ArrowRightIcon,
   BookIcon,
   ChartIcon,
   ClipboardIcon,
+  CreditCardIcon,
+  SettingsIcon,
   TrophyIcon,
   UsersIcon,
 } from "@/components/shared/ui/icons";
@@ -52,14 +52,61 @@ export default async function AdminDashboardPage() {
         description={t("admin.dashboard.welcomeSubtitle")}
       />
 
-      <div className="mt-6">
-        <Alert
-          tone="info"
-          icon={<ChartIcon size={14} />}
-          title={t("dashboard.admin.placeholder.title")}
+      {/* Quick Action Bento Cards */}
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Link
+          href="/admin/payments"
+          className="group flex items-center justify-between rounded-2xl border border-outline-variant bg-surface-0 p-4 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-academic"
         >
-          {t("dashboard.admin.placeholder.description")}
-        </Alert>
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <CreditCardIcon size={20} />
+            </span>
+            <div>
+              <p className="text-sm font-bold text-ink-900 group-hover:text-primary">
+                Payment Approvals
+              </p>
+              <p className="text-xs text-ink-500">Manual bKash transfer queue</p>
+            </div>
+          </div>
+          <ArrowRightIcon size={16} className="text-ink-300 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+
+        <Link
+          href="/admin/settings/payments"
+          className="group flex items-center justify-between rounded-2xl border border-outline-variant bg-surface-0 p-4 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-academic"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--color-warning)]/10 text-[color:var(--color-warning)]">
+              <SettingsIcon size={20} />
+            </span>
+            <div>
+              <p className="text-sm font-bold text-ink-900 group-hover:text-primary">
+                bKash Numbers
+              </p>
+              <p className="text-xs text-ink-500">Configure receiving accounts</p>
+            </div>
+          </div>
+          <ArrowRightIcon size={16} className="text-ink-300 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+
+        <Link
+          href="/courses"
+          className="group flex items-center justify-between rounded-2xl border border-outline-variant bg-surface-0 p-4 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-academic sm:col-span-2 lg:col-span-1"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--color-success)]/10 text-[color:var(--color-success)]">
+              <BookIcon size={20} />
+            </span>
+            <div>
+              <p className="text-sm font-bold text-ink-900 group-hover:text-primary">
+                Course Catalog
+              </p>
+              <p className="text-xs text-ink-500">View public course listings</p>
+            </div>
+          </div>
+          <ArrowRightIcon size={16} className="text-ink-300 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+        </Link>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
@@ -193,18 +240,6 @@ export default async function AdminDashboardPage() {
           />
         </div>
       </section>
-
-      <div className="mt-10 flex justify-center">
-        <Link
-          href="https://github.com/insidejibon/insidejibon#roadmap"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button variant="outline" size="md" trailingIcon={<ArrowRightIcon size={14} />}>
-            {t("dashboard.admin.placeholder.cta")}
-          </Button>
-        </Link>
-      </div>
     </Container>
   );
 }

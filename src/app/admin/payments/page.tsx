@@ -10,6 +10,8 @@ import { getDb } from "@/db";
 import { courses } from "@/db/schema";
 import { inArray } from "drizzle-orm";
 import { AdminPaymentsQueue, type QueueStatus } from "@/components/admin/admin-payments-queue";
+import { Stat } from "@/components/shared/ui/stat";
+import { ClipboardIcon, CreditCardIcon } from "@/components/shared/ui/icons";
 
 export const metadata = {
   title: "Payment approvals | InsideJibon",
@@ -97,15 +99,19 @@ export default async function AdminPaymentsPage({
       </header>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <StatCard
+        <Stat
           label={t("payment.admin.todaysRevenue")}
           value={`৳${todaysRevenue.totalBdt.toFixed(2)}`}
           hint={`${todaysRevenue.approvedCount} approved`}
+          tone="success"
+          icon={<CreditCardIcon size={20} />}
         />
-        <StatCard
+        <Stat
           label={t("payment.admin.pendingApprovals")}
           value={String(pendingCount)}
           hint={pendingCount === 0 ? "All clear" : "Needs attention"}
+          tone={pendingCount > 0 ? "warning" : "neutral"}
+          icon={<ClipboardIcon size={20} />}
         />
       </section>
 
@@ -137,27 +143,5 @@ export default async function AdminPaymentsPage({
         activeSearch={sp.search ?? ""}
       />
     </main>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-}) {
-  return (
-    <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-      <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-        {label}
-      </span>
-      <p className="mt-2 text-3xl font-bold text-primary">{value}</p>
-      {hint && (
-        <span className="mt-1 block text-xs text-on-surface-variant">{hint}</span>
-      )}
-    </div>
   );
 }

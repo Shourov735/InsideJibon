@@ -25,7 +25,11 @@ export async function requireUser(): Promise<CurrentUser> {
 
 export async function requireRole(...roles: Role[]): Promise<CurrentUser> {
   const user = await requireUser();
-  if (!roles.includes(user.role)) redirect("/");
+  if (!roles.includes(user.role)) {
+    redirect(
+      `/access-denied?required=${encodeURIComponent(roles.join(","))}&current=${encodeURIComponent(user.role)}`
+    );
+  }
   return user;
 }
 

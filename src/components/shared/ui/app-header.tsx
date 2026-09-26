@@ -383,67 +383,67 @@ export function AppHeader({
             </IconButton>
           </div>
         </div>
+      </header>
 
-        {/* Bottom nav (mobile only) */}
-        {bottomNavEnabled && variant !== "marketing" ? (
-          <nav
-            aria-label="Bottom"
-            className="fixed bottom-0 left-0 right-0 z-30 border-t border-outline-variant bg-surface-0/95 backdrop-blur md:hidden"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          >
-            <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 py-1">
-              {bottomItems.map((item) => {
-                const active = isActive(item);
-                return (
-                  <li key={item.href} className="flex-1">
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-[10px] font-medium transition-colors",
-                        active ? "text-role" : "text-ink-500 hover:text-ink-900",
-                      )}
-                    >
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
-                          active ? "bg-role-container text-role" : "text-ink-500",
-                        )}
-                      >
-                        {item.icon ?? <HomeIcon size={18} />}
-                      </span>
-                      <span className="truncate">{item.label}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-              {moreItems.length > 0 ? (
-                <li className="flex-1">
-                  <button
-                    type="button"
-                    onClick={() => setMoreOpen(true)}
+      {/* Bottom nav (mobile only) — rendered OUTSIDE <header> to ensure position: fixed attaches to viewport */}
+      {bottomNavEnabled && variant !== "marketing" ? (
+        <nav
+          aria-label="Bottom"
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-outline-variant bg-surface-0/95 shadow-lg backdrop-blur-md md:hidden"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+          <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 py-1.5">
+            {bottomItems.map((item) => {
+              const active = isActive(item);
+              return (
+                <li key={item.href} className="flex-1">
+                  <Link
+                    href={item.href}
                     className={cn(
-                      "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-[10px] font-medium transition-colors",
-                      moreOpen ? "text-role" : "text-ink-500 hover:text-ink-900",
+                      "flex flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-[10px] font-medium transition-colors",
+                      active ? "text-role font-bold" : "text-ink-500 hover:text-ink-900",
                     )}
                   >
                     <span
                       aria-hidden
                       className={cn(
-                        "flex h-7 w-7 items-center justify-center rounded-lg",
-                        moreOpen ? "bg-role-container text-role" : "text-ink-500",
+                        "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
+                        active ? "bg-role-container text-role shadow-2xs" : "text-ink-500",
                       )}
                     >
-                      <ChevronDownIcon size={18} />
+                      {item.icon ?? <HomeIcon size={18} />}
                     </span>
-                    <span>{t("nav.more") ?? "More"}</span>
-                  </button>
+                    <span className="truncate">{item.label}</span>
+                  </Link>
                 </li>
-              ) : null}
-            </ul>
-          </nav>
-        ) : null}
-      </header>
+              );
+            })}
+            {moreItems.length > 0 ? (
+              <li className="flex-1">
+                <button
+                  type="button"
+                  onClick={() => setMoreOpen(true)}
+                  className={cn(
+                    "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-[10px] font-medium transition-colors cursor-pointer",
+                    moreOpen ? "text-role font-bold" : "text-ink-500 hover:text-ink-900",
+                  )}
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "flex h-7 w-7 items-center justify-center rounded-lg",
+                      moreOpen ? "bg-role-container text-role shadow-2xs" : "text-ink-500",
+                    )}
+                  >
+                    <ChevronDownIcon size={18} />
+                  </span>
+                  <span>{t("nav.more") ?? "More"}</span>
+                </button>
+              </li>
+            ) : null}
+          </ul>
+        </nav>
+      ) : null}
 
       {/* Mobile nav drawer (all primary links) */}
       <MobileDrawer
