@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useTranslations } from "@/i18n/client";
 import { useAuth } from "@clerk/nextjs";
 
@@ -45,21 +44,31 @@ export function MarketingHeader({ role = null }: MarketingHeaderProps) {
 
   const { t } = useTranslations();
   const navItems: AppHeaderNavItem[] = [
-    { label: t("nav.home"), href: "/", icon: <HomeIcon size={16} /> },
+    { label: t("nav.home"), href: "/", icon: <HomeIcon size={16} />, primaryNav: true },
     {
       label: t("nav.courses"),
       href: "/courses",
       icon: <BookIcon size={16} />,
+      primaryNav: true,
+      matchPrefix: "/courses",
     },
     {
       label: t("nav.instructor"),
       href: "/#instructor",
       icon: <CompassIcon size={16} />,
+      primaryNav: true,
     },
   ];
 
-  void Link;
-  void liveRole;
+  const dashboardHref = liveRole
+    ? liveRole === "teacher"
+      ? "/teacher"
+      : liveRole === "admin"
+        ? "/admin"
+        : liveRole === "parent"
+          ? "/parent"
+          : "/student"
+    : "/student";
 
   return (
     <AppHeader
@@ -67,6 +76,7 @@ export function MarketingHeader({ role = null }: MarketingHeaderProps) {
       navItems={navItems}
       signedOut={!isSignedIn}
       bottomNav={false}
+      dashboardHref={dashboardHref}
     />
   );
 }

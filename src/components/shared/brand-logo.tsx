@@ -51,8 +51,8 @@ export function BrandLogo({
     "bg-primary-container text-on-primary-container";
 
   const content = (
-    <div className={`flex items-center gap-2.5 group select-none ${className}`}>
-      <div className={`relative ${config.iconClass} rounded-xl overflow-hidden shadow-sm ring-1 ring-primary/20 bg-primary/10 shrink-0 transition-transform duration-300 group-hover:scale-105`}>
+    <div className={`flex shrink-0 items-center gap-2.5 group select-none ${className}`}>
+      <div className={`relative ${config.iconClass} rounded-xl overflow-hidden shadow-xs ring-1 ring-primary/20 bg-primary/10 shrink-0 transition-transform duration-300 group-hover:scale-105`}>
         <Image
           src="/images/logo-icon.jpg"
           alt="InsideJibon Logo"
@@ -64,12 +64,12 @@ export function BrandLogo({
       </div>
 
       {showText && (
-        <div className="flex items-center gap-1.5 min-w-0">
-          <span className={`font-display ${config.textSize} font-bold tracking-tight text-primary transition-colors group-hover:text-primary-container`}>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className={`font-display ${config.textSize} font-bold tracking-tight text-primary transition-colors group-hover:text-primary-container whitespace-nowrap`}>
             Inside<span className="text-primary-container">Jibon</span>
           </span>
           {badge && (
-            <span className={`ml-1 rounded-full font-bold uppercase tracking-wider ${config.badgeSize} ${badgeClasses}`}>
+            <span className={`shrink-0 rounded-full font-bold uppercase tracking-wider whitespace-nowrap ${config.badgeSize} ${badgeClasses}`}>
               {badge}
             </span>
           )}
@@ -80,7 +80,7 @@ export function BrandLogo({
 
   if (href) {
     return (
-      <Link href={href} className="inline-flex items-center">
+      <Link href={href} className="inline-flex shrink-0 items-center focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2 rounded-xl">
         {content}
       </Link>
     );

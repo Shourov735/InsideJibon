@@ -462,7 +462,7 @@ export default async function MarketingPage() {
                 key={f.titleEn}
                 className="flex items-start gap-3 rounded-2xl border border-outline-variant bg-surface-0 p-4 sm:p-5"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-container text-primary">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   {f.icon}
                 </div>
                 <div className="min-w-0">
@@ -554,7 +554,7 @@ export default async function MarketingPage() {
         <Container size="xl">
           <div className="overflow-hidden rounded-3xl border border-outline-variant bg-surface-0">
             <div className="grid grid-cols-1 lg:grid-cols-12">
-              <div className="relative aspect-[4/5] w-full lg:col-span-4 lg:aspect-auto">
+              <div className="relative aspect-[4/5] min-h-[300px] w-full lg:col-span-4 lg:aspect-auto lg:min-h-full">
                 <Image
                   src="/jibon.jpg"
                   alt="Tanvir Hasan Jibon"

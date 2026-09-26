@@ -31,6 +31,8 @@ interface ExamResultsTableProps {
  * so the leaderboard is implicit. Pass/fail chip uses `passPercentage`
  * (default 50) — wired to the per-exam pass threshold in a later phase.
  */
+import { ResponsiveTable, type ResponsiveTableColumn } from "@/components/shared/ui/responsive-table";
+
 export function ExamResultsTable({
   examId,
   rows,
@@ -41,11 +43,11 @@ export function ExamResultsTable({
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-10 text-center shadow-xs space-y-2">
-        <h3 className="text-sm font-bold text-on-surface">
+      <div className="rounded-3xl border border-dashed border-outline-variant bg-surface-0 p-10 text-center shadow-xs space-y-2">
+        <h3 className="text-sm font-bold text-ink-900">
           {t("teacher.examDetail.noResultsTitle")}
         </h3>
-        <p className="mx-auto max-w-sm text-xs text-secondary">
+        <p className="mx-auto max-w-sm text-xs text-ink-500">
           {t("teacher.examDetail.noResultsDesc")}
         </p>
       </div>
@@ -56,8 +58,6 @@ export function ExamResultsTable({
     (a, b) => b.bestPercentage - a.bestPercentage
   );
 
-  // examId is part of the prop surface for the future deep-link wiring;
-  // totalMarks is used as a sanity baseline for the pass threshold.
   void examId;
   void totalMarks;
 
@@ -71,85 +71,116 @@ export function ExamResultsTable({
         }).format(new Date(iso))
       : "—";
 
+  const columns: ResponsiveTableColumn<TeacherExamResultRow>[] = [
+    {
+      header: t("teacher.examDetail.thRank"),
+      className: "w-16 font-bold text-ink-500 text-xs",
+      mobilePrimary: true,
+      cell: (_row, idx) => (
+        <span className="font-bold text-xs text-ink-500">#{idx + 1}</span>
+      ),
+    },
+    {
+      header: t("teacher.examDetail.thStudent"),
+      mobilePrimary: true,
+      cell: (row) => (
+        <div>
+          <span className="font-semibold text-ink-900 block text-sm">
+            {row.studentName || "—"}
+          </span>
+          <span className="text-xs text-ink-500 font-mono">
+            {row.studentEmail}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: t("teacher.examDetail.thScore"),
+      mobileLabel: t("teacher.examDetail.thScore"),
+      cell: (row) => {
+        const passed = row.bestPercentage >= passPercentage;
+        return (
+          <span className={`font-bold text-xs ${passed ? "text-emerald-700" : "text-amber-700"}`}>
+            {row.bestScore} / {row.totalPoints}
+          </span>
+        );
+      },
+    },
+    {
+      header: t("teacher.examDetail.thPercentage"),
+      mobileLabel: t("teacher.examDetail.thPercentage"),
+      cell: (row) => {
+        const passed = row.bestPercentage >= passPercentage;
+        return (
+          <span
+            className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+              passed
+                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                : "bg-amber-100 text-amber-800 border border-amber-300"
+            }`}
+          >
+            {row.bestPercentage.toFixed(1)}%
+          </span>
+        );
+      },
+    },
+    {
+      header: t("teacher.examDetail.thAttempts"),
+      mobileLabel: t("teacher.examDetail.thAttempts"),
+      cell: (row) => (
+        <span className="text-xs text-ink-500 font-medium">
+          {row.attemptCount} (best #{row.bestAttempt})
+        </span>
+      ),
+    },
+    {
+      header: t("teacher.examDetail.thLastSubmitted"),
+      mobileLabel: t("teacher.examDetail.thLastSubmitted"),
+      cell: (row) => (
+        <span className="text-xs text-ink-500">
+          {formatDateTime(row.lastSubmittedAt)}
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-xs">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-outline-variant bg-surface-container-low text-xs uppercase tracking-wider text-secondary">
-            <tr>
-              <th className="px-5 py-3.5 font-semibold">
-                {t("teacher.examDetail.thRank")}
-              </th>
-              <th className="px-5 py-3.5 font-semibold">
-                {t("teacher.examDetail.thStudent")}
-              </th>
-              <th className="px-5 py-3.5 font-semibold">
-                {t("teacher.examDetail.thBestAttempt")}
-              </th>
-              <th className="px-5 py-3.5 font-semibold">
-                {t("teacher.examDetail.thScore")}
-              </th>
-              <th className="px-5 py-3.5 font-semibold">
-                {t("teacher.examDetail.thPercentage")}
-              </th>
-              <th className="px-5 py-3.5 font-semibold">
-                {t("teacher.examDetail.thAttempts")}
-              </th>
-              <th className="px-5 py-3.5 font-semibold">
-                {t("teacher.examDetail.thLastSubmitted")}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant">
-            {sorted.map((row, idx) => {
-              const passed = row.bestPercentage >= passPercentage;
-              return (
-                <tr
-                  key={row.studentId}
-                  className="hover:bg-surface-container-low/70 transition-colors"
-                >
-                  <td className="px-5 py-4 text-xs font-bold text-secondary">
-                    #{idx + 1}
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="font-semibold text-on-surface block">
-                      {row.studentName || "—"}
-                    </span>
-                    <span className="text-xs text-secondary font-mono">
-                      {row.studentEmail}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-xs text-on-surface-variant font-medium">
-                    #{row.bestAttempt}
-                  </td>
-                  <td className="px-5 py-4 text-xs font-bold">
-                    <span className={passed ? "text-emerald-700" : "text-amber-700"}>
-                      {row.bestScore} / {row.totalPoints}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-xs">
-                    <span
-                      className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                        passed
-                          ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                          : "bg-amber-100 text-amber-800 border border-amber-300"
-                      }`}
-                    >
-                      {row.bestPercentage.toFixed(1)}%
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-xs text-on-surface-variant font-medium">
-                    {row.attemptCount}
-                  </td>
-                  <td className="px-5 py-4 text-xs text-on-surface-variant">
-                    {formatDateTime(row.lastSubmittedAt)}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <ResponsiveTable
+      columns={columns}
+      rows={sorted}
+      rowKey={(r) => r.studentId}
+      mobileLeading={(row) => {
+        const rank = sorted.indexOf(row) + 1;
+        return (
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-xs font-bold text-ink-700">
+              #{rank}
+            </span>
+            <div className="min-w-0">
+              <span className="font-semibold text-ink-900 block text-sm truncate">
+                {row.studentName || "—"}
+              </span>
+              <span className="text-xs text-ink-500 font-mono truncate block">
+                {row.studentEmail}
+              </span>
+            </div>
+          </div>
+        );
+      }}
+      mobileTrailing={(row) => {
+        const passed = row.bestPercentage >= passPercentage;
+        return (
+          <span
+            className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+              passed
+                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                : "bg-amber-100 text-amber-800 border border-amber-300"
+            }`}
+          >
+            {row.bestPercentage.toFixed(1)}%
+          </span>
+        );
+      }}
+    />
   );
 }

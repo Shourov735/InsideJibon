@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { StudentCourseSummary } from "@/types/learning";
 import { getTranslator } from "@/i18n/server";
+import { Badge } from "@/components/shared/ui/badge";
+import { ArrowRightIcon, BookIcon, PlayIcon } from "@/components/shared/ui/icons";
 
 interface StudentCourseCardProps {
   course: StudentCourseSummary;
@@ -19,11 +21,11 @@ export async function StudentCourseCard({ course }: StudentCourseCardProps) {
       ? t("student.courses.card.statusInProgress")
       : t("student.courses.card.statusNotStarted");
 
-  const statusColor = course.completedAt
-    ? "bg-emerald-500 text-white"
+  const statusTone = course.completedAt
+    ? "success"
     : course.progress.percent > 0
-      ? "bg-amber-500 text-white"
-      : "bg-secondary text-white";
+      ? "primary"
+      : "neutral";
 
   const lastAccessed = course.lastLesson?.lastAccessedAt
     ? new Intl.DateTimeFormat(t.locale === "bn" ? "bn-BD" : "en-US", {
@@ -35,79 +37,69 @@ export async function StudentCourseCard({ course }: StudentCourseCardProps) {
   return (
     <Link
       href={resumeHref}
-      className="bento-card group flex flex-col overflow-hidden"
+      className="group flex flex-col overflow-hidden rounded-3xl border border-outline-variant bg-surface-0 shadow-academic transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-academic-lg focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2"
     >
-      <div className="relative aspect-[16/9] overflow-hidden bg-surface-container-high border-b border-outline-variant">
+      <div className="relative aspect-[16/10] overflow-hidden bg-surface-2 border-b border-outline-variant">
         {course.thumbnailUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={course.thumbnailUrl}
             alt={course.title}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-primary-container/10">
-            <svg
-              className="h-10 w-10 text-primary/30"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-              />
-            </svg>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 to-primary/5 text-primary/30">
+            <BookIcon size={36} />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         <div className="absolute top-3 left-3">
-          <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider shadow-sm ${statusColor}`}>
+          <Badge tone={statusTone} size="xs" className="font-bold">
             {status}
-          </span>
+          </Badge>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-lg font-bold tracking-tight text-on-surface line-clamp-1 group-hover:text-primary transition-colors">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <h3 className="font-display text-base font-semibold leading-snug text-ink-900 line-clamp-1 group-hover:text-primary transition-colors sm:text-lg">
           {course.title}
         </h3>
 
-        <div className="mt-4 flex flex-col gap-1.5">
-          <div className="flex justify-between text-xs font-semibold text-secondary">
+        <div className="mt-3.5 flex flex-col gap-1.5">
+          <div className="flex justify-between text-xs font-medium text-ink-500">
             <span>
               {t("student.courses.card.lessonRatio", {
                 completed: course.progress.completed,
                 total: course.progress.total,
               })}
             </span>
-            <span>{course.progress.percent}%</span>
+            <span className="font-semibold text-ink-900">{course.progress.percent}%</span>
           </div>
-          <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-surface-2 rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary transition-all duration-500 ease-out rounded-full"
+              className="h-full bg-primary transition-all duration-500 rounded-full"
               style={{ width: `${course.progress.percent}%` }}
             />
           </div>
-          <span className="text-[10px] text-secondary mt-1">
+          <span className="text-[11px] text-ink-500 mt-0.5">
             {lastAccessed
               ? t("student.courses.card.lastAccessed", { date: lastAccessed })
               : t("student.courses.card.neverAccessed")}
           </span>
         </div>
 
-        <div className="mt-5 border-t border-outline-variant pt-4 flex items-center justify-between">
-          <span className="truncate text-xs font-semibold text-on-surface flex-1 mr-2">
+        <div className="mt-auto border-t border-outline-variant pt-3.5 flex items-center justify-between gap-2">
+          <span className="truncate text-xs font-semibold text-ink-900 flex-1">
             {course.teacherName ?? "InsideJibon"}
           </span>
-          <span className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary-container px-4 py-2 text-xs font-bold text-on-primary-container shadow-sm group-hover:bg-primary group-hover:text-on-primary transition-colors">
-            {course.lastLesson
-              ? t("student.courses.card.continue")
-              : t("student.courses.card.start")}
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+          <span className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-xs font-semibold text-on-primary transition-colors group-hover:bg-primary/90">
+            <PlayIcon size={12} />
+            <span>
+              {course.lastLesson
+                ? t("student.courses.card.continue")
+                : t("student.courses.card.start")}
+            </span>
+            <ArrowRightIcon size={12} />
           </span>
         </div>
       </div>

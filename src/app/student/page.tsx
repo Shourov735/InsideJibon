@@ -25,8 +25,8 @@ import {
 import { Badge } from "@/components/shared/ui/badge";
 import {
   ArrowRightIcon,
-  BellIcon,
   BookIcon,
+  CalendarIcon,
   ChartIcon,
   PlayIcon,
   TrophyIcon,
@@ -129,63 +129,88 @@ export default async function StudentDashboardPage() {
           tone="warning"
         />
         <Stat
-          label={t("student.dashboard.stats.progress")}
-          value={t("dashboard.student.hero.badge")}
-          icon={<BellIcon size={18} />}
-          className="col-span-2 sm:col-span-1"
+          label={t("dashboard.student.upcoming.title")}
+          value={formatNumber(upcomingSessions.length, { locale: t.locale })}
+          icon={<CalendarIcon size={18} />}
+          tone="neutral"
         />
       </div>
 
       {/* Hero continue card */}
       {continueCourse ? (
         <section className="mt-6 sm:mt-8">
-          <div className="overflow-hidden rounded-3xl border border-outline-variant bg-gradient-to-br from-primary-container/30 via-surface-0 to-surface-1">
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div className="space-y-2 p-5 sm:p-6">
-                <Badge tone="primary" size="sm">
-                  {t("dashboard.student.continue.title")}
-                </Badge>
-                <h2 className="font-display text-xl font-bold tracking-tight text-ink-900 sm:text-2xl line-clamp-2">
-                  {continueCourse.title}
-                </h2>
-                {continueCourse.lastLesson ? (
-                  <p className="text-sm text-ink-500 line-clamp-1">
-                    {continueCourse.lastLesson.title}
-                  </p>
-                ) : null}
-                <div className="flex items-center gap-3 pt-2">
-                  <Link
-                    href={continueHref ?? "/student/courses"}
-                    className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-semibold text-on-primary hover:bg-primary/90"
-                  >
-                    <PlayIcon size={14} />
-                    {continueCourse.lastLesson ? "Resume lesson" : "Open course"}
-                  </Link>
-                  <span className="text-xs font-medium text-ink-500">
-                    {continueCourse.progress.percent}% complete
-                  </span>
+          <div className="overflow-hidden rounded-3xl border border-outline-variant bg-surface-0 shadow-academic transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5">
+            <div className="flex flex-col sm:flex-row">
+              {/* Left thumbnail / media */}
+              {continueCourse.thumbnailUrl ? (
+                <div className="relative h-44 w-full shrink-0 overflow-hidden bg-surface-2 sm:h-auto sm:w-2/5 md:w-1/3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={continueCourse.thumbnailUrl}
+                    alt={continueCourse.title}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:hidden" />
+                  <div className="absolute bottom-3 left-3 sm:top-3 sm:left-3 sm:bottom-auto">
+                    <Badge tone="primary" size="xs" className="bg-surface-0/90 text-primary font-bold backdrop-blur-xs">
+                      {t("common.status.inProgress")}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-              <div className="hidden sm:block sm:px-6">
-                <div className="relative flex h-32 w-32 items-center justify-center">
-                  <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-                    <circle cx="18" cy="18" r="15" stroke="currentColor" strokeWidth="3" fill="none" className="text-surface-2" />
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="15"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      fill="none"
-                      strokeDasharray={`${(continueCourse.progress.percent / 100) * 94.25}, 94.25`}
-                      strokeLinecap="round"
-                      className="text-primary"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-display text-2xl font-bold text-ink-900">
+              ) : null}
+
+              {/* Right content */}
+              <div className="flex flex-1 flex-col justify-between p-5 sm:p-6">
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-secondary">
+                      {t("dashboard.student.continue.title")}
+                    </span>
+                    <span className="text-xs font-semibold text-primary">
                       {continueCourse.progress.percent}%
                     </span>
+                  </div>
+                  <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight text-ink-900 sm:text-2xl line-clamp-2">
+                    {continueCourse.title}
+                  </h2>
+                  {continueCourse.lastLesson ? (
+                    <p className="mt-1 text-sm text-ink-500 line-clamp-1">
+                      <span className="font-medium text-ink-700">Next lesson:</span> {continueCourse.lastLesson.title}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="mt-5">
+                  <div className="mb-2 flex items-center justify-between text-xs font-medium text-ink-500">
+                    <span>
+                      {t("student.learn.lessonsProgress", {
+                        completed: continueCourse.progress.completed,
+                        total: continueCourse.progress.total,
+                      })}
+                    </span>
+                    <span>{continueCourse.progress.percent}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-500"
+                      style={{ width: `${continueCourse.progress.percent}%` }}
+                    />
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <Link
+                      href={continueHref ?? "/student/courses"}
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-semibold text-on-primary shadow-xs hover:bg-primary/90 transition-colors w-full sm:w-auto"
+                    >
+                      <PlayIcon size={16} />
+                      {continueCourse.lastLesson ? t("student.dashboard.continue") : "Open Course"}
+                    </Link>
+                    <Link
+                      href={`/student/courses/${continueCourse.courseId}/learn`}
+                      className="inline-flex h-11 items-center justify-center rounded-2xl border border-outline-variant bg-surface-0 px-4 text-sm font-medium text-ink-700 hover:bg-surface-1 transition-colors w-full sm:w-auto"
+                    >
+                      {t("marketing.courseDetail.curriculum")}
+                    </Link>
                   </div>
                 </div>
               </div>

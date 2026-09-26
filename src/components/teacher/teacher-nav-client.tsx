@@ -6,13 +6,11 @@ import { AppHeader, type AppHeaderNavItem } from "@/components/shared/ui/app-hea
 import {
   BookIcon,
   CalendarIcon,
-  ChartIcon,
   ClipboardIcon,
+  CreditCardIcon,
   HomeIcon,
   PlusIcon,
-  TrophyIcon,
-  UsersIcon,
-  VideoIcon,
+  UserIcon,
 } from "@/components/shared/ui/icons";
 
 interface TeacherNavClientProps {
@@ -43,12 +41,14 @@ export function TeacherNavClient({ user, labels }: TeacherNavClientProps) {
       href: "/teacher",
       icon: <HomeIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
     },
     {
       label: labels.courses,
       href: "/teacher/courses",
       icon: <BookIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
       matchPrefix: "/teacher/courses",
     },
     {
@@ -56,6 +56,7 @@ export function TeacherNavClient({ user, labels }: TeacherNavClientProps) {
       href: "/teacher/exams",
       icon: <ClipboardIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
       matchPrefix: "/teacher/exams",
     },
     {
@@ -63,49 +64,32 @@ export function TeacherNavClient({ user, labels }: TeacherNavClientProps) {
       href: "/teacher/assignments",
       icon: <ClipboardIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
       matchPrefix: "/teacher/assignments",
-    },
-    {
-      label: labels.liveClasses,
-      href: "/teacher/courses",
-      icon: <VideoIcon size={16} />,
-      bottomNav: false,
-    },
-    {
-      label: labels.analytics,
-      href: "/teacher/courses",
-      icon: <ChartIcon size={16} />,
-      bottomNav: false,
-    },
-    {
-      label: labels.students,
-      href: "/teacher/courses",
-      icon: <UsersIcon size={16} />,
-      bottomNav: false,
-    },
-    {
-      label: labels.announcements,
-      href: "/teacher/courses",
-      icon: <TrophyIcon size={16} />,
-      bottomNav: false,
     },
     {
       label: labels.schedule,
       href: "/teacher/schedule",
       icon: <CalendarIcon size={16} />,
       bottomNav: false,
+      primaryNav: false,
+      matchPrefix: "/teacher/schedule",
     },
     {
       label: labels.payments,
       href: "/teacher/payments",
-      icon: <CalendarIcon size={16} />,
+      icon: <CreditCardIcon size={16} />,
       bottomNav: false,
+      primaryNav: false,
+      matchPrefix: "/teacher/payments",
     },
     {
       label: labels.profile,
       href: "/teacher/profile",
-      icon: <PlusIcon size={16} />,
+      icon: <UserIcon size={16} />,
       bottomNav: false,
+      primaryNav: false,
+      matchPrefix: "/teacher/profile",
     },
   ];
 

@@ -6,7 +6,6 @@ import {
   HomeIcon,
   PlusIcon,
   SettingsIcon,
-  UsersIcon,
 } from "@/components/shared/ui/icons";
 
 interface ParentNavClientProps {
@@ -29,24 +28,23 @@ export function ParentNavClient({ user, labels }: ParentNavClientProps) {
       href: "/parent",
       icon: <HomeIcon size={16} />,
       bottomNav: true,
-    },
-    {
-      label: labels.children,
-      href: "/parent",
-      icon: <UsersIcon size={16} />,
-      bottomNav: true,
+      primaryNav: true,
     },
     {
       label: labels.invite,
       href: "/parent/invite",
       icon: <PlusIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
+      matchPrefix: "/parent/invite",
     },
     {
       label: labels.settings,
       href: "/parent/settings",
       icon: <SettingsIcon size={16} />,
-      bottomNav: false,
+      bottomNav: true,
+      primaryNav: true,
+      matchPrefix: "/parent/settings",
     },
   ];
 

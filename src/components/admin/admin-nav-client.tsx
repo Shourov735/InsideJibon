@@ -3,11 +3,9 @@
 import type { CurrentUser } from "@/lib/auth";
 import { AppHeader, type AppHeaderNavItem } from "@/components/shared/ui/app-header";
 import {
-  ClipboardIcon,
   CreditCardIcon,
   HomeIcon,
   SettingsIcon,
-  UsersIcon,
 } from "@/components/shared/ui/icons";
 
 interface AdminNavClientProps {
@@ -31,30 +29,23 @@ export function AdminNavClient({ user, labels }: AdminNavClientProps) {
       href: "/admin",
       icon: <HomeIcon size={16} />,
       bottomNav: true,
-    },
-    {
-      label: labels.users,
-      href: "/admin",
-      icon: <UsersIcon size={16} />,
-      bottomNav: true,
-    },
-    {
-      label: labels.queue,
-      href: "/admin/payments",
-      icon: <ClipboardIcon size={16} />,
-      bottomNav: true,
+      primaryNav: true,
     },
     {
       label: labels.payments,
       href: "/admin/payments",
       icon: <CreditCardIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
+      matchPrefix: "/admin/payments",
     },
     {
       label: labels.settings,
       href: "/admin/settings/payments",
       icon: <SettingsIcon size={16} />,
-      bottomNav: false,
+      bottomNav: true,
+      primaryNav: true,
+      matchPrefix: "/admin/settings",
     },
   ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton, useAuth } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
 import { AppHeader, type AppHeaderNavItem } from "@/components/shared/ui/app-header";
@@ -12,10 +12,7 @@ import {
   CompassIcon,
   CreditCardIcon,
   HomeIcon,
-  SearchIcon,
-  SparklesIcon,
   UserIcon,
-  VideoIcon,
 } from "@/components/shared/ui/icons";
 import type { CurrentUser } from "@/lib/auth";
 
@@ -47,7 +44,6 @@ export function StudentNavClient({
   initialCount,
   labels,
 }: StudentNavClientProps) {
-  const { isSignedIn } = useAuth();
   // Live-update unread count after push events.
   const [count, setCount] = useState(initialCount);
 
@@ -67,76 +63,69 @@ export function StudentNavClient({
       href: "/student",
       icon: <HomeIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
     },
     {
       label: labels.myCourses,
       href: "/student/courses",
       icon: <BookIcon size={16} />,
       bottomNav: true,
+      primaryNav: true,
       matchPrefix: "/student/courses",
-    },
-    {
-      label: labels.exams,
-      href: "/student/schedule",
-      icon: <CalendarIcon size={16} />,
-      bottomNav: true,
-    },
-    {
-      label: labels.notifications,
-      href: "/student/notifications",
-      icon: (
-        <span className="relative inline-flex">
-          <SearchIcon size={16} />
-          {isSignedIn && count > 0 ? (
-            <span className="absolute -right-1 -top-1 inline-flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[color:var(--color-danger)] px-1 text-[8px] font-bold text-white">
-              {count > 9 ? "9+" : count}
-            </span>
-          ) : null}
-        </span>
-      ),
-      bottomNav: true,
     },
     {
       label: labels.browse,
       href: "/courses",
       icon: <CompassIcon size={16} />,
+      bottomNav: true,
+      primaryNav: true,
+      matchPrefix: "/courses",
+    },
+    {
+      label: labels.schedule,
+      href: "/student/schedule",
+      icon: <CalendarIcon size={16} />,
+      bottomNav: true,
+      primaryNav: true,
+      matchPrefix: "/student/schedule",
+    },
+    {
+      label: labels.exams,
+      href: "/student/schedule",
+      icon: <AwardIcon size={16} />,
       bottomNav: false,
+      primaryNav: false,
     },
     {
       label: labels.assignments,
       href: "/student/schedule",
       icon: <ClipboardIcon size={16} />,
       bottomNav: false,
-    },
-    {
-      label: labels.schedule,
-      href: "/student/schedule",
-      icon: <CalendarIcon size={16} />,
-      bottomNav: false,
-    },
-    {
-      label: labels.aiTutor,
-      href: "/student/schedule",
-      icon: <SparklesIcon size={16} />,
-      bottomNav: false,
+      primaryNav: false,
     },
     {
       label: labels.achievements,
       href: "/student/badges",
       icon: <AwardIcon size={16} />,
       bottomNav: false,
+      primaryNav: false,
+      matchPrefix: "/student/badges",
     },
     {
       label: labels.payments,
       href: "/student/payments",
       icon: <CreditCardIcon size={16} />,
       bottomNav: false,
+      primaryNav: false,
+      matchPrefix: "/student/payments",
     },
     {
       label: labels.profile,
       href: "/student/profile",
       icon: <UserIcon size={16} />,
       bottomNav: false,
+      primaryNav: false,
+      matchPrefix: "/student/profile",
     },
   ];
 
@@ -147,6 +136,7 @@ export function StudentNavClient({
       navItems={navItems}
       user={{ name: user.name, email: user.email }}
       showNotificationBell
+      unreadCount={count}
     />
   );
 }
