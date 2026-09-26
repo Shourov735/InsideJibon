@@ -53,9 +53,9 @@ export const courses = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    // R6: paid course flag and BDT price (free courses leave both null/false).
-    requiresPayment: boolean("requires_payment").notNull().default(false),
-    priceBdt: numeric("price_bdt", { precision: 10, scale: 2 }),
+    // Course enrollment fee: 1000 BDT default
+    requiresPayment: boolean("requires_payment").notNull().default(true),
+    priceBdt: numeric("price_bdt", { precision: 10, scale: 2 }).default("1000.00"),
   },
   (table) => [
     uniqueIndex("courses_slug_unique").on(table.slug),

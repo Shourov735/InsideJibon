@@ -85,6 +85,8 @@ export async function createCourse(
       description: input.description?.trim() || null,
       category: input.category ?? null,
       status: "draft",
+      requiresPayment: true,
+      priceBdt: "1000.00",
     })
     .returning();
 
