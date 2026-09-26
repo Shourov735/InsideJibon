@@ -24,7 +24,6 @@ import { Container } from "@/components/shared/ui/container";
 import { Badge } from "@/components/shared/ui/badge";
 import { Stat } from "@/components/shared/ui/stat";
 import {
-  ArrowRightIcon,
   BookIcon,
   CalendarIcon,
   ChevronRightIcon,
@@ -189,63 +188,16 @@ export default async function PublicCourseDetailPage({
     previewVideoId = extractYouTubeVideoId(course.thumbnailUrl);
   }
 
-  const primaryCta = (() => {
-    if (isPaidCourse && enrollmentStatus === "active") {
-      return (
-        <Link
-          href={`/student/courses/${course.id}/learn`}
-          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
-        >
-          {t("marketing.courseDetail.continueLearning")}
-          <ArrowRightIcon size={16} />
-        </Link>
-      );
-    }
-
-    if (isPaidCourse) {
-      if (cheapestBundle) {
-        return (
-          <Link
-            href={`/checkout/bundle/${cheapestBundle.id}`}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
-          >
-            {t("payment.detail.cta.bundle", { price: formattedBundlePrice ?? "" })}
-            <ArrowRightIcon size={16} />
-          </Link>
-        );
-      }
-      if (canEnroll) {
-        return (
-          <Link
-            href={`/checkout/course/${course.id}`}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
-          >
-            {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
-            <ArrowRightIcon size={16} />
-          </Link>
-        );
-      }
-      return (
-        <Link
-          href={`/sign-in?redirect_url=${encodeURIComponent(`/courses/${course.slug}`)}`}
-          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
-        >
-          {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
-          <ArrowRightIcon size={16} />
-        </Link>
-      );
-    }
-
-    return (
-      <EnrollButton
-        courseId={course.id}
-        courseSlug={course.slug}
-        courseTitle={course.title}
-        canEnroll={canEnroll}
-        enrollmentStatus={enrollmentStatus}
-      />
-    );
-  })();
+  const primaryCta = (
+    <EnrollButton
+      courseId={course.id}
+      courseSlug={course.slug}
+      courseTitle={course.title}
+      canEnroll={canEnroll}
+      enrollmentStatus={enrollmentStatus}
+      priceBdt={course.priceBdt}
+    />
+  );
 
   return (
     <div>
@@ -390,11 +342,7 @@ export default async function PublicCourseDetailPage({
 
                 {primaryCta}
 
-                {enrollmentStatus === "pending" ? (
-                  <div className="rounded-2xl bg-[color:var(--color-warning)]/10 px-3 py-2 text-xs font-medium text-[color:var(--color-warning)]">
-                    {t("marketing.courseDetail.enrollmentPending") ?? "Enrollment request pending review."}
-                  </div>
-                ) : null}
+
 
                 <div className="space-y-2 border-t border-outline-variant pt-3 text-xs text-ink-500">
                   <div className="flex items-center gap-2">

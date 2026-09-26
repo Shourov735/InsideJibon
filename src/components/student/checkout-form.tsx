@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "@/i18n/client";
 import { formatBDT } from "@/lib/utils";
 import { createPaymentSubmissionAction } from "@/app/actions/payment-submissions-actions";
+import { getWhatsAppEnrollmentUrl } from "@/lib/whatsapp";
 
 interface CheckoutFormProps {
   scopeKind: "bundle" | "course";
@@ -31,7 +32,7 @@ export function CheckoutForm({
   numbers,
   hasRecentSubmission,
 }: CheckoutFormProps) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [numberId, setNumberId] = useState<string | null>(
     numbers[0]?.id ?? null
   );
@@ -57,10 +58,33 @@ export function CheckoutForm({
   }
 
   if (numbers.length === 0) {
+    const whatsAppUrl = getWhatsAppEnrollmentUrl(scopeTitle, locale, amountBdt);
     return (
-      <p className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-        {t("payment.checkout.noActiveNumber")}
-      </p>
+      <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 max-w-xl">
+        <h3 className="text-base font-bold text-on-surface mb-2">
+          {locale === "bn" ? "WhatsApp-এ সরাসরি যোগাযোগ ও ভর্তি অনুমোদন" : "Manual Enrollment via WhatsApp"}
+        </h3>
+        <p className="text-xs sm:text-sm leading-relaxed text-secondary mb-4">
+          {locale === "bn"
+            ? `অনলাইন গেটওয়ের পরিবর্তে সরাসরি WhatsApp-এর মাধ্যমে কোর্স ফি (${formatBDT(amountBdt)}) প্রদান করে শিক্ষকের সাথে যোগাযোগ করুন। শিক্ষক বা অ্যাডমিন পেমেন্ট যাচাই করে ম্যানুয়ালি আপনার কোর্স অনুমোদন করে দেবেন।`
+            : `Please contact the teacher directly via WhatsApp to complete payment (${formatBDT(amountBdt)}). The teacher or admin will verify and manually approve your course.`}
+        </p>
+        <a
+          href={whatsAppUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-11 items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 text-xs sm:text-sm font-bold shadow-xs transition-all hover:shadow-md cursor-pointer"
+        >
+          <svg className="h-4 w-4 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.976.58 1.992.921 3.149.921l.002-.001c3.182 0 5.768-2.587 5.769-5.766.001-3.182-2.585-5.769-5.771-5.769zm3.364 8.163c-.14.394-.809.761-1.121.808-.288.043-.665.076-1.921-.444-1.608-.665-2.651-2.296-2.73-2.402-.079-.106-.649-.864-.649-1.648 0-.784.408-1.171.554-1.332.146-.161.32-.201.427-.201.107 0 .213.001.306.006.098.005.23-.037.36.275.14.336.478 1.166.52 1.252.043.086.071.188.014.302-.057.114-.086.185-.171.285-.086.1-.18.223-.257.3-.086.086-.176.18-.076.352.1.171.444.733.953 1.186.656.585 1.209.766 1.381.852.172.086.272.072.373-.044.101-.116.434-.505.549-.678.115-.173.23-.144.388-.086.158.058 1.002.472 1.174.558.172.086.287.129.33.201.043.072.043.418-.097.812zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.176L2 22l4.957-1.399C8.423 21.493 10.153 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" />
+          </svg>
+          <span>
+            {locale === "bn"
+              ? `WhatsApp-এ যোগাযোগ ও ভর্তি অনুমোদন (${formatBDT(amountBdt)}) →`
+              : `Contact via WhatsApp & Request Approval (${formatBDT(amountBdt)}) →`}
+          </span>
+        </a>
+      </div>
     );
   }
 
