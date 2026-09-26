@@ -155,6 +155,13 @@
       "when": 1790600000000,
       "tag": "0021_remaster_r7_parent",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1790700000000,
+      "tag": "0022_remaster_r9_pwa_proctoring",
+      "breakpoints": true
     }
   ]
 }

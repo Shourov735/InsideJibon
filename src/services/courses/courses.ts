@@ -123,11 +123,18 @@ export async function getTeacherCourses(
     conditions.push(eq(courses.category, filter.category));
   }
 
+  // Drizzle's correlated subquery shorthand renders ${courses.id} as a
+  // bare `"id"` column reference — fine when there's only one `id` in
+  // scope, but the lessonCount subquery joins both `lessons` and
+  // `course_modules`, each of which has its own `id`. We avoid the
+  // ambiguity by qualifying the subquery tables (`cm`, `l`) and routing
+  // the outer correlation through a literal `"courses"."id"` so PostgreSQL
+  // resolves it against the FROM clause, not the subquery.
   const teacherCourses = await db
     .select({
       ...getTableColumns(courses),
-      moduleCount: sql<number>`(SELECT COUNT(*)::int FROM ${courseModules} WHERE ${courseModules.courseId} = ${courses.id})`,
-      lessonCount: sql<number>`(SELECT COUNT(*)::int FROM ${lessons} INNER JOIN ${courseModules} ON ${lessons.moduleId} = ${courseModules.id} WHERE ${courseModules.courseId} = ${courses.id})`,
+      moduleCount: sql<number>`(SELECT COUNT(*)::int FROM "course_modules" cm WHERE cm."course_id" = "courses"."id")`,
+      lessonCount: sql<number>`(SELECT COUNT(*)::int FROM "lessons" l INNER JOIN "course_modules" cm ON l."module_id" = cm."id" WHERE cm."course_id" = "courses"."id")`,
     })
     .from(courses)
     .where(and(...conditions))
