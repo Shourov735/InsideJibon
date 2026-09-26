@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@clerk/nextjs";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 type Phase = "waiting" | "timeout";
 
@@ -82,6 +83,9 @@ export function AuthWaitingRoom({ redirectUrl }: { redirectUrl?: string }) {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-surface px-4 text-center">
+      <div className="mb-2">
+        <BrandLogo href="/" size="md" variant="mark" />
+      </div>
       {phase === "waiting" ? (
         <>
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />

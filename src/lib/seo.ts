@@ -43,7 +43,7 @@ export function buildWebsiteJsonLd(locale: "en" | "bn" = "bn") {
         url: SITE_URL,
         logo: {
           "@type": "ImageObject",
-          url: `${SITE_URL}/icon.png`,
+          url: `${SITE_URL}/icon-512.png`,
           width: 512,
           height: 512,
         },

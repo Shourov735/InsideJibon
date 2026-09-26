@@ -46,8 +46,8 @@ export function EducatorSection({ isBn }: EducatorSectionProps) {
 
                 <p className="mt-1 text-sm font-semibold text-primary sm:text-base">
                   {isBn
-                    ? "শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — ঢাকা বিশ্ববিদ্যালয়"
-                    : "Student, Department of Botany, University of Dhaka"}
+                    ? "শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — ঢাকা সেন্ট্রাল ইউনিভার্সিটি"
+                    : "Student, Department of Botany, Dhaka Central University"}
                 </p>
 
                 <p className="mt-1 text-xs font-mono uppercase tracking-wider text-ink-500">

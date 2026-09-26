@@ -119,3 +119,26 @@ body {
   outline: 2px solid var(--color-info);
   outline-offset: 2px;
 }
+
+/* Brand logo adaptive theme visibility */
+.brand-logo-light {
+  display: inline-block;
+}
+.brand-logo-dark {
+  display: none;
+}
+[data-theme="dark"] .brand-logo-light {
+  display: none;
+}
+[data-theme="dark"] .brand-logo-dark {
+  display: inline-block;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .brand-logo-light {
+    display: none;
+  }
+  html:not([data-theme="light"]) .brand-logo-dark {
+    display: inline-block;
+  }
+}
+

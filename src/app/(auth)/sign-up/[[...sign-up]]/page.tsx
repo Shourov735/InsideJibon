@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignUp } from "@clerk/nextjs";
 
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { getCurrentUser } from "@/lib/auth";
 import { dashboardPathForRole } from "@/lib/dashboard";
 import { getTranslator } from "@/i18n/server";
@@ -45,6 +46,9 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-surface px-4 py-10">
+      <div className="mb-6">
+        <BrandLogo href="/" size="md" variant="full" />
+      </div>
       <SignUp
         routing="path"
         path="/sign-up"

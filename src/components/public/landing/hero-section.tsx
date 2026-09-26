@@ -123,8 +123,8 @@ export function HeroSection({ isBn }: HeroSectionProps) {
 
                   <p className="mt-0.5 text-xs text-white/80 sm:text-sm font-medium">
                     {isBn
-                      ? "উদ্ভিদবিজ্ঞান বিভাগ, ঢাকা বিশ্ববিদ্যালয়"
-                      : "Department of Botany, University of Dhaka"}
+                      ? "উদ্ভিদবিজ্ঞান বিভাগ, ঢাকা সেন্ট্রাল ইউনিভার্সিটি"
+                      : "Department of Botany, Dhaka Central University"}
                   </p>
 
                   <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-3 text-[11px] text-white/70">

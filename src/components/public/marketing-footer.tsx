@@ -12,7 +12,7 @@ export async function MarketingFooter({ role = null }: { role?: AppRole | null }
           {/* Brand Column */}
           <div className="md:col-span-2">
             <div className="mb-4">
-              <BrandLogo href="/" size="md" />
+              <BrandLogo href="/" size="md" variant="full" />
             </div>
             <p className="text-sm text-on-surface-variant leading-relaxed max-w-sm">
               {t("footer.tagline")}

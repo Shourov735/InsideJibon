@@ -184,9 +184,6 @@ export function AppHeader({
             ) : (
               <BrandLogo href={dashboardHref} badge={roleBadge} />
             )}
-            <span className="hidden truncate text-sm font-medium text-ink-500 sm:inline-block">
-              {variant === "marketing" ? "InsideJibon" : null}
-            </span>
           </div>
 
           {/* Desktop nav links - clean, streamlined, no overflow */}
