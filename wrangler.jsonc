@@ -84,13 +84,24 @@
   // R5 remaster: streak-freeze (Mon 00:00), weekly-leagues (Sun 23:59),
   // energy-refill tick (every 5 min).
   // R9 remaster: proctor-chunk purge (daily at 03:00 UTC).
+  // R7 remaster: parent digest — folded into the existing
+  //              0 3 * * * proctor-purge trigger to stay within the
+  //              Cloudflare Free plan's 5-cron-trigger limit. The phase
+  //              doc calls for 06:00 UTC, but we already had R9 sitting
+  //              on 03:00 UTC and adding a sixth trigger would be
+  //              rejected by the deploy. The handler dispatches digest
+  //              jobs alongside the existing purge jobs.
   //
   // The Cron Trigger fires the matching route in src/app/api/cron/*:
   //   - 13 */2 * * *      leaderboard        (R4 — every 2 hours)
   //   - 0  0  * * 2       streak-freezes     (R5 — Mon 00:00 UTC)
   //   - 59 23 * * 1       weekly-leagues     (R5 — Sun 23:59 UTC)
   //   - */5 * * * *       energy-refill      (R5 — every 5 min)
-  //   - 0  3  * * *       proctor-purge      (R9 — daily 03:00 UTC)
+  //   - 0  3  * * *       proctor-purge + parent-digest
+  //                                              (R9 daily 03:00 UTC;
+  //                                               R7 parent digest runs
+  //                                               daily at the same tick;
+  //                                               weekly digests on Mon)
   //
   // NOTE the day-of-week numbering: Cloudflare cron uses 1-7 where
   // 1 = Sunday and 7 = Saturday — NOT the 0-6 convention of stock cron.
@@ -98,8 +109,11 @@
   // (code 10100) and aborts the whole deploy, so Monday is 2 and Sunday 1.
   // Three-letter abbreviations (`MON`, `SUN`) are unambiguous if you prefer.
   //
-  // Cloudflare's Free plan allows 5 Cron Triggers per worker — R9 fills
-  // the fifth slot. See docs/remaster-phase-9-pwa-proctoring.md §3.6.
+  // Cloudflare's Free plan allows 5 Cron Triggers per worker. R7 folds
+  // the daily + weekly digest (both intended for 06:00 UTC) into the
+  // existing R9 daily 03:00 UTC slot. The phase doc deviation is logged
+  // for operator reference; the email cadence + dedupe behavior is
+  // unchanged.
   // ---------------------------------------------------------------------------
   "triggers": {
     "crons": [

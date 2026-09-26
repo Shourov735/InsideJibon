@@ -1,45 +1,53 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import { requireUser } from "@/lib/permissions";
+import { requireParent } from "@/lib/permissions";
 import { getTranslator } from "@/i18n/server";
+import {
+  getLinkedStudents,
+} from "@/services/parent/links";
+import {
+  getParentOverview,
+} from "@/services/parent/dashboard";
 import { EmptyState } from "@/components/shared/feedback";
 
-export const metadata = {
-  title: "Parent Panel | InsideJibon",
-  description:
-    "A dedicated space for parents to track their child's learning progress — coming soon.",
-};
+import { ParentOverviewClient } from "@/components/parent/parent-overview-client";
+import type { DashboardChild, DashboardUpcoming } from "@/components/parent/parent-overview-client";
 
-// Public roadmap anchor for placeholder CTAs. Phase R7 will replace
-// these placeholders with the real parent experience.
-const ROADMAP_URL = "https://github.com/insidejibon/insidejibon#roadmap";
+export const dynamic = "force-dynamic";
 
-export default async function ParentPlaceholderPage() {
-  // Parent role does not exist yet in the DB schema (roleEnum is
-  // student/teacher/admin only). We require *some* signed-in user
-  // so anonymous visitors are still bounced to sign-in, but we don't
-  // gate by role — R7 will introduce the `parent` role and tighten
-  // this gate to `requireRole("parent")`.
-  await requireUser();
+export default async function ParentDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ child?: string }>;
+}) {
+  const user = await requireParent();
   const t = await getTranslator();
+  const linked = await getLinkedStudents(user.id);
 
-  return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-16 sm:px-6">
-      <div className="space-y-6">
-        <div className="space-y-2 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-primary-container px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary-container">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            {t("nav.parent")}
+  if (linked.length === 0) {
+    return (
+      <main className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
+        <div className="mb-8">
+          <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse" />
+            {t("parent.dashboard.title")}
           </span>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-            {t("dashboard.parent.placeholder.title")}
+          <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
+            {t("parent.dashboard.welcome", {
+              name:
+                user.name?.split(" ")[0] ||
+                t("parent.dashboard.guestFallback"),
+            })}
           </h1>
+          <p className="mt-1 text-sm text-secondary">
+            {t("parent.dashboard.introEmpty")}
+          </p>
         </div>
-
         <EmptyState
           icon={
             <svg
-              className="h-6 w-6 text-primary"
+              className="h-6 w-6 text-rose-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -52,20 +60,78 @@ export default async function ParentPlaceholderPage() {
               />
             </svg>
           }
-          title={t("dashboard.parent.placeholder.title")}
-          description={t("dashboard.parent.placeholder.description")}
+          title={t("parent.dashboard.empty.title")}
+          description={t("parent.dashboard.empty.description")}
           action={
             <Link
-              href={ROADMAP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-on-primary shadow-2xs hover:bg-primary-container hover:text-on-primary-container transition-colors"
+              href="/parent/invite"
+              className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-rose-700 transition-colors"
             >
-              {t("dashboard.parent.placeholder.cta")} →
+              {t("parent.dashboard.empty.cta")} →
             </Link>
           }
         />
+      </main>
+    );
+  }
+
+  const overview = await getParentOverview(user.id);
+  const params = await searchParams;
+  const requestedId = params.child;
+  const activeChildId =
+    overview.children.find((c) => c.child.studentId === requestedId)?.child
+      .studentId ?? overview.children[0]?.child.studentId;
+
+  if (!activeChildId) redirect("/parent");
+
+  const childList: DashboardChild[] = overview.children.map((entry) => ({
+    studentId: entry.child.studentId,
+    studentName: entry.child.studentName,
+    currentStreak: entry.child.currentStreak,
+    longestStreak: entry.child.longestStreak,
+    xpLast7Days: entry.child.xpLast7Days,
+    avgGradePct: entry.child.avgGradePct,
+    attendancePct: entry.child.attendancePct,
+    missingAssignments: entry.child.missingAssignments,
+    enrolledCourses: entry.child.enrolledCourses,
+    recentGrades: entry.child.recentGrades.map((g) => ({
+      label: g.label,
+      pct: g.pct,
+      submittedAt: g.submittedAt.toISOString(),
+    })),
+    lastActivityAt: entry.child.lastActivityAt
+      ? entry.child.lastActivityAt.toISOString()
+      : null,
+    upcoming: entry.upcoming.map((u): DashboardUpcoming => ({
+      kind: u.kind,
+      id: u.id,
+      title: u.title,
+      when: u.when,
+      courseTitle: u.courseTitle,
+    })),
+  }));
+
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 space-y-6">
+      <div>
+        <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700">
+          <span className="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse" />
+          {t("parent.dashboard.title")}
+        </span>
+        <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
+          {t("parent.dashboard.welcome", {
+            name: user.name?.split(" ")[0] || user.email.split("@")[0],
+          })}
+        </h1>
+        <p className="mt-1 text-sm text-secondary">
+          {t("parent.dashboard.intro")}
+        </p>
       </div>
+
+      <ParentOverviewClient
+        childList={childList}
+        activeChildId={activeChildId}
+      />
     </main>
   );
 }

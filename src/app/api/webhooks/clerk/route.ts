@@ -20,6 +20,16 @@ const userPayloadSchema = z.object({
   image_url: z.string().nullable().optional(),
   primary_email_address_id: z.string().nullable().optional(),
   email_addresses: z.array(emailAddressSchema),
+  // R7 — `public_metadata.role` is the source of truth for app role.
+  // We accept any record shape and tighten it ourselves.
+  public_metadata: z
+    .object({
+      role: z
+        .enum(["student", "teacher", "admin", "parent"])
+        .optional(),
+    })
+    .passthrough()
+    .optional(),
 });
 
 const deletedUserSchema = z.object({
@@ -66,7 +76,7 @@ export async function POST(request: NextRequest) {
         return new Response("Skipped", { status: 200 });
       }
 
-      const { id, first_name, last_name, image_url, primary_email_address_id, email_addresses } =
+      const { id, first_name, last_name, image_url, primary_email_address_id, email_addresses, public_metadata } =
         parsed.data;
       const email = email_addresses.find(
         (address) => address.id === primary_email_address_id,
@@ -79,14 +89,24 @@ export async function POST(request: NextRequest) {
         return new Response("Skipped", { status: 200 });
       }
 
+      // R7 — public_metadata.role is the source of truth for app role.
+      // The admin bootstrap decision (first-ever user → 'admin') still
+      // holds: we use it only when role is absent from metadata.
+      const metadataRole = public_metadata?.role ?? null;
+
       // Single-statement upsert: the admin bootstrap decision and the row
       // insert are atomic, so concurrent webhooks cannot produce duplicate
       // admin rows or throw a primary-key conflict error.
       await db.execute(sql`
         INSERT INTO users (id, email, name, image_url, role)
         SELECT ${id}, ${email}, ${`${first_name ?? ""} ${last_name ?? ""}`.trim() || null}, ${image_url},
-               CASE WHEN (SELECT count(*) FROM users) = 0
-                    THEN 'admin'::"role" ELSE 'student'::"role" END
+               CASE
+                 WHEN ${metadataRole}::text IS NOT NULL
+                   THEN ${metadataRole}::text
+                 WHEN (SELECT count(*) FROM users) = 0
+                   THEN 'admin'
+                 ELSE 'student'
+               END
         ON CONFLICT (id) DO NOTHING
       `);
     } else if (type === "user.updated") {
@@ -99,23 +119,33 @@ export async function POST(request: NextRequest) {
         return new Response("Skipped", { status: 200 });
       }
 
-      const { id, first_name, last_name, image_url, primary_email_address_id, email_addresses } =
+      const { id, first_name, last_name, image_url, primary_email_address_id, email_addresses, public_metadata } =
         parsed.data;
       const email = email_addresses.find(
         (address) => address.id === primary_email_address_id,
       )?.email_address;
 
-      if (email) {
-        await db
-          .update(users)
-          .set({
-            email,
-            name: `${first_name ?? ""} ${last_name ?? ""}`.trim() || null,
-            imageUrl: image_url,
-            updatedAt: new Date(),
-          })
-          .where(eq(users.id, id));
+      if (!email) {
+        console.warn("Skipping user.updated: no primary email address.", id);
+        return new Response("Skipped", { status: 200 });
       }
+
+      // R7 — when public_metadata.role is present, sync it to the local
+      // users.role. The mapping is one-way: changes made directly in the
+      // local Drizzle UI do NOT flow back to Clerk (Clerk is the source
+      // for app role). Other metadata-driven fields could be added here.
+      const nextRole = public_metadata?.role ?? null;
+
+      await db
+        .update(users)
+        .set({
+          email,
+          name: `${first_name ?? ""} ${last_name ?? ""}`.trim() || null,
+          imageUrl: image_url,
+          ...(nextRole ? { role: nextRole } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, id));
     } else if (type === "user.deleted") {
       const parsed = deletedUserSchema.safeParse(data);
       if (!parsed.success || !parsed.data.id) {

@@ -24,3 +24,4 @@ export * from "./proctoring";
 export * from "./pwa";
 export * from "./legal-email";
 export * from "./payments";
+export * from "./parent";

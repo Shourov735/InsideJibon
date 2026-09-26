@@ -32,3 +32,4 @@ export async function requireRole(...roles: Role[]): Promise<CurrentUser> {
 export const requireStudent = () => requireRole("student");
 export const requireTeacher = () => requireRole("teacher");
 export const requireAdmin = () => requireRole("admin");
+export const requireParent = () => requireRole("parent");

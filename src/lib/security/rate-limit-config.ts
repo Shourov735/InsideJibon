@@ -39,6 +39,13 @@ export const RATE_LIMIT_CONFIG = {
    *  from saturating DB writes.
    */
   "proctor.event": { limit: 120, windowSec: 60, keyHint: "proctor:event" },
+  /** R7 — parent invitation request. 6 attempts/min is more than enough
+   *  for a real parent onboarding one or two children, but it caps a
+   *  brute-force enumeration attack quickly. Email-enumeration resistance
+   *  is preserved by the service always returning a 200 with the same
+   *  generic message; this bucket is the only abuse gate.
+   */
+  "parent.invite": { limit: 6, windowSec: 60, keyHint: "act:par:invite" },
 } as const;
 
 export type RateLimitBucket = keyof typeof RATE_LIMIT_CONFIG;

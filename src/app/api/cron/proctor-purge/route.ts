@@ -6,6 +6,7 @@ import {
   isQuotaAtRisk,
   countSendsLast24Hours,
 } from "@/services/email/maintenance";
+import { sendDailyDigests, sendWeeklyDigests } from "@/services/parent/digest";
 
 /**
  * R9 — Cron Trigger: 30-day proctor chunk purge.
@@ -18,20 +19,42 @@ import {
  *   2. `purgeOldEmailLogEntries` — R10 90-day email-send-log purge.
  *   3. `isQuotaAtRisk` — R10 free-tier alert at 70 sends/24h.
  *
+ * R7 folded the parent digest fan-out into the same trigger:
+ *   4. `sendDailyDigests`  — every day.
+ *   5. `sendWeeklyDigests` — only on Mondays (dow=1 in UTC). The phase
+ *      doc preferred 06:00 UTC; we already had R9 on 03:00 UTC and
+ *      adding a sixth trigger is rejected by Cloudflare Free. The
+ *      dispatch window is 3 hours earlier, well within Bangladeshi
+ *      morning hours.
+ *
  * Each job is independent and idempotent. The handler returns a
  * JSON summary and sets `Cache-Control: no-store` so Cloudflare
  * never caches the response.
  */
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const [proctorResult, emailPurge, sendCounts, quotaAlert] =
+    const url = new URL(request.url);
+    const onlyDigest = url.searchParams.get("scope") === "digest";
+
+    const today = new Date();
+    const isMonday = today.getUTCDay() === 1;
+
+    const [proctorResult, emailPurge, sendCounts, quotaAlert, dailyResult, weeklyResult] =
       await Promise.all([
-        purgeStaleProctorChunks({ olderThanDays: 30 }),
-        purgeOldEmailLogEntries({ olderThanDays: 90 }),
-        countSendsLast24Hours(),
-        isQuotaAtRisk(70),
+        onlyDigest
+          ? Promise.resolve({ scanned: 0, deleted: 0 })
+          : purgeStaleProctorChunks({ olderThanDays: 30 }),
+        onlyDigest
+          ? Promise.resolve({ scanned: 0, deleted: 0 })
+          : purgeOldEmailLogEntries({ olderThanDays: 90 }),
+        onlyDigest
+          ? Promise.resolve({ sent: 0, suppressed: 0, failed: 0 })
+          : countSendsLast24Hours(),
+        onlyDigest ? Promise.resolve(false) : isQuotaAtRisk(70),
+        sendDailyDigests(),
+        isMonday ? sendWeeklyDigests() : Promise.resolve(null),
       ]);
 
     if (quotaAlert) {
@@ -53,6 +76,10 @@ export async function GET() {
         emailPurge,
         sendCounts,
         quotaAlert,
+        parentDigest: {
+          daily: dailyResult,
+          weekly: weeklyResult,
+        },
       },
       { headers: { "Cache-Control": "no-store" } }
     );

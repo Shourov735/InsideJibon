@@ -1,13 +1,20 @@
 import { redirect } from "next/navigation";
 import { requireStudent } from "@/lib/permissions";
 import { getStudentProfileStats } from "@/services/profile";
+import { getParentsOfStudent } from "@/services/parent/links";
 import { getTranslator } from "@/i18n/server";
+import { LinkedFamilySection } from "@/components/parent/linked-family-section";
+
+export const dynamic = "force-dynamic";
 
 export default async function StudentProfilePage() {
   const user = await requireStudent();
   const t = await getTranslator();
 
-  const stats = await getStudentProfileStats(user.id);
+  const [stats, parents] = await Promise.all([
+    getStudentProfileStats(user.id),
+    getParentsOfStudent(user.id),
+  ]);
   if (!stats) {
     redirect("/");
   }
@@ -78,6 +85,18 @@ export default async function StudentProfilePage() {
       <div className="bento-card-static p-4 bg-surface-container-low text-xs text-secondary">
         💡 Note: To update your profile photo, name, or password, click on your avatar in the top navigation bar.
       </div>
+
+      <LinkedFamilySection
+        parents={parents.map((parent) => ({
+          linkId: parent.linkId,
+          parentName: parent.parentName,
+          parentEmail: parent.parentEmail,
+          status: parent.status,
+          invitedAt: parent.invitedAt ? parent.invitedAt.toISOString() : null,
+          acceptedAt: parent.acceptedAt ? parent.acceptedAt.toISOString() : null,
+          revokedAt: parent.revokedAt ? parent.revokedAt.toISOString() : null,
+        }))}
+      />
     </main>
   );
 }

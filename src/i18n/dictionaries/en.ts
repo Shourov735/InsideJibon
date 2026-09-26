@@ -2416,6 +2416,118 @@ export const en = {
     "Screenshot must be 2 MB or smaller.",
   "payment.errors.uploadUnavailable":
     "Screenshot upload is temporarily unavailable — submit without one.",
+
+  // --- R7 Parent Panel & Linked Accounts -------------------------------
+  "nav.parent.settings": "Settings",
+  "parent.dashboard.title": "Parent Dashboard",
+  "parent.dashboard.welcome": "Welcome, {name}",
+  "parent.dashboard.guestFallback": "Guardian",
+  "parent.dashboard.intro":
+    "Track your child's learning progress on InsideJibon — daily streaks, upcoming deadlines, and gentle alerts.",
+  "parent.dashboard.introEmpty":
+    "When you link to your child, their progress will appear here.",
+  "parent.dashboard.switchChild": "Viewing",
+  "parent.dashboard.inviteAnother": "Add another child",
+  "parent.dashboard.empty.title": "No linked children yet",
+  "parent.dashboard.empty.description":
+    "Send a request to your child by email. They'll approve the link from their profile.",
+  "parent.dashboard.empty.cta": "Send a request",
+  "parent.cards.streak": "Streak",
+  "parent.cards.streakBest": "Best: {days} day(s)",
+  "parent.cards.streakNone": "No streak recorded yet",
+  "parent.cards.xpWeek": "XP this week",
+  "parent.cards.xpWeekSub": "Sum of all XP earned in the last 7 days.",
+  "parent.cards.avgGrade": "Avg grade",
+  "parent.cards.avgGradeSub": "Mean of the last 8 graded items.",
+  "parent.cards.attendance": "Attendance",
+  "parent.upcoming.title": "Upcoming deadlines",
+  "parent.upcoming.empty":
+    "No assignments, exams or live classes scheduled in the next two weeks.",
+  "parent.upcoming.kindLive": "Live",
+  "parent.upcoming.kindAssignment": "HW",
+  "parent.upcoming.kindExam": "Exam",
+  "parent.alerts.title": "Alerts",
+  "parent.alerts.missingAssignment_one":
+    "{count} assignment is overdue",
+  "parent.alerts.missingAssignment_other":
+    "{count} assignments are overdue",
+  "parent.alerts.attendanceDropped":
+    "Attendance has dropped to {pct}% in the last 30 days.",
+  "parent.alerts.examFail":
+    "Average exam score is {pct}% over the last 8 graded items.",
+  "parent.alerts.allGood": "Everything looks healthy right now.",
+  "parent.gradeTrend.title": "Grade trend",
+  "parent.attendance.subtitle": "Completed live-class sessions attended in the last 30 days.",
+  "parent.courses.title": "Course progress",
+  "parent.courses.empty": "Your child has no active enrollments yet.",
+  "parent.invite.title": "Link a child",
+  "parent.invite.intro":
+    "Send a request to your child by email. They'll be notified and asked to approve the link from their profile.",
+  "parent.invite.emailLabel": "Child's email",
+  "parent.invite.emailHelp":
+    "Use the email your child registered with on InsideJibon.",
+  "parent.invite.emailPlaceholder": "your.child@example.com",
+  "parent.invite.submit": "Send request",
+  "parent.invite.submitting": "Sending…",
+  "parent.invite.rateLimited":
+    "You're going a bit fast. Wait a minute before sending another request.",
+  "parent.invite.outcome.created":
+    "Request sent — we'll let you know when the student approves.",
+  "parent.invite.outcome.existingPending":
+    "A pending request already exists for this student.",
+  "parent.invite.outcome.alreadyActive":
+    "You're already linked to this student.",
+  "parent.invite.outcome.unknown":
+    "If the email belongs to a registered student, an invitation has been sent.",
+  "parent.invite.outcome.rateLimited":
+    "You've sent a few requests in a row — try again in a minute.",
+  "parent.invite.outcome.error":
+    "Something went wrong. Please try again.",
+  "parent.invite.toast.created": "Request sent",
+  "parent.invite.toast.unknown": "If eligible, an invitation has been sent",
+  "parent.invite.toast.error": "Could not send the request",
+  "parent.linkList.title": "Family links",
+  "parent.linkList.empty": "You haven't requested any links yet.",
+  "parent.linkList.manageCta": "Manage",
+  "parent.link.status.pending": "Pending",
+  "parent.link.status.active": "Active",
+  "parent.link.status.revoked": "Revoked",
+  "parent.link.requested": "Request sent",
+  "parent.link.accepted": "Parent link accepted",
+  "parent.link.revoked": "Parent link revoked",
+  "parent.link.pendingForStudent": "A parent is waiting for your approval",
+  "parent.link.revoke": "Revoke",
+  "parent.link.revokeError": "Could not revoke the link",
+  "parent.link.acceptError": "Could not accept the link",
+  "parent.family.heading": "Linked family",
+  "parent.family.subheading":
+    "Parents you have approved (or who have requested access) appear here. You can revoke access at any time.",
+  "parent.family.status.pending": "Pending",
+  "parent.family.status.active": "Active",
+  "parent.family.status.revoked": "Revoked",
+  "parent.family.approve": "Approve",
+  "parent.settings.title": "Parent settings",
+  "parent.settings.intro":
+    "Choose when to receive the digest email for each of your linked children.",
+  "parent.settings.cadenceHeading": "Digest cadence",
+  "parent.settings.cadenceSubheading":
+    "Adjust per child. Daily goes out every morning at 06:00 UTC; weekly goes out on Monday mornings.",
+  "parent.settings.emailRecipients": "Digest emails are sent to {email}.",
+  "parent.settings.cadence.daily": "Daily",
+  "parent.settings.cadence.weekly": "Weekly",
+  "parent.settings.cadence.off": "Off",
+  "parent.settings.sendHour": "Send hour (UTC)",
+  "parent.settings.cadenceSaved": "Saved",
+  "parent.settings.cadenceError": "Could not save the cadence",
+  "parent.settings.quietHours": "Quiet hours",
+  "parent.settings.linkManagement.heading": "Manage links",
+  "parent.settings.linkManagement.subheading":
+    "Revoke a link to stop receiving digests and disable read-only access for that child.",
+  "parent.settings.empty": "No active links yet.",
+  "parent.settings.backToDashboard": "Back to dashboard",
+  "parent.email.subject": "InsideJibon digest",
+  "parent.email.intro": "Here's the latest progress on InsideJibon.",
+  "parent.email.footer": "Manage your preferences in /parent/settings.",
 } as const;
 
 export type Dictionary = { [K in keyof typeof en]: string };

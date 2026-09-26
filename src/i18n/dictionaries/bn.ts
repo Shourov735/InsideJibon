@@ -2407,4 +2407,116 @@ export const bn: Dictionary = {
     "স্ক্রিনশট অবশ্যই ২ MB বা তার কম হতে হবে।",
   "payment.errors.uploadUnavailable":
     "স্ক্রিনশট আপলোড অস্থায়ীভাবে বন্ধ — স্ক্রিনশট ছাড়াই জমা দিন।",
+
+  // --- R7 Parent Panel & Linked Accounts -------------------------------
+  "nav.parent.settings": "সেটিংস",
+  "parent.dashboard.title": "অভিভাবক ড্যাশবোর্ড",
+  "parent.dashboard.welcome": "স্বাগতম, {name}",
+  "parent.dashboard.guestFallback": "অভিভাবক",
+  "parent.dashboard.intro":
+    "InsideJibon-এ আপনার সন্তানের অগ্রগতি দেখুন — দৈনিক স্ট্রিক, আসন্ন ডেডলাইন এবং হালকা সতর্কতা।",
+  "parent.dashboard.introEmpty":
+    "যখন আপনি আপনার সন্তানের সাথে লিঙ্ক করবেন, তার অগ্রগতি এখানে দেখা যাবে।",
+  "parent.dashboard.switchChild": "দেখছেন",
+  "parent.dashboard.inviteAnother": "আরেকটি সন্তান যোগ করুন",
+  "parent.dashboard.empty.title": "এখনও কোনো সন্তান লিঙ্ক করা হয়নি",
+  "parent.dashboard.empty.description":
+    "ইমেইল দিয়ে আপনার সন্তানকে অনুরোধ পাঠান। তিনি তার প্রোফাইল থেকে লিঙ্ক অনুমোদন করবেন।",
+  "parent.dashboard.empty.cta": "অনুরোধ পাঠান",
+  "parent.cards.streak": "স্ট্রিক",
+  "parent.cards.streakBest": "সেরা: {days} দিন",
+  "parent.cards.streakNone": "এখনও কোনো স্ট্রিক নেই",
+  "parent.cards.xpWeek": "গত সপ্তাহে XP",
+  "parent.cards.xpWeekSub": "গত ৭ দিনে অর্জিত মোট XP।",
+  "parent.cards.avgGrade": "গড় গ্রেড",
+  "parent.cards.avgGradeSub": "গত ৮টি গ্রেডেড আইটেমের গড়।",
+  "parent.cards.attendance": "উপস্থিতি",
+  "parent.upcoming.title": "আসন্ন ডেডলাইন",
+  "parent.upcoming.empty":
+    "পরবর্তী দুই সপ্তাহে কোনো অ্যাসাইনমেন্ট, পরীক্ষা বা লাইভ ক্লাস নেই।",
+  "parent.upcoming.kindLive": "লাইভ",
+  "parent.upcoming.kindAssignment": "HW",
+  "parent.upcoming.kindExam": "পরীক্ষা",
+  "parent.alerts.title": "সতর্কতা",
+  "parent.alerts.missingAssignment_one":
+    "{count}টি অ্যাসাইনমেন্ট মেয়াদোত্তীর্ণ",
+  "parent.alerts.missingAssignment_other":
+    "{count}টি অ্যাসাইনমেন্ট মেয়াদোত্তীর্ণ",
+  "parent.alerts.attendanceDropped":
+    "গত ৩০ দিনে উপস্থিতি {pct}%-এ নেমে এসেছে।",
+  "parent.alerts.examFail":
+    "গত ৮ গ্রেডেড আইটেমের গড় স্কোর {pct}%।",
+  "parent.alerts.allGood": "এই মুহূর্তে সবকিছু ভালো দেখাচ্ছে।",
+  "parent.gradeTrend.title": "গ্রেড ট্রেন্ড",
+  "parent.attendance.subtitle": "গত ৩০ দিনে সম্পন্ন লাইভ ক্লাসে উপস্থিতি।",
+  "parent.courses.title": "কোর্সের অগ্রগতি",
+  "parent.courses.empty": "আপনার সন্তানের এখনও কোনো সক্রিয় এনরোলমেন্ট নেই।",
+  "parent.invite.title": "সন্তানকে লিঙ্ক করুন",
+  "parent.invite.intro":
+    "ইমেইল দিয়ে আপনার সন্তানকে অনুরোধ পাঠান। তিনি নোটিফিকেশন পেয়ে প্রোফাইল থেকে অনুমোদন দেবেন।",
+  "parent.invite.emailLabel": "সন্তানের ইমেইল",
+  "parent.invite.emailHelp":
+    "InsideJibon-এ আপনার সন্তান যে ইমেইল দিয়ে নিবন্ধিত সেটি ব্যবহার করুন।",
+  "parent.invite.emailPlaceholder": "your.child@example.com",
+  "parent.invite.submit": "অনুরোধ পাঠান",
+  "parent.invite.submitting": "পাঠানো হচ্ছে…",
+  "parent.invite.rateLimited":
+    "আপনি একটু দ্রুত যাচ্ছেন। আরেকটি অনুরোধের আগে এক মিনিট অপেক্ষা করুন।",
+  "parent.invite.outcome.created":
+    "অনুরোধ পাঠানো হয়েছে — শিক্ষার্থী অনুমোদন করলে আপনাকে জানানো হবে।",
+  "parent.invite.outcome.existingPending":
+    "এই শিক্ষার্থীর জন্য ইতিমধ্যে একটি বিচারাধীন অনুরোধ আছে।",
+  "parent.invite.outcome.alreadyActive":
+    "আপনি ইতিমধ্যে এই শিক্ষার্থীর সাথে লিঙ্ক করা আছেন।",
+  "parent.invite.outcome.unknown":
+    "যদি ইমেইলটি একজন নিবন্ধিত শিক্ষার্থীর হয়, একটি আমন্ত্রণ পাঠানো হয়েছে।",
+  "parent.invite.outcome.rateLimited":
+    "আপনি একটানা কয়েকটি অনুরোধ পাঠিয়েছেন — এক মিনিট পর আবার চেষ্টা করুন।",
+  "parent.invite.outcome.error":
+    "কিছু সমস্যা হয়েছে। আবার চেষ্টা করুন।",
+  "parent.invite.toast.created": "অনুরোধ পাঠানো হয়েছে",
+  "parent.invite.toast.unknown": "যদি যোগ্য হয়, একটি আমন্ত্রণ পাঠানো হয়েছে",
+  "parent.invite.toast.error": "অনুরোধ পাঠানো যায়নি",
+  "parent.linkList.title": "পারিবারিক লিঙ্ক",
+  "parent.linkList.empty": "আপনি এখনও কোনো লিঙ্ক অনুরোধ করেননি।",
+  "parent.linkList.manageCta": "পরিচালনা",
+  "parent.link.status.pending": "বিচারাধীন",
+  "parent.link.status.active": "সক্রিয়",
+  "parent.link.status.revoked": "প্রত্যাহার করা হয়েছে",
+  "parent.link.requested": "অনুরোধ পাঠানো হয়েছে",
+  "parent.link.accepted": "প্যারেন্ট লিঙ্ক গৃহীত",
+  "parent.link.revoked": "প্যারেন্ট লিঙ্ক প্রত্যাহার",
+  "parent.link.pendingForStudent": "একজন অভিভাবক আপনার অনুমোদনের জন্য অপেক্ষা করছেন",
+  "parent.link.revoke": "প্রত্যাহার",
+  "parent.link.revokeError": "লিঙ্ক প্রত্যাহার করা যায়নি",
+  "parent.link.acceptError": "লিঙ্ক গ্রহণ করা যায়নি",
+  "parent.family.heading": "সংযুক্ত পরিবার",
+  "parent.family.subheading":
+    "আপনি যে অভিভাবকদের অনুমোদন দিয়েছেন (বা যারা অ্যাক্সেস চেয়েছেন) তারা এখানে দেখা যাবে। যেকোনো সময় অ্যাক্সেস প্রত্যাহার করতে পারবেন।",
+  "parent.family.status.pending": "বিচারাধীন",
+  "parent.family.status.active": "সক্রিয়",
+  "parent.family.status.revoked": "প্রত্যাহার",
+  "parent.family.approve": "অনুমোদন",
+  "parent.settings.title": "অভিভাবক সেটিংস",
+  "parent.settings.intro":
+    "প্রতিটি সংযুক্ত সন্তানের জন্য ডাইজেস্ট ইমেইল কখন পাঠাতে চান তা বেছে নিন।",
+  "parent.settings.cadenceHeading": "ডাইজেস্টের ধরন",
+  "parent.settings.cadenceSubheading":
+    "প্রতি সন্তানের জন্য আলাদাভাবে সেট করুন। দৈনিক প্রতিদিন সকাল ০৬:০০ UTC-তে যায়; সাপ্তাহিক সোমবার সকালে যায়।",
+  "parent.settings.emailRecipients": "ডাইজেস্ট ইমেইল {email}-এ পাঠানো হয়।",
+  "parent.settings.cadence.daily": "দৈনিক",
+  "parent.settings.cadence.weekly": "সাপ্তাহিক",
+  "parent.settings.cadence.off": "বন্ধ",
+  "parent.settings.sendHour": "পাঠানোর সময় (UTC)",
+  "parent.settings.cadenceSaved": "সংরক্ষিত",
+  "parent.settings.cadenceError": "ক্যাডেন্স সংরক্ষণ করা যায়নি",
+  "parent.settings.quietHours": "শান্ত ঘন্টা",
+  "parent.settings.linkManagement.heading": "লিঙ্ক পরিচালনা",
+  "parent.settings.linkManagement.subheading":
+    "লিঙ্ক প্রত্যাহার করলে ডাইজেস্ট বন্ধ হবে এবং ঐ সন্তানের জন্য রিড-অনলি অ্যাক্সেসও বন্ধ হবে।",
+  "parent.settings.empty": "কোনো সক্রিয় লিঙ্ক নেই।",
+  "parent.settings.backToDashboard": "ড্যাশবোর্ডে ফিরে যান",
+  "parent.email.subject": "InsideJibon ডাইজেস্ট",
+  "parent.email.intro": "InsideJibon-এ সর্বশেষ অগ্রগতি এখানে।",
+  "parent.email.footer": "আপনার পছন্দ /parent/settings থেকে পরিচালনা করুন।",
 };

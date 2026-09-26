@@ -7,6 +7,13 @@ interface BrandLogoProps {
   showText?: boolean;
   className?: string;
   badge?: string;
+  /**
+   * Tailwind classes for the badge background + text colours when
+   * a non-default (primary-container) badge is required — e.g. parent
+   * (rose) or admin (slate). Must include `font-bold` and
+   * `uppercase tracking-wider` if you override the look fully.
+   */
+  badgeClassName?: string;
 }
 
 const sizeConfig = {
@@ -36,8 +43,12 @@ export function BrandLogo({
   showText = true,
   className = "",
   badge,
+  badgeClassName,
 }: BrandLogoProps) {
   const config = sizeConfig[size];
+  const badgeClasses =
+    badgeClassName ??
+    "bg-primary-container text-on-primary-container";
 
   const content = (
     <div className={`flex items-center gap-2.5 group select-none ${className}`}>
@@ -58,7 +69,7 @@ export function BrandLogo({
             Inside<span className="text-primary-container">Jibon</span>
           </span>
           {badge && (
-            <span className={`ml-1 rounded-full bg-primary-container font-bold text-on-primary-container uppercase tracking-wider ${config.badgeSize}`}>
+            <span className={`ml-1 rounded-full font-bold uppercase tracking-wider ${config.badgeSize} ${badgeClasses}`}>
               {badge}
             </span>
           )}

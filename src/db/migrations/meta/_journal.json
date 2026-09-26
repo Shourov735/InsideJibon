@@ -148,6 +148,13 @@
       "when": 1790503600000,
       "tag": "0020_remaster_r6_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1790600000000,
+      "tag": "0021_remaster_r7_parent",
+      "breakpoints": true
     }
   ]
 }
