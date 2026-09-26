@@ -7,12 +7,13 @@ import { useEffect, useState } from "react";
 
 import { BrandLogo } from "@/components/shared/brand-logo";
 
-type HeaderRole = "student" | "teacher" | "admin" | null;
+type HeaderRole = "student" | "teacher" | "admin" | "parent" | null;
 
 const DASHBOARD_PATH: Record<Exclude<HeaderRole, null>, string> = {
   student: "/student",
   teacher: "/teacher",
   admin: "/admin",
+  parent: "/parent",
 };
 
 export function MarketingHeader({ role = null }: { role?: HeaderRole }) {

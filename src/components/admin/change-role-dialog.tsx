@@ -1,12 +1,13 @@
 "use client";
 
 import { useTranslations } from "@/i18n/client";
+import type { Role } from "@/db/schema";
 
 interface ChangeRoleDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (role: "student" | "teacher" | "admin") => void;
-  currentRole: "student" | "teacher" | "admin";
+  onConfirm: (role: Role) => void;
+  currentRole: Role;
   userName: string;
   isPending: boolean;
 }

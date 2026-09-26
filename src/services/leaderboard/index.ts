@@ -6,6 +6,7 @@ import {
   leaderboardSnapshots,
   users,
   xpEvents,
+  type Role,
 } from "@/db/schema";
 
 /**
@@ -27,7 +28,7 @@ export interface LeaderboardEntry {
   userId: string;
   userName: string | null;
   userImage: string | null;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   xp: number;
   rank: number;
 }
@@ -232,7 +233,7 @@ type XpRow = Record<string, unknown> & {
   xp: number;
   userName: string | null;
   userImage: string | null;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
 };
 
 async function aggregateLeaderboard(args: AggregateArgs): Promise<LeaderboardEntry[]> {

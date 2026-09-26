@@ -324,7 +324,7 @@ function LeaderboardList({
     userId: string;
     userName: string | null;
     userImage: string | null;
-    userRole: "student" | "teacher" | "admin";
+    userRole: import("@/db/schema").Role;
     xp: number;
     rank: number;
   }>;

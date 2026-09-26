@@ -4,6 +4,7 @@ import { useState, useTransition, useMemo } from "react";
 import Image from "next/image";
 import { useTranslations } from "@/i18n/client";
 import type { User } from "@/db/schema";
+import type { Role } from "@/db/schema";
 import { RoleBadge } from "./role-badge";
 import { ChangeRoleDialog } from "./change-role-dialog";
 import { updateUserRoleAction } from "@/app/admin/actions/admin-actions";
@@ -16,7 +17,7 @@ interface UserDirectoryProps {
 export function UserDirectory({ users: initialUsers, currentUserId }: UserDirectoryProps) {
   const { t } = useTranslations();
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"all" | "student" | "teacher" | "admin">("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | Role>("all");
   
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -31,7 +32,7 @@ export function UserDirectory({ users: initialUsers, currentUserId }: UserDirect
     });
   }, [initialUsers, search, roleFilter]);
 
-  const handleRoleChange = (newRole: "student" | "teacher" | "admin") => {
+  const handleRoleChange = (newRole: Role) => {
     if (!selectedUser) return;
     
     startTransition(async () => {
@@ -60,7 +61,7 @@ export function UserDirectory({ users: initialUsers, currentUserId }: UserDirect
         
         <select
           value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value as "all" | "student" | "teacher" | "admin")}
+          onChange={(e) => setRoleFilter(e.target.value as "all" | Role)}
           className="w-full sm:w-auto rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         >
           <option value="all">{t("admin.users.allRoles")}</option>

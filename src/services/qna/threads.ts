@@ -13,6 +13,7 @@ import {
   type QaThread,
   type QaKind,
   type QaStatus,
+  type Role,
 } from "@/db/schema";
 import { isStudentEnrolled } from "@/services/enrollments/enrollments";
 import { emitQaUpvoteXp, emitQaAcceptedXp } from "@/services/xp/emit";
@@ -95,11 +96,11 @@ async function resolveThreadContext(
 export async function canAccessLesson(
   userId: string,
   lessonId: string,
-  role: "student" | "teacher" | "admin"
+  role: Role
 ): Promise<boolean> {
   const ctx = await resolveLessonContext(lessonId);
   if (!ctx) return false;
-  if (role !== "student") return true; // teacher / admin see all lessons
+  if (role !== "student" && role !== "parent") return true; // teacher / admin see all lessons
   return isStudentEnrolled(userId, ctx.courseId);
 }
 
@@ -124,7 +125,7 @@ export interface QaThreadWithMeta extends QaThread {
   authorId: string;
   authorName: string | null;
   authorImage: string | null;
-  authorRole: "student" | "teacher" | "admin";
+  authorRole: Role;
   answerCount: number;
   myVote: -1 | 0 | 1;
   isAccepted: boolean;
@@ -147,7 +148,7 @@ export type QaFilter = "all" | "open" | "resolved" | "closed" | "mine";
 export async function listLessonQa(args: {
   lessonId: string;
   currentUserId: string;
-  currentUserRole: "student" | "teacher" | "admin";
+  currentUserRole: Role;
   sort?: QaSort;
   filter?: QaFilter;
 }): Promise<QaThreadWithMeta[]> {
@@ -202,7 +203,7 @@ export async function listLessonQa(args: {
     thread: QaThread;
     authorName: string | null;
     authorImage: string | null;
-    authorRole: "student" | "teacher" | "admin";
+    authorRole: Role;
   }>;
 
   if (questions.length === 0) return [];
@@ -261,7 +262,7 @@ export async function listLessonQa(args: {
     thread: QaThread;
     authorName: string | null;
     authorImage: string | null;
-    authorRole: "student" | "teacher" | "admin";
+    authorRole: Role;
   }>>();
   replies.forEach((r) => {
     const pid = r.thread.parentId ?? "";
@@ -308,7 +309,7 @@ export async function listLessonQa(args: {
 export async function askQuestion(args: {
   lessonId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   title: string;
   content: string;
   tags?: string[];
@@ -342,7 +343,7 @@ export async function askQuestion(args: {
 export async function postAnswer(args: {
   parentId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   content: string;
 }): Promise<QaThread> {
   const content = args.content.trim();
@@ -403,7 +404,7 @@ export async function postAnswer(args: {
 export async function postComment(args: {
   parentId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   content: string;
 }): Promise<QaThread> {
   const content = args.content.trim();
@@ -460,7 +461,7 @@ export interface VoteResult {
 export async function vote(args: {
   threadId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   value: -1 | 1;
 }): Promise<VoteResult> {
   const ctx = await resolveThreadContext(args.threadId);
@@ -597,7 +598,7 @@ export async function acceptAnswer(args: {
   questionId: string;
   answerId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
 }): Promise<QaThread> {
   const db = getDb();
 
@@ -676,7 +677,7 @@ export async function acceptAnswer(args: {
 export async function setStatus(args: {
   threadId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   status: QaStatus;
 }): Promise<QaThread> {
   const ctx = await resolveThreadContext(args.threadId);
@@ -718,7 +719,7 @@ export async function setStatus(args: {
 export async function pinThread(args: {
   threadId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   pinned: boolean;
 }): Promise<QaThread> {
   const ctx = await resolveThreadContext(args.threadId);

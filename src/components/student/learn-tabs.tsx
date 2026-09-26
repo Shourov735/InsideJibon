@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "@/i18n/client";
-import type { ClassSession, Announcement } from "@/db/schema";
+import type { ClassSession, Announcement, Role } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { CourseSessionsList } from "./classes/course-sessions-list";
 import { CourseAnnouncementsList } from "./announcements/course-announcements-list";
@@ -15,7 +15,7 @@ interface LearnPageTabsProps {
   lessonId: string;
   courseId: string;
   currentUserId: string;
-  currentUserRole: "student" | "teacher" | "admin";
+  currentUserRole: Role;
 }
 
 export function LearnPageTabs({

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "@/i18n/client";
+import type { Role } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import {
   askQuestionAction,
@@ -31,7 +32,7 @@ export interface QaReplyView {
   authorId: string;
   authorName: string | null;
   authorImage: string | null;
-  authorRole: "student" | "teacher" | "admin";
+  authorRole: Role;
   upvotes: number;
   downvotes: number;
   myVote: -1 | 0 | 1;
@@ -51,7 +52,7 @@ interface QnaPanelProps {
   lessonId: string;
   courseId: string;
   currentUserId: string;
-  currentUserRole: "student" | "teacher" | "admin";
+  currentUserRole: Role;
   initialQuestions: QaQuestionView[];
 }
 
@@ -273,12 +274,12 @@ function QuestionCard({
   question: QaQuestionView;
   courseId: string;
   currentUserId: string;
-  currentUserRole: "student" | "teacher" | "admin";
+  currentUserRole: Role;
 }) {
   const { t, tn } = useTranslations();
   const [showAnswer, setShowAnswer] = useState(false);
   const isOwn = question.authorId === currentUserId;
-  const isStaff = currentUserRole !== "student";
+  const isStaff = currentUserRole !== "student" && currentUserRole !== "parent";
   const canModerate = isStaff;
   const acceptedAnswer = question.children.find((c) => c.isAccepted);
   const otherAnswers = question.children.filter((c) => c.kind === "answer" && !c.isAccepted);

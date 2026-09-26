@@ -9,6 +9,7 @@ import {
   courseModules,
   courses,
   type QaThread,
+  type Role,
 } from "@/db/schema";
 
 /**
@@ -51,7 +52,7 @@ async function isTeacherOfCourse(
 }
 
 function assertStaff(
-  userRole: "student" | "teacher" | "admin",
+  userRole: Role,
   ctx: { courseId: string } | null
 ): void {
   if (userRole === "admin") return;
@@ -62,7 +63,7 @@ function assertStaff(
 export async function softDeleteThread(args: {
   threadId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
 }): Promise<QaThread> {
   const db = getDb();
   const [thread] = await db
@@ -104,7 +105,7 @@ export async function softDeleteThread(args: {
 export async function lockThread(args: {
   threadId: string;
   userId: string;
-  userRole: "student" | "teacher" | "admin";
+  userRole: Role;
   locked: boolean;
 }): Promise<QaThread> {
   const ctx = await resolveContext(args.threadId);

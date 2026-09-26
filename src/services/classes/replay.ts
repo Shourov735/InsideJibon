@@ -3,6 +3,7 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 
 import { getDb } from "@/db";
+import type { Role } from "@/db/schema";
 import {
   classChat,
   classReactions,
@@ -202,12 +203,12 @@ export async function getReplayContext(sessionId: string): Promise<ReplayContext
  * Returns a boolean + the viewer's role.
  */
 export type ReplayAuth =
-  | { ok: true; role: "student" | "teacher" | "admin" }
+  | { ok: true; role: Role }
   | { ok: false };
 
 export async function authorizeReplayViewer(
   sessionId: string,
-  viewer: { id: string; role: "student" | "teacher" | "admin" }
+  viewer: { id: string; role: Role }
 ): Promise<ReplayAuth> {
   const db = getDb();
   const [row] = await db

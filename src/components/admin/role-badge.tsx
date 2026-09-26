@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
+import type { Role } from "@/db/schema";
 
 interface RoleBadgeProps {
-  role: "student" | "teacher" | "admin";
+  role: Role;
   className?: string;
   label?: string;
 }
@@ -14,6 +15,7 @@ export function RoleBadge({ role, className, label }: RoleBadgeProps) {
         role === "student" && "bg-blue-100 text-blue-800",
         role === "teacher" && "bg-green-100 text-green-800",
         role === "admin" && "bg-amber-100 text-amber-800",
+        role === "parent" && "bg-rose-100 text-rose-800",
         className
       )}
     >
