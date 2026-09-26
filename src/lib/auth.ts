@@ -177,11 +177,13 @@ async function resolveCurrentUserImpl(): Promise<ResolvedSession> {
   }
 
   const db = getDb();
-  let [user] = await db
+  const rows = await db
     .select()
     .from(users)
     .where(eq(users.id, subject))
     .limit(1);
+
+  let user: CurrentUser | null = rows[0] ?? null;
 
   if (!user) {
     user = await autoProvisionUser(subject, env.CLERK_SECRET_KEY);
