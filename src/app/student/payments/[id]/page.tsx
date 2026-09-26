@@ -22,7 +22,7 @@ export default async function StudentPaymentStatusPage({
 
   if (!isUuid(id)) {
     return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-3xl px-4 py-10">
         <p className="text-on-surface">{t("system.requestError")}</p>
       </main>
     );
@@ -31,7 +31,7 @@ export default async function StudentPaymentStatusPage({
   const submission = await getSubmissionById(id);
   if (!submission || submission.userId !== user.id) {
     return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-3xl px-4 py-10">
         <p className="text-on-surface">{t("system.requestError")}</p>
       </main>
     );
@@ -70,7 +70,7 @@ export default async function StudentPaymentStatusPage({
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+    <main id="main-content" className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
       <StudentPaymentStatus
         submission={{
           id: submission.id,

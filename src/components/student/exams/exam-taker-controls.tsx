@@ -81,7 +81,7 @@ export function ExamTakerControls({
                 }`}
               >
                 <svg
-                  className={`h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 ${
+        className={`h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 ${
                     isUrgentTime
                       ? "text-error"
                       : isLowTime
@@ -104,7 +104,7 @@ export function ExamTakerControls({
             ) : isUntimed ? (
               <div className="hidden sm:flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs font-medium text-secondary">
                 <svg
-                  className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -128,14 +128,19 @@ export function ExamTakerControls({
                   ? t("student.exam.unmarkQuestion")
                   : t("student.exam.markQuestionTitle")
               }
-              className={`inline-flex items-center gap-1 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+              aria-label={
+                isCurrentMarked
+                  ? t("student.exam.unmarkQuestion")
+                  : t("student.exam.markQuestionTitle")
+              }
+              className={`inline-flex h-9 items-center gap-1 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2 ${
                 isCurrentMarked
                   ? "border-tertiary bg-amber-50 text-amber-900 shadow-2xs"
                   : "border-outline-variant bg-surface-container-low text-secondary hover:bg-surface-container hover:text-on-surface"
               }`}
             >
               <svg
-                className={`h-3.5 w-3.5 ${isCurrentMarked ? "text-amber-800" : "text-secondary"}`}
+        className={`h-3.5 w-3.5 ${isCurrentMarked ? "text-amber-800" : "text-secondary"}`}
                 fill={isCurrentMarked ? "currentColor" : "none"}
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -155,7 +160,7 @@ export function ExamTakerControls({
             <button
               type="button"
               onClick={onRequestSubmit}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-primary px-3 sm:px-4 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2 cursor-pointer"
             >
               <span>{t("student.exam.submitExam")}</span>
             </button>
@@ -169,10 +174,11 @@ export function ExamTakerControls({
           type="button"
           disabled={currentIndex === 0}
           onClick={onPrev}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 sm:px-5 py-2.5 text-xs font-bold text-on-surface shadow-2xs transition-colors hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          aria-label={t("student.learn.previous")}
+          className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-lowest px-3.5 sm:px-5 text-xs font-bold text-on-surface shadow-2xs transition-colors hover:bg-surface-container-low focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           <svg
-            className="h-4 w-4"
+        className="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -198,11 +204,12 @@ export function ExamTakerControls({
           <button
             type="button"
             onClick={onRequestSubmit}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 sm:px-6 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
+            aria-label={t("student.exam.reviewAndSubmit")}
+            className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-primary px-4 sm:px-6 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2 cursor-pointer"
           >
             <span>{t("student.exam.reviewAndSubmit")}</span>
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -219,11 +226,12 @@ export function ExamTakerControls({
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 sm:px-5 py-2.5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container cursor-pointer"
+            aria-label={t("student.exam.nextQuestion")}
+            className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-primary px-3.5 sm:px-5 text-xs font-bold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2 cursor-pointer"
           >
             <span>{t("student.exam.nextQuestion")}</span>
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

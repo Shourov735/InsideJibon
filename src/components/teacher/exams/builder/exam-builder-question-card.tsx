@@ -81,7 +81,7 @@ export function ExamBuilderQuestionCard({
               className="rounded p-1 text-secondary hover:bg-surface-container hover:text-on-surface disabled:opacity-30 cursor-pointer"
             >
               <svg
-                className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -102,7 +102,7 @@ export function ExamBuilderQuestionCard({
               className="rounded p-1 text-secondary hover:bg-surface-container hover:text-on-surface disabled:opacity-30 cursor-pointer"
             >
               <svg
-                className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -122,7 +122,7 @@ export function ExamBuilderQuestionCard({
               className="rounded p-1 text-secondary hover:bg-error-container/50 hover:text-error cursor-pointer"
             >
               <svg
-                className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -157,7 +157,7 @@ export function ExamBuilderQuestionCard({
             }
           >
             <svg
-              className="h-3.5 w-3.5 text-amber-600"
+        className="h-3.5 w-3.5 text-amber-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -174,7 +174,7 @@ export function ExamBuilderQuestionCard({
         ) : (
           <span className="flex items-center gap-1 font-medium text-emerald-700">
             <svg
-              className="h-3.5 w-3.5 text-emerald-600"
+        className="h-3.5 w-3.5 text-emerald-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

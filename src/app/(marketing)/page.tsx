@@ -5,13 +5,22 @@ import type { Metadata } from "next";
 import { getTranslator } from "@/i18n/server";
 import { buildWebsiteJsonLd, buildAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
+import { Container } from "@/components/shared/ui/container";
+import { Badge } from "@/components/shared/ui/badge";
+import {
+  ArrowRightIcon,
+  BookIcon,
+  CalendarIcon,
+  ChartIcon,
+  ClipboardIcon,
+  PlayIcon,
+  SparklesIcon,
+  TrophyIcon,
+  UsersIcon,
+  VideoIcon,
+} from "@/components/shared/ui/icons";
+import { getPublishedCourses } from "@/services/courses";
 
-// R0 §8: marketing landing is read-mostly and benefits from edge caching.
-// 60s TTL, 10min stale-while-revalidate. Tag invalidation is fired when
-// marketing-owned content changes (course publish on the marketing hero,
-// site-wide banners, etc.). The header/footer that wraps this page are
-// resolved on every request so the marketing layout already pays the
-// per-user fetch cost; the cached portion here is just the static body.
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,9 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = t("seo.home.description");
 
   return {
-    title: {
-      absolute: title,
-    },
+    title: { absolute: title },
     description,
     alternates: buildAlternates("/"),
     openGraph: {
@@ -52,464 +59,592 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+const SUBJECTS = [
+  {
+    slug: "physics",
+    label: "পদার্থবিজ্ঞান",
+    labelEn: "Physics",
+    color: "from-blue-600 to-indigo-700",
+    cover: "/images/courses/physics-cover.jpg",
+    description:
+      "ভেক্টর, গতি, কাজ-শক্তি, তড়িৎ এবং আধুনিক পদার্থবিজ্ঞানের গভীর আলোচনা।",
+  },
+  {
+    slug: "chemistry",
+    label: "রসায়ন",
+    labelEn: "Chemistry",
+    color: "from-amber-500 to-orange-600",
+    cover: "/images/courses/chemistry-cover.jpg",
+    description:
+      "গুণগত রসায়ন, পর্যায়বৃত্ত ধর্ম এবং জৈব রসায়নের রিঅ্যাকশন মেকানিজম।",
+  },
+  {
+    slug: "biology",
+    label: "জীববিজ্ঞান",
+    labelEn: "Biology",
+    color: "from-emerald-500 to-green-700",
+    cover: "/images/courses/biology-cover.jpg",
+    description:
+      "উদ্ভিদবিজ্ঞান, মানব শারীরতত্ত্ব এবং বিশ্ববিদ্যালয় ভর্তি প্রস্তুতি।",
+  },
+  {
+    slug: "ict",
+    label: "আইসিটি",
+    labelEn: "ICT",
+    color: "from-cyan-500 to-sky-700",
+    cover: "/images/courses/ict-cover.jpg",
+    description:
+      "সংখ্যা পদ্ধতি, ডিজিটাল লজিক, HTML ও সি প্রোগ্রামিংয়ের হ্যান্ডস-অন কোডিং।",
+  },
+  {
+    slug: "mathematics",
+    label: "উচ্চতর গণিত",
+    labelEn: "Higher Mathematics",
+    color: "from-purple-600 to-fuchsia-700",
+    cover: "/images/courses/math-cover.jpg",
+    description:
+      "ম্যাট্রিক্স, ত্রিকোণমিতি, অন্তরীকরণ ও যোগজীকরণে দক্ষতা।",
+  },
+];
+
+const METHOD_STEPS = [
+  {
+    n: "1",
+    titleEn: "Learn with Structure",
+    titleBn: "কাঠামোগত পাঠদান",
+    descriptionEn:
+      "Meticulously planned video lectures and comprehensive materials that build a deep understanding.",
+    descriptionBn:
+      "পরিকল্পিত ভিডিও লেকচার ও সমৃদ্ধ লেকচার শিট — গভীর ধারণা গড়ে তোলার জন্য।",
+    icon: <BookIcon size={20} />,
+  },
+  {
+    n: "2",
+    titleEn: "Practice with Purpose",
+    titleBn: "লক্ষ্যভিত্তিক অনুশীলন",
+    descriptionEn:
+      "Board-standard MCQ and written exams with instant auto-grading so you always know where you stand.",
+    descriptionBn:
+      "বোর্ড-স্ট্যান্ডার্ড MCQ ও লিখিত পরীক্ষা — তাৎক্ষণিক অটো-গ্রেডিং সহ।",
+    icon: <ClipboardIcon size={20} />,
+  },
+  {
+    n: "3",
+    titleEn: "Improve with Confidence",
+    titleBn: "আত্মবিশ্বাসী উন্নতি",
+    descriptionEn:
+      "Assignment feedback, performance analytics and direct lesson discussion with the educator.",
+    descriptionBn:
+      "অ্যাসাইনমেন্ট ফিডব্যাক, পারফরম্যান্স অ্যানালিটিক্স এবং শিক্ষকের সাথে সরাসরি আলোচনা।",
+    icon: <TrophyIcon size={20} />,
+  },
+];
+
+const PLATFORM_FEATURES = [
+  {
+    icon: <VideoIcon size={20} />,
+    titleEn: "Structured video lessons",
+    titleBn: "সুশৃঙ্খল ভিডিও লেসন",
+    descriptionEn: "Carefully sequenced lessons with chapter-wise learning paths.",
+    descriptionBn: "অধ্যায়ভিত্তিক পাঠপথ সহ সুশৃঙ্খলভাবে সাজানো লেসন।",
+  },
+  {
+    icon: <ClipboardIcon size={20} />,
+    titleEn: "Assignments & auto-grading",
+    titleBn: "অ্যাসাইনমেন্ট ও অটো-গ্রেডিং",
+    descriptionEn: "Submit written work, get instant marks and educator feedback.",
+    descriptionBn: "লিখিত কাজ জমা দিন, তাৎক্ষণিক নম্বর ও শিক্ষকের মন্তব্য পান।",
+  },
+  {
+    icon: <CalendarIcon size={20} />,
+    titleEn: "Live classes",
+    titleBn: "লাইভ ক্লাস",
+    descriptionEn: "Real-time sessions with chat, raise hand, and replay access.",
+    descriptionBn: "চ্যাট, হাত তোলা ও রিপ্লে সুবিধাসহ রিয়েল-টাইম সেশন।",
+  },
+  {
+    icon: <ChartIcon size={20} />,
+    titleEn: "Performance analytics",
+    titleBn: "পারফরম্যান্স অ্যানালিটিক্স",
+    descriptionEn: "Visual progress, streaks, and league standings to keep you motivated.",
+    descriptionBn: "ভিজ্যুয়াল প্রগতি, স্ট্রিক ও লিগ র‍্যাঙ্কিং — মোটিভেশন ধরে রাখতে।",
+  },
+  {
+    icon: <SparklesIcon size={20} />,
+    titleEn: "AI study assistant",
+    titleBn: "AI স্টাডি অ্যাসিস্ট্যান্ট",
+    descriptionEn: "Ask questions about any lesson and get contextual help, anytime.",
+    descriptionBn: "যেকোনো লেসন সম্পর্কে প্রশ্ন করুন — যেকোনো সময় প্রাসঙ্গিক সাহায্য।",
+  },
+  {
+    icon: <UsersIcon size={20} />,
+    titleEn: "Parent visibility",
+    titleBn: "অভিভাবকের নজরদারি",
+    descriptionEn: "Parents can monitor progress, attendance and key milestones.",
+    descriptionBn: "অভিভাবকরা প্রগতি, উপস্থিতি ও গুরুত্বপূর্ণ মাইলফলক দেখতে পারবেন।",
+  },
+];
+
 export default async function MarketingPage() {
   const t = await getTranslator();
-  return (
-    <div className="flex flex-col w-full overflow-x-hidden">
-      <JsonLd data={buildWebsiteJsonLd(t.locale as "en" | "bn")} />
-      {/* Hero Section */}
-      <section className="relative w-full overflow-hidden bg-surface py-12 sm:py-24 lg:py-32">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="flex flex-col gap-5 sm:gap-6 relative z-10 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-container/10 border border-primary/20 text-xs font-semibold text-primary w-fit">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                বিজ্ঞান ও আইসিটি শিক্ষার পরিকল্পিত প্ল্যাটফর্ম
-              </div>
+  let featuredCourses: Awaited<ReturnType<typeof getPublishedCourses>> = [];
+  try {
+    featuredCourses = await getPublishedCourses();
+    featuredCourses = featuredCourses.slice(0, 3);
+  } catch {
+    // ignore — page still works without featured courses
+  }
 
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-primary leading-tight">
-                Learn with structure.<br />
-                Practice with purpose.<br />
+  return (
+    <div className="flex w-full flex-col">
+      <JsonLd data={buildWebsiteJsonLd(t.locale as "en" | "bn")} />
+
+      {/* HERO */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-surface-0 via-surface-0 to-surface-1">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(15,138,95,0.08),transparent_45%),radial-gradient(circle_at_85%_30%,rgba(67,56,202,0.08),transparent_45%)]"
+        />
+        <Container className="relative py-12 sm:py-20 lg:py-28" size="xl">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+            <div className="space-y-6 sm:space-y-7 lg:col-span-7">
+              <Badge tone="primary" size="sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                বিজ্ঞান ও আইসিটি শিক্ষার পরিকল্পিত প্ল্যাটফর্ম
+              </Badge>
+
+              <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+                Learn with structure.
+                <br />
+                <span className="text-primary">Practice with purpose.</span>
+                <br />
                 Improve with confidence.
-                <span className="block h-1.5 w-20 sm:w-24 bg-primary mt-4 sm:mt-6 rounded-full"></span>
               </h1>
-              <p className="text-base sm:text-lg font-medium text-secondary leading-relaxed">
-                এসএসসি, এইচএসসি ও বিশ্ববিদ্যালয় ভর্তি প্রস্তুতির জন্য পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান, আইসিটি ও উচ্চতর গণিতের পূর্ণাঙ্গ একাডেমিক প্ল্যাটফর্ম।
+
+              <p className="max-w-xl text-base leading-relaxed text-ink-500 sm:text-lg">
+                এসএসসি, এইচএসসি ও বিশ্ববিদ্যালয় ভর্তি প্রস্তুতির জন্য পদার্থবিজ্ঞান, রসায়ন,
+                জীববিজ্ঞান, আইসিটি ও উচ্চতর গণিতের পূর্ণাঙ্গ একাডেমিক প্ল্যাটফর্ম।
               </p>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mt-2">
+
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/courses"
-                  className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm sm:text-base font-semibold text-on-primary shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-all hover:shadow-md text-center"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary shadow-[0_4px_14px_-6px_rgba(0,53,85,0.45)] transition-colors hover:bg-primary/90"
                 >
-                  Explore Courses / কোর্সসমূহ
+                  Explore Courses
+                  <ArrowRightIcon size={16} />
                 </Link>
                 <a
                   href="#instructor"
-                  className="inline-flex items-center justify-center rounded-xl border-2 border-primary px-6 py-3.5 text-sm sm:text-base font-semibold text-primary hover:bg-surface-container-low transition-colors text-center"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-outline-variant bg-surface-0 px-6 text-base font-semibold text-ink-900 hover:bg-surface-1"
                 >
-                  Meet Instructor
+                  Meet Your Instructor
                 </a>
               </div>
+
+              {/* Quick stats */}
+              <dl className="grid grid-cols-3 gap-3 pt-2 sm:gap-6">
+                {[
+                  { label: "Subjects", value: "5" },
+                  { label: "Lectures", value: "50+" },
+                  { label: "Board Aligned", value: "100%" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-2xl border border-outline-variant bg-surface-0/70 p-3 sm:p-4">
+                    <dt className="text-[10px] font-semibold uppercase tracking-wide text-ink-500">
+                      {s.label}
+                    </dt>
+                    <dd className="font-display text-xl font-bold text-ink-900 sm:text-2xl">
+                      {s.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-            
-            <div className="relative w-full max-w-sm sm:max-w-md mx-auto lg:mx-0 lg:ml-auto mt-4 lg:mt-0">
-              <div className="bento-card overflow-hidden shadow-academic-lg relative aspect-[4/5] rounded-2xl border border-outline-variant">
-                <Image 
-                  src="/jibon.jpg" 
-                  alt="Tanvir Hasan Jibon" 
-                  fill 
+
+            {/* Hero visual */}
+            <div className="relative mx-auto w-full max-w-sm sm:max-w-md lg:col-span-5 lg:max-w-none">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-outline-variant shadow-[0_24px_64px_-20px_rgba(0,0,0,0.18)]">
+                <Image
+                  src="/jibon.jpg"
+                  alt="Tanvir Hasan Jibon — Lead Educator"
+                  fill
                   className="object-cover"
                   priority
+                  sizes="(min-width: 1024px) 40vw, 90vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 text-white">
-                  <span className="text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-emerald-400">Lead Educator</span>
-                  <p className="font-display text-xl sm:text-2xl font-bold mt-0.5">Tanvir Hasan Jibon</p>
-                  <p className="text-xs text-gray-300 mt-0.5">Science & Mathematics Educator</p>
-                  <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-3">
-                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur rounded text-[10px] sm:text-[11px] font-medium">⚛️ Physics</span>
-                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur rounded text-[10px] sm:text-[11px] font-medium">🧪 Chemistry</span>
-                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur rounded text-[10px] sm:text-[11px] font-medium">🧬 Biology</span>
-                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur rounded text-[10px] sm:text-[11px] font-medium">💻 ICT</span>
-                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur rounded text-[10px] sm:text-[11px] font-medium">📐 Math</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-6">
+                  <Badge tone="primary" className="bg-white/15 text-white backdrop-blur">
+                    Lead Educator
+                  </Badge>
+                  <p className="mt-3 font-display text-xl font-bold sm:text-2xl">Tanvir Hasan Jibon</p>
+                  <p className="text-xs text-white/80 sm:text-sm">
+                    Science &amp; Mathematics Educator
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {["Physics", "Chemistry", "Biology", "ICT", "Math"].map((s) => (
+                      <span
+                        key={s}
+                        className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-medium backdrop-blur sm:text-[11px]"
+                      >
+                        {s}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
+              {/* Floating preview chip */}
+              <div className="absolute -bottom-4 -left-4 hidden rotate-[-4deg] rounded-2xl border border-outline-variant bg-surface-0 p-3 shadow-[0_12px_32px_-10px_rgba(0,0,0,0.12)] sm:flex sm:items-center sm:gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[color:var(--color-success)]/12 text-[color:var(--color-success)]">
+                  <PlayIcon size={16} />
+                </div>
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-ink-500">
+                    Live now
+                  </div>
+                  <div className="text-sm font-semibold text-ink-900">Force &amp; Motion</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* Stats/Trust Banner */}
-      <section className="w-full border-y border-outline-variant bg-surface-container-low py-8 sm:py-10">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
-            <div className="flex flex-col items-center p-3 rounded-xl bg-surface-container-lowest/60 border border-outline-variant/40 sm:border-0 sm:bg-transparent">
-              <span className="text-2xl sm:text-4xl font-bold text-primary">5</span>
-              <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-secondary mt-1">Core Academic Subjects</span>
-            </div>
-            <div className="flex flex-col items-center p-3 rounded-xl bg-surface-container-lowest/60 border border-outline-variant/40 sm:border-0 sm:bg-transparent">
-              <span className="text-2xl sm:text-4xl font-bold text-primary">50+</span>
-              <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-secondary mt-1">Structured Lectures</span>
-            </div>
-            <div className="flex flex-col items-center p-3 rounded-xl bg-surface-container-lowest/60 border border-outline-variant/40 sm:border-0 sm:bg-transparent">
-              <span className="text-2xl sm:text-4xl font-bold text-primary">Board</span>
-              <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-secondary mt-1">Standard Curriculum</span>
-            </div>
-            <div className="flex flex-col items-center p-3 rounded-xl bg-surface-container-lowest/60 border border-outline-variant/40 sm:border-0 sm:bg-transparent">
-              <span className="text-2xl sm:text-4xl font-bold text-primary">100%</span>
-              <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-secondary mt-1">Structured Access</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Curricula Section */}
-      <section className="w-full py-14 sm:py-20 bg-surface">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="text-center mb-10 sm:mb-14">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-xs font-semibold text-secondary uppercase tracking-wider mb-3">
-              Curriculum Discovery
-            </div>
-            <h2 className="font-display text-2xl sm:text-4xl font-bold text-primary">বিষয়ভিত্তিক পূর্ণাঙ্গ পাঠ্যক্রম</h2>
-            <p className="text-secondary mt-2 text-sm sm:text-base max-w-2xl mx-auto">
-              এসএসসি ও এইচএসসি শিক্ষার্থীদের প্রতিটি অধ্যায় ও গাণিতিক সমস্যা সহজভাবে অনুধাবনের জন্য বিশেষভাবে সাজানো কোর্সসমূহ।
+      {/* SUBJECTS */}
+      <section className="bg-surface-1 py-14 sm:py-20">
+        <Container size="xl">
+          <div className="mb-8 max-w-2xl sm:mb-12">
+            <Badge tone="muted" size="sm">Curriculum</Badge>
+            <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-4xl">
+              বিষয়ভিত্তিক পূর্ণাঙ্গ পাঠ্যক্রম
+            </h2>
+            <p className="mt-2 text-sm text-ink-500 sm:text-base">
+              এসএসসি ও এইচএসসি শিক্ষার্থীদের প্রতিটি অধ্যায় ও গাণিতিক সমস্যা সহজভাবে
+              অনুধাবনের জন্য বিশেষভাবে সাজানো কোর্সসমূহ।
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Physics */}
-            <div className="bento-card group flex flex-col overflow-hidden">
-              <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                <Image
-                  src="/images/courses/physics-cover.jpg"
-                  alt="Physics Cover"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute top-3 right-3">
-                  <span className="rounded bg-blue-600/90 text-white px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur">
-                    Physics
-                  </span>
-                </div>
-                <div className="absolute bottom-3 left-4 text-white">
-                  <span className="text-xs font-semibold text-cyan-300 uppercase tracking-wide">পদার্থবিজ্ঞান</span>
-                </div>
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-lg font-bold text-on-surface group-hover:text-primary transition-colors">
-                    HSC Physics Masterclass
-                  </h3>
-                  <p className="text-sm text-secondary mt-1.5 line-clamp-2">
-                    ভেক্টর, দ্বিমাত্রিক গতি, কাজ-শক্তি, তড়িৎ এবং কোয়ান্টাম বলবিদ্যার গভীর ও বিশ্লেষণধর্মী আলোচনা।
-                  </p>
-                </div>
-                <Link
-                  href="/courses?category=physics"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary hover:text-primary-container"
-                >
-                  View Physics Courses →
-                </Link>
-              </div>
-            </div>
 
-            {/* Chemistry */}
-            <div className="bento-card group flex flex-col overflow-hidden">
-              <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                <Image
-                  src="/images/courses/chemistry-cover.jpg"
-                  alt="Chemistry Cover"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute top-3 right-3">
-                  <span className="rounded bg-amber-600/90 text-white px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur">
-                    Chemistry
-                  </span>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+            {SUBJECTS.slice(0, 4).map((s) => (
+              <Link
+                key={s.slug}
+                href={`/courses?category=${s.slug}`}
+                className="group flex flex-col overflow-hidden rounded-3xl border border-outline-variant bg-surface-0 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-10px_rgba(0,0,0,0.12)]"
+              >
+                <div className={`relative aspect-[16/10] overflow-hidden bg-gradient-to-br ${s.color}`}>
+                  <Image
+                    src={s.cover}
+                    alt={`${s.labelEn} cover`}
+                    fill
+                    className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
+                    sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                  <div className="absolute left-4 top-4">
+                    <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur">
+                      {s.labelEn}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-3 left-4 text-white">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-white/80">
+                      {s.label}
+                    </span>
+                  </div>
                 </div>
-                <div className="absolute bottom-3 left-4 text-white">
-                  <span className="text-xs font-semibold text-amber-300 uppercase tracking-wide">রসায়ন</span>
+                <div className="flex flex-1 flex-col justify-between p-5">
+                  <p className="text-sm text-ink-500">{s.description}</p>
+                  <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                    View courses
+                    <ArrowRightIcon size={14} />
+                  </div>
                 </div>
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-lg font-bold text-on-surface group-hover:text-primary transition-colors">
-                    HSC Chemistry Complete Foundation
-                  </h3>
-                  <p className="text-sm text-secondary mt-1.5 line-clamp-2">
-                    গুণগত রসায়ন, পর্যায়বৃত্ত ধর্ম, রাসায়নিক পরিবর্তন এবং জৈব রসায়নের রিঅ্যাকশন মেকানিজম।
-                  </p>
-                </div>
-                <Link
-                  href="/courses?category=chemistry"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary hover:text-primary-container"
-                >
-                  View Chemistry Courses →
-                </Link>
-              </div>
-            </div>
+              </Link>
+            ))}
 
-            {/* Biology */}
-            <div className="bento-card group flex flex-col overflow-hidden">
-              <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                <Image
-                  src="/images/courses/biology-cover.jpg"
-                  alt="Biology Cover"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute top-3 right-3">
-                  <span className="rounded bg-emerald-600/90 text-white px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur">
-                    Biology
-                  </span>
+            {/* Featured span */}
+            <Link
+              href="/courses?category=mathematics"
+              className="group relative col-span-1 flex flex-col overflow-hidden rounded-3xl border border-outline-variant bg-surface-0 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-10px_rgba(0,0,0,0.12)] sm:col-span-2 lg:col-span-2"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-5">
+                <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-purple-600 to-fuchsia-700 sm:aspect-auto sm:col-span-2">
+                  <Image
+                    src={SUBJECTS[4].cover}
+                    alt="Mathematics cover"
+                    fill
+                    className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
+                    sizes="(min-width: 1024px) 35vw, (min-width: 640px) 45vw, 90vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+                  <div className="absolute bottom-3 left-4 text-white">
+                    <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide backdrop-blur">
+                      Mathematics
+                    </span>
+                  </div>
                 </div>
-                <div className="absolute bottom-3 left-4 text-white">
-                  <span className="text-xs font-semibold text-emerald-300 uppercase tracking-wide">জীববিজ্ঞান</span>
-                </div>
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-lg font-bold text-on-surface group-hover:text-primary transition-colors">
-                    HSC Biology Botany & Zoology Explorer
+                <div className="flex flex-1 flex-col justify-center p-5 sm:col-span-3 sm:p-6">
+                  <h3 className="font-display text-lg font-bold text-ink-900 sm:text-xl">
+                    HSC Higher Mathematics — Calculus &amp; Coordinate Geometry
                   </h3>
-                  <p className="text-sm text-secondary mt-1.5 line-clamp-2">
-                    উদ্ভিদবিজ্ঞান, মানব শারীরতত্ত্ব, কোষ বিভাজন এবং মেডিকেল ও বিশ্ববিদ্যালয়ের ভর্তি প্রস্তুতি।
+                  <p className="mt-2 text-sm text-ink-500">
+                    ম্যাট্রিক্স, সরলরেখা, ত্রিকোণমিতি, অন্তরীকরণ ও যোগজীকরণে শর্টকাট
+                    কৌশল ও সমাধান।
                   </p>
-                </div>
-                <Link
-                  href="/courses?category=biology"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary hover:text-primary-container"
-                >
-                  View Biology Courses →
-                </Link>
-              </div>
-            </div>
-
-            {/* ICT */}
-            <div className="bento-card group flex flex-col overflow-hidden">
-              <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                <Image
-                  src="/images/courses/ict-cover.jpg"
-                  alt="ICT Cover"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute top-3 right-3">
-                  <span className="rounded bg-cyan-600/90 text-white px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur">
-                    ICT
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                    View Higher Math
+                    <ArrowRightIcon size={14} />
                   </span>
                 </div>
-                <div className="absolute bottom-3 left-4 text-white">
-                  <span className="text-xs font-semibold text-cyan-300 uppercase tracking-wide">তথ্য ও যোগাযোগ প্রযুক্তি</span>
-                </div>
               </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-lg font-bold text-on-surface group-hover:text-primary transition-colors">
-                    HSC ICT & Computer Science Accelerator
-                  </h3>
-                  <p className="text-sm text-secondary mt-1.5 line-clamp-2">
-                    সংখ্যা পদ্ধতি, ডিজিটাল লজিক গেট, HTML ওয়েব ডিজাইন এবং সি প্রোগ্রামিং ভাষার পূর্ণাঙ্গ হ্যান্ডস-অন কোডিং।
-                  </p>
-                </div>
-                <Link
-                  href="/courses?category=ict"
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary hover:text-primary-container"
-                >
-                  View ICT Courses →
-                </Link>
-              </div>
-            </div>
-
-            {/* Mathematics */}
-            <div className="bento-card group flex flex-col overflow-hidden md:col-span-2 lg:col-span-2">
-              <div className="relative aspect-[16/9] sm:aspect-[21/9] overflow-hidden bg-slate-900">
-                <Image
-                  src="/images/courses/math-cover.jpg"
-                  alt="Mathematics Cover"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
-                <div className="absolute top-3 right-3">
-                  <span className="rounded bg-purple-600/90 text-white px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur">
-                    Mathematics
-                  </span>
-                </div>
-                <div className="absolute bottom-4 left-4 sm:left-5 right-4 text-white">
-                  <span className="text-xs font-semibold text-purple-300 uppercase tracking-wide">উচ্চতর গণিত</span>
-                  <h3 className="font-display text-lg sm:text-xl font-bold mt-0.5">
-                    HSC Higher Mathematics — Calculus & Coordinate Geometry
-                  </h3>
-                </div>
-              </div>
-              <div className="p-5 flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <p className="text-sm text-secondary max-w-xl">
-                  ম্যাট্রিক্স, সরলরেখা, ত্রিকোণমিতি, অন্তরীকরণ ও যোগজীকরণ ক্যালকুলাসের শর্টকাট কৌশল ও সমাধান।
-                </p>
-                <Link
-                  href="/courses?category=mathematics"
-                  className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:text-primary-container whitespace-nowrap"
-                >
-                  View Mathematics Courses →
-                </Link>
-              </div>
-            </div>
+            </Link>
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* The InsideJibon Method */}
-      <section className="w-full border-y border-outline-variant bg-surface-container-lowest py-14 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="text-center mb-12 sm:mb-16">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container/10 text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-              Learning Architecture
-            </div>
-            <h2 className="font-display text-2xl sm:text-4xl font-bold text-primary">পরিকল্পিত শিক্ষার পদ্ধতি · The InsideJibon Method</h2>
-            <p className="text-secondary mt-2 text-sm sm:text-base max-w-xl mx-auto">
-              বিজ্ঞান শিক্ষাকে কার্যকর ও আত্মবিশ্বাসী করতে একটি সমন্বিত তিন ধাপের শিক্ষণ পদ্ধতি।
+      {/* METHOD */}
+      <section className="bg-surface-0 py-14 sm:py-20">
+        <Container size="xl">
+          <div className="mb-10 max-w-2xl sm:mb-14">
+            <Badge tone="primary" size="sm">Learning Architecture</Badge>
+            <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-4xl">
+              পরিকল্পিত শিক্ষার পদ্ধতি · The InsideJibon Method
+            </h2>
+            <p className="mt-2 text-sm text-ink-500 sm:text-base">
+              বিজ্ঞান শিক্ষাকে কার্যকর ও আত্মবিশ্বাসী করতে একটি সমন্বিত তিন ধাপের শিক্ষণ
+              পদ্ধতি।
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
-            <div className="bento-card p-6 flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-primary text-on-primary text-lg sm:text-xl font-bold mb-4 sm:mb-5 shadow-sm">
-                1
-              </div>
-              <h3 className="font-display text-lg sm:text-xl font-bold text-on-surface mb-2">কাঠামোগত পাঠদান<br/><span className="text-sm font-normal text-secondary">Learn with Structure</span></h3>
-              <p className="text-secondary text-xs sm:text-sm leading-relaxed">Meticulously planned video lectures and comprehensive lecture sheet materials.</p>
-            </div>
 
-            <div className="bento-card p-6 flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-primary text-on-primary text-lg sm:text-xl font-bold mb-4 sm:mb-5 shadow-sm">
-                2
-              </div>
-              <h3 className="font-display text-lg sm:text-xl font-bold text-on-surface mb-2">লক্ষ্যভিত্তিক অনুশীলন<br/><span className="text-sm font-normal text-secondary">Practice with Purpose</span></h3>
-              <p className="text-secondary text-xs sm:text-sm leading-relaxed">Board-standard MCQ and written exam engine with instant auto-grading.</p>
-            </div>
-
-            <div className="bento-card p-6 flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-primary text-on-primary text-lg sm:text-xl font-bold mb-4 sm:mb-5 shadow-sm">
-                3
-              </div>
-              <h3 className="font-display text-lg sm:text-xl font-bold text-on-surface mb-2">আত্মবিশ্বাসী উন্নতি<br/><span className="text-sm font-normal text-secondary">Improve with Confidence</span></h3>
-              <p className="text-secondary text-xs sm:text-sm leading-relaxed">Assignment feedback, performance tracking, and direct lesson discussion.</p>
-            </div>
-          </div>
-
-          {/* Visual Learning Banner */}
-          <div className="relative rounded-2xl overflow-hidden shadow-academic-lg border border-outline-variant min-h-[260px] sm:aspect-[24/9] flex items-center">
-            <Image
-              src="/images/learning-banner.jpg"
-              alt="InsideJibon Student Study Experience"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/75 to-primary/40 sm:to-transparent flex items-center p-6 sm:p-12">
-              <div className="max-w-md text-white">
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-300">Modern Digital Learning</span>
-                <h3 className="font-display text-xl sm:text-3xl font-bold mt-1">স্ট্রাকচার্ড লার্নিং ও পরীক্ষা প্রস্তুতি</h3>
-                <p className="text-xs sm:text-sm text-gray-200 mt-2">
-                  প্রতিটি লেসনের সাথে থাকছে লেকচার শিট, হ্যান্ড নোটস এবং অধ্যায়ভিত্তিক স্পেশাল মডেল টেস্ট।
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+            {METHOD_STEPS.map((step) => (
+              <div
+                key={step.n}
+                className="flex flex-col rounded-3xl border border-outline-variant bg-surface-0 p-5 sm:p-6"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-on-primary">
+                  {step.icon}
+                </div>
+                <div className="text-micro font-semibold uppercase tracking-wide text-ink-500">
+                  Step {step.n}
+                </div>
+                <h3 className="mt-1 font-display text-lg font-bold text-ink-900">
+                  {step.titleBn}
+                </h3>
+                <p className="text-sm font-medium text-primary">{step.titleEn}</p>
+                <p className="mt-3 text-sm leading-relaxed text-ink-500">
+                  {step.descriptionBn}
                 </p>
-                <Link
-                  href="/courses"
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-primary hover:bg-gray-100 transition-colors shadow-sm"
-                >
-                  Start Learning Now →
-                </Link>
+                <p className="mt-1 text-xs leading-relaxed text-ink-300">
+                  {step.descriptionEn}
+                </p>
               </div>
-            </div>
+            ))}
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* Instructor Spotlight */}
-      <section id="instructor" className="w-full py-14 sm:py-20 bg-surface">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="bento-card-static p-5 sm:p-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-              <div className="lg:col-span-4 relative aspect-[4/5] max-w-sm mx-auto lg:max-w-none w-full rounded-2xl overflow-hidden shadow-academic border border-outline-variant">
-                <Image 
-                  src="/jibon.jpg" 
-                  alt="Tanvir Hasan Jibon" 
-                  fill 
+      {/* PLATFORM CAPABILITIES */}
+      <section className="bg-surface-1 py-14 sm:py-20">
+        <Container size="xl">
+          <div className="mb-8 max-w-2xl sm:mb-12">
+            <Badge tone="muted" size="sm">Platform</Badge>
+            <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-4xl">
+              শেখার জন্য যা কিছু দরকার
+            </h2>
+            <p className="mt-2 text-sm text-ink-500 sm:text-base">
+              Everything you need to learn, practice and improve — all in one place.
+            </p>
+          </div>
+
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+            {PLATFORM_FEATURES.map((f) => (
+              <li
+                key={f.titleEn}
+                className="flex items-start gap-3 rounded-2xl border border-outline-variant bg-surface-0 p-4 sm:p-5"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-container text-primary">
+                  {f.icon}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-display text-sm font-semibold text-ink-900">
+                    {f.titleBn}
+                  </h3>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-ink-500">
+                    {f.titleEn}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-ink-500">
+                    {f.descriptionBn}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      {/* FEATURED COURSES (live) */}
+      {featuredCourses.length > 0 ? (
+        <section className="bg-surface-0 py-14 sm:py-20">
+          <Container size="xl">
+            <div className="mb-8 flex flex-col gap-3 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <Badge tone="primary" size="sm">Featured</Badge>
+                <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-4xl">
+                  জনপ্রিয় কোর্সসমূহ
+                </h2>
+                <p className="mt-2 text-sm text-ink-500 sm:text-base">
+                  এই মুহূর্তে শিক্ষার্থীরা যেসব কোর্সে সবচেয়ে বেশি এগিয়ে চলেছে।
+                </p>
+              </div>
+              <Link
+                href="/courses"
+                className="inline-flex h-10 items-center gap-1 self-start rounded-xl border border-outline-variant bg-surface-0 px-4 text-sm font-semibold text-ink-900 hover:bg-surface-1 sm:self-auto"
+              >
+                সকল কোর্স
+                <ArrowRightIcon size={14} />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+              {featuredCourses.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/courses/${c.slug}`}
+                  className="group flex flex-col overflow-hidden rounded-3xl border border-outline-variant bg-surface-0 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-10px_rgba(0,0,0,0.12)]"
+                >
+                  {c.thumbnailUrl ? (
+                    <div className="relative aspect-[16/10] overflow-hidden bg-surface-2">
+                      <Image
+                        src={c.thumbnailUrl}
+                        alt={c.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-[16/10] bg-gradient-to-br from-primary/20 to-primary/5" />
+                  )}
+                  <div className="flex flex-1 flex-col p-5">
+                    <h3 className="font-display text-base font-semibold text-ink-900 line-clamp-2 group-hover:text-primary">
+                      {c.title}
+                    </h3>
+                    {c.description ? (
+                      <p className="mt-2 text-sm text-ink-500 line-clamp-2">{c.description}</p>
+                    ) : null}
+                    <div className="mt-auto flex items-center justify-between pt-4">
+                      <span className="font-display text-base font-bold text-primary">
+                        {c.priceBdt ? `৳${c.priceBdt}` : "Free"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                        View
+                        <ArrowRightIcon size={12} />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* INSTRUCTOR */}
+      <section id="instructor" className="bg-surface-1 py-14 sm:py-20">
+        <Container size="xl">
+          <div className="overflow-hidden rounded-3xl border border-outline-variant bg-surface-0">
+            <div className="grid grid-cols-1 lg:grid-cols-12">
+              <div className="relative aspect-[4/5] w-full lg:col-span-4 lg:aspect-auto">
+                <Image
+                  src="/jibon.jpg"
+                  alt="Tanvir Hasan Jibon"
+                  fill
                   className="object-cover"
+                  sizes="(min-width: 1024px) 33vw, 100vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="bg-white/95 backdrop-blur p-3 rounded-xl text-center shadow-sm">
-                    <span className="text-primary font-bold font-display text-sm sm:text-base">Tanvir Hasan Jibon</span>
-                  </div>
-                </div>
               </div>
-              
-              <div className="lg:col-span-8 flex flex-col gap-5 sm:gap-6">
-                <div className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-high text-xs font-semibold text-secondary w-fit">
-                  শিক্ষক পরিচিতি · Meet Your Instructor
-                </div>
-                
+              <div className="flex flex-col gap-5 p-6 sm:p-8 lg:col-span-8 lg:p-10">
+                <Badge tone="muted" size="sm">শিক্ষক পরিচিতি · Meet Your Instructor</Badge>
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold font-display text-primary">তানভীর হাসান জীবন (Tanvir Hasan Jibon)</h2>
-                  <p className="text-secondary mt-1 text-sm sm:text-base font-medium">শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — ঢাকা সেন্ট্রাল ইউনিভার্সিটি </p>
-                  <p className="text-primary font-semibold mt-2 text-xs sm:text-sm">বিজ্ঞান, আইসিটি ও গণিত শিক্ষক · Physics, Chemistry, Biology, ICT & Mathematics Educator</p>
-                </div>
-                
-                <div className="space-y-3 sm:space-y-4 text-on-surface-variant text-sm sm:text-base leading-relaxed">
-                  <p>
-                    Passionate about making complex scientific concepts accessible to every student. With years of experience guiding students through SSC, HSC, and University Admission preparations, I believe in building a strong foundation rather than rote memorization.
+                  <h2 className="font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
+                    তানভীর হাসান জীবন <span className="text-ink-500">(Tanvir Hasan Jibon)</span>
+                  </h2>
+                  <p className="mt-1 text-sm text-ink-500 sm:text-base">
+                    শিক্ষার্থী, উদ্ভিদবিজ্ঞান বিভাগ — ঢাকা সেন্ট্রাল ইউনিভার্সিটি
                   </p>
-                  <p>
-                    My teaching methodology focuses on structural understanding and consistent practice. Through InsideJibon, I aim to provide high-quality education to all students across Bangladesh.
+                  <p className="mt-1 text-sm font-medium text-primary">
+                    Physics, Chemistry, Biology, ICT &amp; Mathematics Educator
                   </p>
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
-                    <div className="text-xl mb-1">⚛️</div>
-                    <h3 className="font-bold text-sm text-on-surface">Physics</h3>
-                    <p className="text-[11px] text-secondary mt-0.5">Mechanics & Modern Physics</p>
-                  </div>
-                  <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
-                    <div className="text-xl mb-1">🧪</div>
-                    <h3 className="font-bold text-sm text-on-surface">Chemistry</h3>
-                    <p className="text-[11px] text-secondary mt-0.5">Organic & Inorganic Mastery</p>
-                  </div>
-                  <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
-                    <div className="text-xl mb-1">🧬</div>
-                    <h3 className="font-bold text-sm text-on-surface">Biology</h3>
-                    <p className="text-[11px] text-secondary mt-0.5">Botany & Zoology Explorer</p>
-                  </div>
-                  <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
-                    <div className="text-xl mb-1">💻</div>
-                    <h3 className="font-bold text-sm text-on-surface">ICT</h3>
-                    <p className="text-[11px] text-secondary mt-0.5">C Coding & Logic Design</p>
-                  </div>
-                  <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50 sm:col-span-2">
-                    <div className="text-xl mb-1">📐</div>
-                    <h3 className="font-bold text-sm text-on-surface">Higher Mathematics</h3>
-                    <p className="text-[11px] text-secondary mt-0.5">Calculus, Trigonometry & Coordinate Geometry</p>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-                  <div className="flex items-center gap-3">
-                    <a href="https://youtube.com/@tanvirhasanjibon5827" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 font-medium transition-colors text-xs sm:text-sm">
-                      <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <p className="text-sm leading-relaxed text-ink-500 sm:text-base">
+                  Passionate about making complex scientific concepts accessible to every
+                  student. With years of experience guiding students through SSC, HSC, and
+                  University Admission preparations, I believe in building a strong
+                  foundation rather than rote memorization.
+                </p>
+                <p className="text-sm leading-relaxed text-ink-500 sm:text-base">
+                  Through InsideJibon, I aim to provide high-quality education to all
+                  students across Bangladesh.
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <Link
+                    href="/courses"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-semibold text-on-primary hover:bg-primary/90"
+                  >
+                    View All Courses
+                    <ArrowRightIcon size={14} />
+                  </Link>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href="https://youtube.com/@tanvirhasanjibon5827"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-outline-variant bg-surface-0 px-4 text-sm font-semibold text-ink-900 hover:bg-surface-1"
+                    >
                       YouTube
                     </a>
-                    <a href="https://facebook.com/mdtanvirhasan.jibon" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium transition-colors text-xs sm:text-sm">
-                      <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <a
+                      href="https://facebook.com/mdtanvirhasan.jibon"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-outline-variant bg-surface-0 px-4 text-sm font-semibold text-ink-900 hover:bg-surface-1"
+                    >
                       Facebook
                     </a>
                   </div>
-                  <Link href="/courses" className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-xs sm:text-sm font-semibold text-on-primary shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors text-center">
-                    সকল কোর্স দেখুন → View All Courses
-                  </Link>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* CTA Banner */}
-      <section className="w-full bg-primary py-12 sm:py-16">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <h2 className="font-display text-2xl sm:text-4xl font-bold text-on-primary mb-3 sm:mb-4">বিজ্ঞান ও আইসিটি শিক্ষার পরিকল্পিত পথ — InsideJibon</h2>
-          <p className="text-on-primary/90 text-sm sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
-            বিনামূল্যে অ্যাকাউন্ট তৈরি করুন এবং পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান, আইসিটি ও উচ্চতর গণিতের সুশৃঙ্খল পাঠ শুরু করুন।
+      {/* CTA */}
+      <section className="bg-primary py-14 sm:py-20">
+        <Container size="md" className="text-center">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-on-primary sm:text-4xl">
+            বিজ্ঞান ও আইসিটি শিক্ষার পরিকল্পিত পথ — InsideJibon
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-on-primary/80 sm:text-base">
+            বিনামূল্যে অ্যাকাউন্ট তৈরি করুন এবং পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান, আইসিটি ও
+            উচ্চতর গণিতের সুশৃঙ্খল পাঠ শুরু করুন।
           </p>
-          <Link href="/sign-up" className="inline-flex items-center justify-center rounded-xl bg-white px-8 py-3.5 sm:py-4 text-base sm:text-lg font-bold text-primary shadow-sm hover:bg-gray-100 transition-colors w-full sm:w-auto">
-            Get Started Free / শুরু করুন
-          </Link>
-        </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/sign-up"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-surface-0 px-6 text-base font-semibold text-primary hover:bg-surface-1"
+            >
+              Get Started Free
+              <ArrowRightIcon size={16} />
+            </Link>
+            <Link
+              href="/courses"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-on-primary/30 bg-transparent px-6 text-base font-semibold text-on-primary hover:bg-white/10"
+            >
+              Browse Courses
+            </Link>
+          </div>
+        </Container>
       </section>
     </div>
   );

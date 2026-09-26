@@ -321,7 +321,7 @@ export function LessonVideoEditor({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3">
           <h4 className="text-sm font-bold text-on-surface flex items-center gap-2">
             <svg
-              className="h-4 w-4 text-primary"
+        className="h-4 w-4 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

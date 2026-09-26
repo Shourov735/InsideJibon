@@ -17,7 +17,8 @@ export default async function StudentLayout({
   return (
     <div data-role="student" className="flex min-h-dvh flex-col bg-surface">
       <StudentNav user={user} />
-      <div className="flex-1">{children}</div>
+      {/* Reserve room for the fixed bottom-nav on mobile. md:pb-0 removes it on desktop. */}
+      <div className="flex-1 pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
       <CommandProvider role="student" />
     </div>
   );

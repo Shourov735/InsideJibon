@@ -94,7 +94,7 @@ export function PublishModal({ course, isOpen, onClose }: PublishModalProps) {
             className="rounded-md p-1 text-secondary hover:bg-surface-container hover:text-on-surface"
           >
             <svg
-              className="h-5 w-5"
+        className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -195,7 +195,7 @@ function ChecklistItem({ passed, label }: { passed: boolean; label: string }) {
     <div className="flex items-center gap-2">
       {passed ? (
         <svg
-          className="h-4 w-4 text-emerald-600 shrink-0"
+        className="h-4 w-4 text-emerald-600 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -209,7 +209,7 @@ function ChecklistItem({ passed, label }: { passed: boolean; label: string }) {
         </svg>
       ) : (
         <svg
-          className="h-4 w-4 text-error shrink-0"
+        className="h-4 w-4 text-error shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

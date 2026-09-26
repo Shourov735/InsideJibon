@@ -1,14 +1,28 @@
+import Link from "next/link";
+
 import { requireAdmin } from "@/lib/permissions";
 import { getTranslator } from "@/i18n/server";
 import { getPlatformStats, getAllUsers, getAllCoursesOverview } from "@/services/admin/admin";
 import { getAllPendingRequests } from "@/services/enrollments";
 import { UserDirectory } from "@/components/admin/user-directory";
 import { PendingRequestsList } from "@/components/shared/pending-requests-list";
-import Link from "next/link";
 
-// Public roadmap anchor for placeholder CTAs. Phase R7 will replace
-// these placeholders with the redesigned admin experience.
-const ROADMAP_URL = "https://github.com/insidejibon/insidejibon#roadmap";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { SectionHeader } from "@/components/shared/ui/section-header";
+import { Stat } from "@/components/shared/ui/stat";
+import { Alert } from "@/components/shared/ui/alert";
+import { Badge } from "@/components/shared/ui/badge";
+import { Button } from "@/components/shared/ui/button";
+import { ResponsiveTable } from "@/components/shared/ui/responsive-table";
+import {
+  ArrowRightIcon,
+  BookIcon,
+  ChartIcon,
+  ClipboardIcon,
+  TrophyIcon,
+  UsersIcon,
+} from "@/components/shared/ui/icons";
 
 export const metadata = {
   title: "Admin Dashboard | InsideJibon",
@@ -17,7 +31,7 @@ export const metadata = {
 export default async function AdminDashboardPage() {
   const admin = await requireAdmin();
   const t = await getTranslator();
-  
+
   const [stats, users, coursesOverview, pendingRequests] = await Promise.all([
     getPlatformStats(),
     getAllUsers(),
@@ -26,159 +40,171 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8 space-y-12">
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
+    <Container className="py-6 sm:py-8" size="xl">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
             {t("admin.dashboard.badge")}
           </span>
-        </div>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-          {t("admin.dashboard.greeting", { name: admin.name ?? admin.email })}
-        </h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          {t("admin.dashboard.welcomeSubtitle")}
-        </p>
+        }
+        title={t("admin.dashboard.greeting", { name: admin.name ?? admin.email })}
+        description={t("admin.dashboard.welcomeSubtitle")}
+      />
+
+      <div className="mt-6">
+        <Alert
+          tone="info"
+          icon={<ChartIcon size={14} />}
+          title={t("dashboard.admin.placeholder.title")}
+        >
+          {t("dashboard.admin.placeholder.description")}
+        </Alert>
       </div>
 
-      {/* R1 §6.4 marker: a v2 roadmap banner so admins know the redesign
-          is in flight. We keep the existing dashboard fully functional
-          (per-user controls, platform stats, pending requests, user
-          directory, course overview) until R7 lands. */}
-      <section className="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-5 sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-1">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary-container px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary-container">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              {t("dashboard.admin.placeholder.title")}
-            </span>
-            <p className="max-w-2xl text-sm text-secondary">
-              {t("dashboard.admin.placeholder.description")}
-            </p>
-          </div>
-          <Link
-            href={ROADMAP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-surface-0 px-3.5 py-2 text-xs font-semibold text-primary hover:bg-surface-container transition-colors shrink-0"
-          >
-            {t("dashboard.admin.placeholder.cta")} →
-          </Link>
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
+        <Stat
+          label={t("admin.dashboard.stats.totalUsers")}
+          value={stats.users.total}
+          hint={`${stats.users.students} S · ${stats.users.teachers} T · ${stats.users.admins} A`}
+          icon={<UsersIcon size={18} />}
+          tone="primary"
+        />
+        <Stat
+          label={t("admin.dashboard.stats.totalCourses")}
+          value={stats.courses.total}
+          hint={`${stats.courses.published} published · ${stats.courses.draft} draft`}
+          icon={<BookIcon size={18} />}
+          tone="warning"
+        />
+        <Stat
+          label={t("admin.dashboard.stats.totalExams")}
+          value={stats.totalExams}
+          icon={<TrophyIcon size={18} />}
+          tone="success"
+        />
+        <Stat
+          label={t("admin.dashboard.stats.totalAssignments")}
+          value={stats.totalAssignments}
+          icon={<ClipboardIcon size={18} />}
+          tone="neutral"
+        />
+        <Stat
+          label={t("admin.dashboard.stats.totalEnrollments")}
+          value={stats.totalEnrollments}
+          icon={<ChartIcon size={18} />}
+          tone="primary"
+          className="col-span-2 sm:col-span-1"
+        />
+      </div>
+
+      <section className="mt-10">
+        <SectionHeader
+          title={t("enrollment.requests.title")}
+          description={t("enrollment.requests.adminSubtitle")}
+        />
+        <div className="mt-3">
+          <PendingRequestsList requests={pendingRequests} />
         </div>
       </section>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("admin.dashboard.stats.totalUsers")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-primary">{stats.users.total}</p>
-          <span className="mt-1 block text-xs text-on-surface-variant">
-            {stats.users.students} S • {stats.users.teachers} T • {stats.users.admins} A
-          </span>
+      <section className="mt-10">
+        <SectionHeader
+          title={t("admin.users.title")}
+          description={t("admin.users.subtitle")}
+        />
+        <div className="mt-3">
+          <UserDirectory users={users} currentUserId={admin.id} />
         </div>
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("admin.dashboard.stats.totalCourses")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-primary">{stats.courses.total}</p>
-          <span className="mt-1 block text-xs text-on-surface-variant">
-            {stats.courses.published} Pub • {stats.courses.draft} Drf
-          </span>
-        </div>
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("admin.dashboard.stats.totalExams")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-primary">{stats.totalExams}</p>
-        </div>
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("admin.dashboard.stats.totalAssignments")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-primary">{stats.totalAssignments}</p>
-        </div>
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("admin.dashboard.stats.totalEnrollments")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-primary">{stats.totalEnrollments}</p>
-        </div>
-      </div>
+      </section>
 
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-lg font-bold tracking-tight text-on-surface">
-            {t("enrollment.requests.title")}
-          </h2>
-          <p className="text-xs text-on-surface-variant">
-            {t("enrollment.requests.adminSubtitle")}
-          </p>
-        </div>
-        <PendingRequestsList requests={pendingRequests} />
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-lg font-bold tracking-tight text-on-surface">
-            {t("admin.users.title")}
-          </h2>
-          <p className="text-xs text-on-surface-variant">
-            {t("admin.users.subtitle")}
-          </p>
-        </div>
-        <UserDirectory users={users} currentUserId={admin.id} />
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-lg font-bold tracking-tight text-on-surface">
-            {t("admin.courses.allCourses")}
-          </h2>
-          <p className="text-xs text-on-surface-variant">
-            {t("admin.courses.subtitle")}
-          </p>
-        </div>
-        
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest shadow-2xs overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-surface-container-low text-secondary border-b border-outline-variant">
-              <tr>
-                <th className="px-4 py-3 font-semibold">{t("admin.courses.title")}</th>
-                <th className="px-4 py-3 font-semibold">{t("admin.courses.teacher")}</th>
-                <th className="px-4 py-3 font-semibold">{t("admin.courses.status")}</th>
-                <th className="px-4 py-3 font-semibold text-right">{t("admin.courses.students")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant">
-              {coursesOverview.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-secondary">
-                    {t("admin.courses.noCourses")}
-                  </td>
-                </tr>
+      <section className="mt-10">
+        <SectionHeader
+          title={t("admin.courses.allCourses")}
+          description={t("admin.courses.subtitle")}
+        />
+        <div className="mt-3">
+          <ResponsiveTable
+            columns={[
+              {
+                header: t("admin.courses.title"),
+                mobileLabel: t("admin.courses.title"),
+                mobilePrimary: true,
+                cell: (c) => (
+                  <Link
+                    href={`/courses/${c.id}`}
+                    className="font-semibold text-ink-900 hover:text-primary"
+                  >
+                    {c.title}
+                  </Link>
+                ),
+              },
+              {
+                header: t("admin.courses.teacher"),
+                mobileLabel: t("admin.courses.teacher"),
+                cell: (c) => (
+                  <span className="text-ink-700">{c.teacherName || "Unknown"}</span>
+                ),
+              },
+              {
+                header: t("admin.courses.status"),
+                mobileLabel: t("admin.courses.status"),
+                cell: (c) =>
+                  c.status === "published" ? (
+                    <Badge tone="success" size="xs">
+                      {c.status}
+                    </Badge>
+                  ) : (
+                    <Badge tone="muted" size="xs">
+                      {c.status}
+                    </Badge>
+                  ),
+              },
+              {
+                header: t("admin.courses.students"),
+                mobileLabel: t("admin.courses.students"),
+                className: "text-right",
+                mobileClassName: "text-right",
+                cell: (c) => (
+                  <span className="font-mono font-semibold text-ink-900">
+                    {c.studentCount.toLocaleString()}
+                  </span>
+                ),
+              },
+            ]}
+            rows={coursesOverview.map((c) => ({ ...c }))}
+            rowKey={(c) => c.id}
+            emptyState={<p className="text-sm text-ink-500">{t("admin.courses.noCourses")}</p>}
+            mobileLeading={(c) => (
+              <div className="space-y-0.5">
+                <p className="text-sm font-semibold text-ink-900">{c.title}</p>
+                <p className="text-xs text-ink-500">
+                  {c.teacherName || "Unknown"} · {c.studentCount.toLocaleString()} {t("admin.courses.students").toLowerCase()}
+                </p>
+              </div>
+            )}
+            mobileTrailing={(c) =>
+              c.status === "published" ? (
+                <Badge tone="success" size="xs">{c.status}</Badge>
               ) : (
-                coursesOverview.map((course) => (
-                  <tr key={course.id} className="hover:bg-surface-container-lowest/50">
-                    <td className="px-4 py-3 font-medium text-on-surface">
-                      <Link href={`/courses/${course.id}`} className="hover:underline">
-                        {course.title}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-secondary">{course.teacherName || "Unknown"}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium uppercase tracking-wider ${course.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-surface-container-high text-secondary'}`}>
-                        {course.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right font-medium text-on-surface">{course.studentCount}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                <Badge tone="muted" size="xs">{c.status}</Badge>
+              )
+            }
+          />
         </div>
+      </section>
+
+      <div className="mt-10 flex justify-center">
+        <Link
+          href="https://github.com/insidejibon/insidejibon#roadmap"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button variant="outline" size="md" trailingIcon={<ArrowRightIcon size={14} />}>
+            {t("dashboard.admin.placeholder.cta")}
+          </Button>
+        </Link>
       </div>
-    </main>
+    </Container>
   );
 }

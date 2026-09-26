@@ -32,7 +32,7 @@ export async function StudentExamCard({ exam, courseId }: StudentExamCardProps) 
             ) : isCompleted ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
                 <svg
-                  className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -83,7 +83,7 @@ export async function StudentExamCard({ exam, courseId }: StudentExamCardProps) 
         <div className="flex flex-wrap items-center gap-2.5 pt-2 text-xs font-medium text-secondary">
           <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-low px-2.5 py-1 text-on-surface">
             <svg
-              className="h-3.5 w-3.5 text-primary"
+        className="h-3.5 w-3.5 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -102,7 +102,7 @@ export async function StudentExamCard({ exam, courseId }: StudentExamCardProps) 
 
           <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-low px-2.5 py-1 text-on-surface">
             <svg
-              className="h-3.5 w-3.5 text-primary"
+        className="h-3.5 w-3.5 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -124,7 +124,7 @@ export async function StudentExamCard({ exam, courseId }: StudentExamCardProps) 
 
           <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-low px-2.5 py-1 text-on-surface">
             <svg
-              className="h-3.5 w-3.5 text-secondary"
+        className="h-3.5 w-3.5 text-secondary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -164,7 +164,7 @@ export async function StudentExamCard({ exam, courseId }: StudentExamCardProps) 
           >
             <span>{t("student.exam.resumeAttempt")}</span>
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -184,7 +184,7 @@ export async function StudentExamCard({ exam, courseId }: StudentExamCardProps) 
           >
             <span>{isCompleted ? t("student.exam.retake") : t("student.exam.startExam")}</span>
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

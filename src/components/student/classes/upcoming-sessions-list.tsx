@@ -76,7 +76,7 @@ export function UpcomingSessionsList({ sessions }: UpcomingSessionsListProps) {
                 >
                   {isLive ? t("student.classes.joinClass") : t("student.classes.watchRecording")}
                   <svg
-                    className="h-4 w-4"
+        className="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

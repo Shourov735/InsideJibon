@@ -5,6 +5,9 @@ import { AssignmentStatusBadge } from "@/components/assignments/assignment-statu
 import { DeadlineBadge } from "@/components/assignments/deadline-badge";
 import type { StudentAssignmentSummary } from "@/services/assignments";
 import { useTranslations } from "@/i18n/client";
+import { cn } from "@/lib/utils";
+
+import { ArrowRightIcon, TrophyIcon } from "@/components/shared/ui/icons";
 
 interface StudentAssignmentCardProps {
   assignment: StudentAssignmentSummary;
@@ -38,9 +41,14 @@ export function StudentAssignmentCard({
   })();
 
   return (
-    <div className="flex flex-col justify-between rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs transition-all hover:border-primary/40 hover:shadow-xs">
+    <Link
+      href={targetHref}
+      className={cn(
+        "group flex h-full flex-col justify-between gap-3 rounded-3xl border border-outline-variant bg-surface-0 p-4 transition-all hover:border-primary/40 hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)] sm:p-5",
+        isGraded && "bg-gradient-to-br from-emerald-50/60 via-surface-0 to-surface-0",
+      )}
+    >
       <div className="space-y-3">
-        {/* Header Badges */}
         <div className="flex items-start justify-between gap-2">
           <AssignmentStatusBadge
             status={status}
@@ -54,27 +62,19 @@ export function StudentAssignmentCard({
           />
         </div>
 
-        {/* Title */}
         <div>
-          <h3 className="text-base font-bold tracking-tight text-on-surface line-clamp-1">
-            <Link href={targetHref} className="hover:text-primary transition-colors">
-              {assignment.title}
-            </Link>
+          <h3 className="line-clamp-1 font-display text-base font-semibold tracking-tight text-ink-900 group-hover:text-primary">
+            {assignment.title}
           </h3>
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink-500">
+            {assignment.instructions}
+          </p>
         </div>
 
-        {/* Instructions preview */}
-        <p className="line-clamp-2 text-xs text-on-surface-variant leading-relaxed">
-          {assignment.instructions}
-        </p>
-
-        {/* Score / Points preview */}
-        <div className="flex items-center gap-3 pt-1 text-xs">
+        <div className="flex items-center gap-2 pt-1 text-xs">
           {isGraded ? (
-            <span className="flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700">
+              <TrophyIcon size={12} />
               <span>
                 {t("student.assignments.card.pointsEarned", {
                   points: submission?.points ?? 0,
@@ -83,29 +83,31 @@ export function StudentAssignmentCard({
               </span>
             </span>
           ) : (
-            <span className="text-secondary font-medium">
+            <span className="font-medium text-ink-500">
               {t("student.assignments.card.maxPoints", { points: assignment.maxPoints })}
             </span>
           )}
         </div>
       </div>
 
-      {/* Card CTA Footer */}
-      <div className="mt-4 flex items-center justify-end border-t border-outline-variant pt-3">
-        <Link
-          href={targetHref}
-          className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-colors ${
+      <div className="flex items-center justify-between border-t border-outline-variant pt-3">
+        <span className="text-[11px] font-semibold text-ink-500">
+          {assignment.status === "closed"
+            ? t("student.assignments.closedShort")
+            : t("student.assignments.dueShort")}
+        </span>
+        <span
+          className={cn(
+            "inline-flex h-8 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold",
             isGraded
-              ? "border border-outline-variant bg-surface-container-low text-on-surface hover:bg-surface-container"
-              : "bg-primary text-on-primary shadow-2xs hover:bg-primary-container"
-          }`}
+              ? "border border-outline-variant bg-surface-0 text-ink-900 group-hover:bg-surface-1"
+              : "bg-primary text-on-primary group-hover:bg-primary/90",
+          )}
         >
-          <span>{ctaLabel}</span>
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
+          {ctaLabel}
+          <ArrowRightIcon size={12} />
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }

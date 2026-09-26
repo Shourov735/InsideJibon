@@ -168,7 +168,7 @@ export function MaterialUploadForm({
           className="flex items-start gap-2.5 rounded-lg border border-error/30 bg-error-container/40 p-3 text-xs font-medium text-on-error-container"
         >
           <svg
-            className="h-4 w-4 text-error shrink-0 mt-0.5"
+        className="h-4 w-4 text-error shrink-0 mt-0.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -212,7 +212,7 @@ export function MaterialUploadForm({
           />
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-container-highest text-secondary group-hover:text-primary transition-colors">
             <svg
-              className="h-6 w-6"
+        className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

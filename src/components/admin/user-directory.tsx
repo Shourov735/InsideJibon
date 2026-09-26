@@ -54,6 +54,7 @@ export function UserDirectory({ users: initialUsers, currentUserId }: UserDirect
         <input
           type="text"
           placeholder={t("admin.users.searchPlaceholder")}
+          aria-label={t("admin.users.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:max-w-xs rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"

@@ -51,7 +51,7 @@ export default async function StudentPaymentsPage() {
   for (const row of bundleRows) titleByScope.set(`bundle:${row.id}`, { title: row.title, slug: row.slug });
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6 lg:px-8 space-y-6">
+    <main id="main-content" className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6 lg:px-8 space-y-6">
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
           {t("payment.title")}

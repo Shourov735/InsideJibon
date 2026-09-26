@@ -168,6 +168,12 @@ export default async function RootLayout({
           />
         </head>
         <body className="min-h-full flex flex-col bg-surface text-on-surface font-sans">
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-on-primary focus:shadow-lg"
+          >
+            Skip to main content
+          </a>
           <LanguageProvider locale={locale}>
             <ToastViewport />
             {/* R9 — service worker, install banner, offline pill */}

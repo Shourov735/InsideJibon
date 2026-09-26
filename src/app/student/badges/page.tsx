@@ -3,6 +3,14 @@ import Link from "next/link";
 import { requireStudent } from "@/lib/permissions";
 import { listBadgesForUser } from "@/services/gamification/badges";
 import { getTranslator } from "@/i18n/server";
+import { cn } from "@/lib/utils";
+
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { Container } from "@/components/shared/ui/container";
+import { SectionHeader } from "@/components/shared/ui/section-header";
+import { Progress } from "@/components/shared/ui/progress";
+import { Badge } from "@/components/shared/ui/badge";
+import { AwardIcon, TrophyIcon, HomeIcon, ChevronRightIcon } from "@/components/shared/ui/icons";
 
 /**
  * R5 §4.4 — Badge shelf.
@@ -14,6 +22,12 @@ import { getTranslator } from "@/i18n/server";
  */
 export const dynamic = "force-dynamic";
 
+const TIER_TONE: Record<string, "warning" | "muted" | "neutral"> = {
+  gold: "warning",
+  silver: "muted",
+  bronze: "neutral",
+};
+
 export default async function BadgesPage() {
   const user = await requireStudent();
   const t = await getTranslator();
@@ -23,156 +37,136 @@ export default async function BadgesPage() {
   const locked = badges.filter((b) => b.unlockedAt == null);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
-      <header className="mb-8">
-        <p className="font-mono text-xs font-semibold uppercase tracking-wide text-secondary">
-          {t("gamification.badges.kicker")}
-        </p>
-        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-on-surface">
-          {t("gamification.badges.title")}
-        </h1>
-        <p className="mt-2 text-sm text-secondary">
-          {t.tn("gamification.badges.subtitle", earned.length, {
+    <Container className="py-6 sm:py-8" size="lg">
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-1.5 text-xs font-medium text-ink-500"
+      >
+        <Link href="/student" className="inline-flex items-center gap-1 hover:text-ink-900">
+          <HomeIcon size={12} />
+          {t("nav.student.dashboard")}
+        </Link>
+        <ChevronRightIcon size={12} className="text-outline" />
+        <span className="text-ink-900">{t("gamification.badges.title")}</span>
+      </nav>
+
+      <div className="mt-3">
+        <PageHeader
+          eyebrow={
+            <span className="inline-flex items-center gap-1.5 text-primary">
+              <TrophyIcon size={14} />
+              {t("gamification.badges.kicker")}
+            </span>
+          }
+          title={t("gamification.badges.title")}
+          description={t.tn("gamification.badges.subtitle", earned.length, {
             earned: earned.length,
             total: badges.length,
           })}
-        </p>
-      </header>
-
-      <nav
-        aria-label="Badge sections"
-        className="mb-6 inline-flex rounded-full border border-outline-variant bg-surface-container-lowest p-1 text-sm"
-      >
-        <SectionTab
-          href="/student/badges"
-          label={t("gamification.badges.tab.all")}
-          active
         />
-      </nav>
+      </div>
 
-      <section
-        aria-label="Earned badges"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        {earned.map((badge) => (
-          <BadgeCard key={badge.id} badge={badge} earned />
-        ))}
-      </section>
+      <SectionHeader
+        title={`Earned (${earned.length})`}
+        className="mt-8"
+      />
+
+      {earned.length === 0 ? (
+        <div className="mt-3 rounded-3xl border border-dashed border-outline-variant bg-surface-0 p-8 text-center">
+          <p className="text-sm text-ink-500">
+            {t("gamification.badges.noEarned")}
+          </p>
+        </div>
+      ) : (
+        <section
+          aria-label="Earned badges"
+          className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {earned.map((badge) => (
+            <BadgeCard key={badge.id} badge={badge} earned t={t} />
+          ))}
+        </section>
+      )}
 
       {locked.length > 0 ? (
         <>
-          <h2 className="mt-10 mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
-            {t("gamification.badges.lockedHeading")}
-          </h2>
+          <SectionHeader
+            title={t("gamification.badges.lockedHeading")}
+            className="mt-10"
+          />
           <section
             aria-label="Locked badges"
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
           >
             {locked.map((badge) => (
-              <BadgeCard key={badge.id} badge={badge} earned={false} />
+              <BadgeCard key={badge.id} badge={badge} earned={false} t={t} />
             ))}
           </section>
         </>
       ) : null}
-
-      <p className="mt-10 text-center">
-        <Link
-          href="/student"
-          className="text-xs font-semibold text-primary hover:underline"
-        >
-          ← {t("nav.student.dashboard")}
-        </Link>
-      </p>
-    </main>
+    </Container>
   );
 }
-
-function SectionTab({
-  href,
-  label,
-  active,
-}: {
-  href: string;
-  label: string;
-  active: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={
-        active
-          ? "rounded-full bg-primary px-4 py-1.5 text-on-primary shadow-xs"
-          : "rounded-full px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high"
-      }
-    >
-      {label}
-    </Link>
-  );
-}
-
-const TIER_RING: Record<string, string> = {
-  gold: "border-amber-300 bg-amber-50",
-  silver: "border-slate-300 bg-slate-50",
-  bronze: "border-orange-300 bg-orange-50",
-};
 
 function BadgeCard({
   badge,
   earned,
+  t,
 }: {
   badge: Awaited<ReturnType<typeof listBadgesForUser>>[number];
   earned: boolean;
+  t: Awaited<ReturnType<typeof getTranslator>>;
 }) {
-  const tone = TIER_RING[badge.tier] ?? "border-outline-variant bg-surface-0";
   const percent =
     badge.target > 0
       ? Math.min(100, Math.round((badge.progress / badge.target) * 100))
       : 0;
 
+  const tierTone = TIER_TONE[badge.tier] ?? "muted";
+
   return (
     <article
-      className={`relative flex flex-col gap-3 rounded-2xl border-2 p-5 shadow-2xs transition-all ${
-        earned ? tone : "border-dashed border-outline-variant bg-surface-container-lowest opacity-90"
-      }`}
+      className={cn(
+        "relative flex flex-col gap-3 overflow-hidden rounded-3xl border p-5 transition-all",
+        earned
+          ? "border-amber-300/60 bg-gradient-to-br from-amber-50 via-surface-0 to-surface-1"
+          : "border-dashed border-outline-variant bg-surface-0 opacity-90",
+      )}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <BadgeIcon icon={badge.icon} earned={earned} />
-        <span
-          className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-            earned
-              ? "bg-primary text-on-primary"
-              : "bg-surface-container-high text-on-surface-variant"
-          }`}
-        >
+        <Badge tone={tierTone} size="xs">
           {badge.tier}
-        </span>
+        </Badge>
       </div>
-      <div>
-        <h3 className="font-display text-base font-bold text-on-surface">
+
+      <div className="min-w-0">
+        <h3
+          className={cn(
+            "font-display text-base font-semibold",
+            earned ? "text-ink-900" : "text-ink-700",
+          )}
+        >
           {badge.titleKey}
         </h3>
-        <p className="mt-1 text-xs text-secondary">{badge.descriptionKey}</p>
+        <p className="mt-1 line-clamp-2 text-xs text-ink-500">
+          {badge.descriptionKey}
+        </p>
       </div>
 
-      <div>
-        <div className="flex items-center justify-between text-[10px] font-semibold text-secondary">
-          <span>
-            {badge.progress} / {badge.target}
-          </span>
-          <span className="font-mono">{percent}%</span>
-        </div>
-        <div className="mt-1 h-1 overflow-hidden rounded-full bg-surface-container-high">
-          <div
-            className={`h-full rounded-full ${earned ? "bg-primary" : "bg-outline"} transition-[width] duration-500`}
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      </div>
+      <Progress
+        value={percent}
+        size="sm"
+        tone={earned ? "success" : "primary"}
+        label={`${badge.progress} / ${badge.target}`}
+        showLabel
+      />
 
       {earned && badge.unlockedAt ? (
-        <p className="text-[10px] font-medium text-secondary">
-          Earned {new Date(badge.unlockedAt).toLocaleDateString()}
+        <p className="text-[11px] font-medium text-ink-500">
+          {t("gamification.badges.earnedOn", {
+            date: new Date(badge.unlockedAt).toLocaleDateString(),
+          })}
         </p>
       ) : null}
     </article>
@@ -182,18 +176,15 @@ function BadgeCard({
 function BadgeIcon({ icon, earned }: { icon: string; earned: boolean }) {
   return (
     <span
-      className={`inline-flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${
-        earned ? "bg-primary/10" : "bg-surface-container-high grayscale"
-      }`}
+      className={cn(
+        "inline-flex h-12 w-12 items-center justify-center rounded-2xl",
+        earned
+          ? "bg-primary-container text-primary"
+          : "bg-surface-2 text-ink-500 grayscale",
+      )}
       aria-hidden="true"
     >
-      {icon === "flame" ? "🔥" :
-        icon === "sprout" ? "🌱" :
-        icon === "scroll" ? "📜" :
-        icon === "chat" ? "💬" :
-        icon === "star" ? "⭐" :
-        icon === "calendar" ? "📅" :
-        "🏅"}
+      <AwardIcon size={22} />
     </span>
   );
 }

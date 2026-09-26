@@ -1,7 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { PublicCourseSummary } from "@/types/course";
 import { CategoryBadge } from "@/components/shared/category-badge";
 import { formatBDT } from "@/lib/utils";
+import { Badge } from "@/components/shared/ui/badge";
+import { BookIcon, PlayIcon } from "@/components/shared/ui/icons";
 
 interface PublicCourseCardProps {
   course: PublicCourseSummary;
@@ -15,15 +18,16 @@ function TeacherAvatar({ course }: PublicCourseCardProps) {
   const avatarSrc = course.teacher.imageUrl || "/jibon.jpg";
 
   return (
-    <img
-      src={avatarSrc}
-      alt={name || "Tanvir Hasan Jibon"}
-      className="h-6 w-6 rounded-full border border-outline-variant object-cover"
-      width={24}
-      height={24}
-      loading="lazy"
-      decoding="async"
-    />
+    <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full border border-outline-variant bg-surface-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={avatarSrc}
+        alt={name || "Tanvir Hasan Jibon"}
+        className="h-full w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+    </span>
   );
 }
 
@@ -35,102 +39,78 @@ export function PublicCourseCard({ course, enrollmentStatus, inBundle }: PublicC
       ? "In a bundle"
       : formatBDT(Number(course.priceBdt));
 
-  const priceBadgeClass = !isPaid
-    ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+  const priceTone = !isPaid
+    ? "success"
     : inBundle
-      ? "bg-amber-100 text-amber-900 border-amber-200"
-      : "bg-primary-container text-on-primary-container border-primary/30";
+      ? "warning"
+      : "primary";
 
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="bento-card group flex flex-col overflow-hidden"
+      className="group flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant bg-surface-0 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-10px_rgba(0,0,0,0.12)] focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2"
     >
-      <div className="relative aspect-[16/10] overflow-hidden bg-surface-container-high border-b border-outline-variant">
+      <div className="relative aspect-[16/10] overflow-hidden bg-surface-2">
         {course.thumbnailUrl ? (
-          <img
+          <Image
             src={course.thumbnailUrl}
             alt={course.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-            decoding="async"
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-primary-container/10">
-            <svg
-              className="h-12 w-12 text-primary/30"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-              />
-            </svg>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 to-primary/5 text-primary/30">
+            <BookIcon size={36} />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
 
-        {enrollmentStatus === "active" && (
-          <div className="absolute top-3 left-3">
-            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          {enrollmentStatus === "active" ? (
+            <Badge tone="success" size="xs">
               Enrolled
-            </span>
-          </div>
-        )}
-
-        {enrollmentStatus === "pending" && (
-          <div className="absolute top-3 left-3">
-            <span className="rounded-full bg-amber-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+            </Badge>
+          ) : null}
+          {enrollmentStatus === "pending" ? (
+            <Badge tone="warning" size="xs">
               Pending
-            </span>
-          </div>
-        )}
-
-        {course.category && (
-          <div className="absolute top-3 right-3">
-            <CategoryBadge category={course.category} />
-          </div>
-        )}
+            </Badge>
+          ) : null}
+        </div>
+        <div className="absolute right-3 top-3">
+          {course.category ? <CategoryBadge category={course.category} /> : null}
+        </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display text-lg font-bold tracking-tight text-on-surface line-clamp-1 group-hover:text-primary transition-colors">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="min-w-0 flex-1 font-display text-base font-semibold leading-snug text-ink-900 line-clamp-2 group-hover:text-primary sm:text-lg">
             {course.title}
           </h3>
-          <span
-            className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${priceBadgeClass}`}
-          >
+          <Badge tone={priceTone} size="xs" className="shrink-0">
             {priceLabel}
-          </span>
+          </Badge>
         </div>
-        <p className="mt-2 line-clamp-2 text-sm text-on-surface-variant">
-          {course.description || "A structured course from InsideJibon."}
-        </p>
 
-        <div className="mt-auto flex items-center justify-between gap-2 border-t border-outline-variant pt-4">
+        {course.description ? (
+          <p className="mt-2 text-sm text-ink-500 line-clamp-2">{course.description}</p>
+        ) : null}
+
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-outline-variant pt-4">
           <div className="flex min-w-0 items-center gap-2">
             <TeacherAvatar course={course} />
-            <span className="truncate text-xs font-semibold text-on-surface">
+            <span className="truncate text-xs font-semibold text-ink-900">
               {course.teacher.name || "Tanvir Hasan Jibon"}
             </span>
           </div>
-
-          <div className="flex items-center gap-3 text-xs font-semibold text-secondary">
-            <span className="flex items-center gap-1">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+          <div className="flex shrink-0 items-center gap-3 text-xs font-semibold text-ink-500">
+            <span className="flex items-center gap-1" aria-label="modules">
+              <BookIcon size={12} />
               {course.moduleCount}
             </span>
-            <span className="flex items-center gap-1">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+            <span className="flex items-center gap-1" aria-label="lessons">
+              <PlayIcon size={12} />
               {course.lessonCount}
             </span>
           </div>

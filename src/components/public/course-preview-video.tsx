@@ -76,7 +76,7 @@ export function CoursePreviewVideo({
           aria-label="Unmute video preview"
         >
           <svg
-            className="h-4 w-4"
+        className="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

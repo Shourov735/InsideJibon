@@ -88,7 +88,7 @@ export default async function AdminPaymentsPage({
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+    <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
           {t("payment.admin.title")}

@@ -41,7 +41,7 @@ export default async function ExamPage({ params, searchParams }: ExamPageProps) 
     if (!taking) notFound();
 
     return (
-      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 space-y-4">
+      <main id="main-content" className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 space-y-4">
         {/* Navigation / Exit bar */}
         <nav className="flex items-center justify-between text-xs font-medium text-secondary">
           <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default async function ExamPage({ params, searchParams }: ExamPageProps) 
     detail.maxAttempts == null || detail.attemptsUsed < detail.maxAttempts;
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 space-y-6">
+    <main id="main-content" className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 space-y-6">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
         <Link href="/student" className="hover:text-primary transition-colors">

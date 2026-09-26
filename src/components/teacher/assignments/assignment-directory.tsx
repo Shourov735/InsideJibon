@@ -224,7 +224,7 @@ export function AssignmentDirectory({
               className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 pl-8 text-xs text-on-surface outline-none focus:border-primary"
             />
             <svg
-              className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-secondary"
+        className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-secondary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -286,7 +286,7 @@ export function AssignmentDirectory({
         <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center shadow-xs space-y-3">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
             <svg
-              className="h-7 w-7"
+        className="h-7 w-7"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

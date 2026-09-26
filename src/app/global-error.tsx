@@ -39,16 +39,24 @@ export default function GlobalError({
             </p>
           )}
           <button
+            type="button"
             onClick={reset}
             style={{
               background: "#2f6f4f",
               color: "#fff",
-              border: "none",
+              border: "2px solid transparent",
               borderRadius: "0.5rem",
               padding: "0.6rem 1.25rem",
               fontWeight: 600,
               cursor: "pointer",
               marginRight: "0.5rem",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.outline = "2px solid #4a86c4";
+              e.currentTarget.style.outlineOffset = "2px";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = "2px solid transparent";
             }}
           >
             Try again / আবার চেষ্টা করুন
@@ -56,7 +64,10 @@ export default function GlobalError({
           {/* Plain anchor intentionally: global-error renders outside the
               app router context where next/link cannot be relied on. */}
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/" style={{ fontSize: "0.875rem", color: "#2f6f4f", fontWeight: 600 }}>
+          <a
+            href="/"
+            style={{ fontSize: "0.875rem", color: "#2f6f4f", fontWeight: 600, textDecoration: "none" }}
+          >
             Go home / হোমপেজে যান
           </a>
         </div>

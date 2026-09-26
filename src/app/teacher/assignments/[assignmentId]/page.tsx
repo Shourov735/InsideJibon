@@ -8,9 +8,9 @@ import {
   getSubmissionDetailForTeacher,
 } from "@/services/assignments";
 import { getTeacherCourseById } from "@/services/courses";
-import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { AssignmentDetailView } from "@/components/teacher/assignments";
 import type { SubmissionDetail } from "@/services/assignments";
+import { Container } from "@/components/shared/ui/container";
 
 interface AssignmentDetailPageProps {
   params: Promise<{ assignmentId: string }>;
@@ -52,19 +52,15 @@ export default async function TeacherAssignmentDetailPage({ params }: Assignment
   }
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      <TeacherNav user={teacher} activeSection="assignments" />
-
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-        <AssignmentDetailView
-          assignment={assignment}
-          courseTitle={course?.title ?? "Course"}
-          validation={validation}
-          submissions={submissions}
-          stats={stats}
-          detailedSubmissionsMap={detailedSubmissionsMap}
-        />
-      </main>
-    </div>
+    <Container className="py-6 sm:py-8" size="xl">
+      <AssignmentDetailView
+        assignment={assignment}
+        courseTitle={course?.title ?? "Course"}
+        validation={validation}
+        submissions={submissions}
+        stats={stats}
+        detailedSubmissionsMap={detailedSubmissionsMap}
+      />
+    </Container>
   );
 }

@@ -14,16 +14,27 @@ import type { QaQuestionView } from "@/components/student/qna/qna-panel";
 import { getStudentSessionsForCourse } from "@/services/classes/classes";
 import { getStudentAnnouncementsForCourse } from "@/services/announcements/announcements";
 import { LearningSidebar } from "@/components/student/learning-sidebar";
+import { LearnMobileCurriculum } from "@/components/student/learn-mobile-curriculum";
 import { LessonCompleteButton } from "@/components/student/lesson-complete-button";
 import { LessonResources } from "@/components/student/lesson-resources";
 import { LessonVideo } from "@/components/student/lesson-video";
-import { ProgressBar } from "@/components/student/progress-bar";
 import { LearnPageTabs } from "@/components/student/learn-tabs";
 import { StreakXpCard } from "@/components/student/gamification/StreakXpCard";
 import { TutorSheet, type TutorHistoryMessage } from "@/components/student/tutor/tutor-sheet";
 import { listTutorHistory, readBudget } from "@/services/ai/tutor";
 import { getLessonVideoForStudent } from "@/services/lessons/video";
 import { getTranslator } from "@/i18n/server";
+
+import { Badge } from "@/components/shared/ui/badge";
+import { Progress } from "@/components/shared/ui/progress";
+import { cn } from "@/lib/utils";
+import {
+  ArrowRightIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  HomeIcon,
+  PlayIcon,
+} from "@/components/shared/ui/icons";
 
 interface LearnPageProps {
   params: Promise<{ courseId: string }>;
@@ -71,20 +82,24 @@ export default async function LearnPage({
 
   if (!activeLessonId) {
     return (
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
-        <p className="text-sm font-medium text-on-surface">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-1 text-ink-500">
+          <PlayIcon size={24} />
+        </div>
+        <h1 className="mt-4 font-display text-lg font-semibold text-ink-900">
           {t("student.learn.noLessons")}
-        </p>
-        <p className="mt-1 text-sm text-secondary">
+        </h1>
+        <p className="mt-1 text-sm text-ink-500">
           {t("student.learn.noLessonsDesc")}
         </p>
         <Link
           href="/student/courses"
-          className="mt-6 inline-flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-primary/40"
+          className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-on-primary hover:bg-primary/90"
         >
           {t("student.learn.backToMyCourses")}
+          <ArrowRightIcon size={14} />
         </Link>
-      </main>
+      </div>
     );
   }
 
@@ -129,35 +144,15 @@ export default async function LearnPage({
   const isLastLesson =
     lesson.totalLessons > 0 && lesson.completedCount >= lesson.totalLessons - 1;
 
-  return (
-    <div className="flex h-[calc(100dvh-4rem)] flex-col lg:flex-row">
-      {/* Mobile curriculum toggle */}
-      <details className="border-b border-outline-variant bg-surface-container-lowest lg:hidden">
-        <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-3 text-sm font-semibold text-on-surface">
-          <span>
-            {t("student.learn.curriculumPercent", { percent: course.progress.percent })}
-          </span>
-          <svg
-            className="h-4 w-4 text-secondary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </summary>
-        <div className="max-h-80 overflow-y-auto">
-          <LearningSidebar
-            course={course}
-            courseId={courseId}
-            activeLessonId={lesson.lesson.id}
-          />
-        </div>
-      </details>
+  const isCompleted = lesson.progress?.completed ?? false;
+  const lessonsProgressTone = course.progress.percent >= 100
+    ? "success"
+    : course.completedAt
+      ? "success"
+      : "primary";
 
+  return (
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col lg:flex-row">
       {/* Desktop curriculum sidebar */}
       <aside className="hidden w-80 shrink-0 border-r border-outline-variant lg:block">
         <LearningSidebar
@@ -168,64 +163,76 @@ export default async function LearnPage({
       </aside>
 
       {/* Main lesson area */}
-      <main className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-surface-container-lowest">
-        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
-          <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
-            <Link href="/student" className="hover:text-primary hover:underline">
-              {t("nav.student.dashboard")}
-            </Link>
-            <svg
-              className="h-3 w-3 text-outline"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
+      <main id="main-content" className="flex min-w-0 flex-1 flex-col bg-surface-0">
+        {/* Mobile curriculum trigger — sticky on small screens */}
+        <div className="sticky top-0 z-30 border-b border-outline-variant bg-surface-0/95 backdrop-blur lg:hidden">
+          <LearnMobileCurriculum
+            course={course}
+            courseId={courseId}
+            activeLessonId={lesson.lesson.id}
+          />
+        </div>
+
+        <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-5 sm:px-6 sm:py-8">
+          {/* Breadcrumb */}
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 overflow-hidden text-xs font-medium text-ink-500"
+          >
+            <Link
+              href="/student"
+              className="inline-flex shrink-0 items-center gap-1 hover:text-ink-900"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+              <HomeIcon size={12} />
+              <span className="hidden sm:inline">{t("nav.student.dashboard")}</span>
+            </Link>
+            <ChevronRightIcon size={12} className="shrink-0 text-outline" />
             <Link
               href="/student/courses"
-              className="hover:text-primary hover:underline"
+              className="shrink-0 truncate hover:text-ink-900"
             >
               {t("nav.student.courses")}
             </Link>
-            <svg
-              className="h-3 w-3 text-outline"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRightIcon size={12} className="shrink-0 text-outline" />
             <Link
               href={`/student/courses/${courseId}/learn`}
-              className="hover:text-primary hover:underline"
+              className="truncate hover:text-ink-900"
+              title={course.title}
             >
               {course.title}
             </Link>
           </nav>
 
-          <div className="mt-4 flex items-center gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-xs">
+          {/* Progress / status card */}
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-outline-variant bg-surface-0 p-3.5 sm:gap-4 sm:p-4">
             <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between text-xs font-medium text-secondary">
-                <span>
-                  {t("student.learn.lessonsProgress", {
-                    completed: lesson.completedCount,
-                    total: lesson.totalLessons,
-                  })}
-                </span>
-                <span className="font-bold text-primary">
-                  {course.progress.percent}%
-                </span>
-              </div>
-              <ProgressBar percent={course.progress.percent} className="mt-2" />
+              <Progress
+                value={course.progress.percent}
+                size="sm"
+                tone={lessonsProgressTone}
+                label={t("student.learn.lessonsProgress", {
+                  completed: lesson.completedCount,
+                  total: lesson.totalLessons,
+                })}
+                showLabel
+              />
             </div>
-            <span className="hidden shrink-0 rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 sm:block">
-              {course.completedAt
-                ? t("common.status.completed")
-                : t("common.status.inProgress")}
-            </span>
+            <div className="flex items-center gap-2">
+              {isCompleted ? (
+                <Badge tone="success" size="sm">
+                  <CheckIcon size={12} />
+                  {t("common.status.completed")}
+                </Badge>
+              ) : course.completedAt ? (
+                <Badge tone="success" size="sm">
+                  {t("common.status.completed")}
+                </Badge>
+              ) : (
+                <Badge tone="primary" size="sm">
+                  {t("common.status.inProgress")}
+                </Badge>
+              )}
+            </div>
           </div>
 
           {/* R5 — compact streak / XP / league card on the lesson page */}
@@ -233,38 +240,44 @@ export default async function LearnPage({
             <StreakXpCard userId={user.id} compact />
           </div>
 
-          {(videoData?.video || lesson.lesson.videoUrl) && (
+          {/* Video */}
+          {(videoData?.video || lesson.lesson.videoUrl) ? (
             <div className="mt-6">
-              <LessonVideo
-                lessonId={lesson.lesson.id}
-                video={videoData?.video ?? null}
-                descriptor={videoData?.video ?? null}
-                videoProvider={videoData?.provider ?? (lesson.lesson.videoUrl ? "external" : "youtube")}
-                youtubeVideoId={videoData?.youtubeVideoId}
-                videoUrl={videoData?.videoUrl ?? lesson.lesson.videoUrl}
-                initialPosition={lesson.progress?.lastPosition ?? null}
-              />
+              <div className="overflow-hidden rounded-3xl border border-outline-variant bg-ink-900 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.25)]">
+                <div className="relative aspect-video w-full">
+                  <LessonVideo
+                    lessonId={lesson.lesson.id}
+                    video={videoData?.video ?? null}
+                    descriptor={videoData?.video ?? null}
+                    videoProvider={videoData?.provider ?? (lesson.lesson.videoUrl ? "external" : "youtube")}
+                    youtubeVideoId={videoData?.youtubeVideoId}
+                    videoUrl={videoData?.videoUrl ?? lesson.lesson.videoUrl}
+                    initialPosition={lesson.progress?.lastPosition ?? null}
+                  />
+                </div>
+              </div>
             </div>
-          )}
+          ) : null}
 
+          {/* Lesson header */}
           <div className="mt-6 flex flex-col gap-4 border-b border-outline-variant pb-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="font-mono text-xs font-semibold text-secondary">
+              <p className="font-mono text-xs font-semibold uppercase tracking-wider text-ink-500">
                 {t("common.moduleLessonLabel", {
                   module: lesson.module.position,
                   lesson: lesson.lesson.position,
                 })}
               </p>
-              <h1 className="mt-1 text-xl font-bold leading-tight tracking-tight text-on-surface sm:text-2xl">
+              <h1 className="mt-1.5 font-display text-xl font-bold leading-tight tracking-tight text-ink-900 sm:text-2xl">
                 {lesson.lesson.title}
               </h1>
-              {lesson.lesson.description && (
-                <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+              {lesson.lesson.description ? (
+                <p className="mt-2 text-sm leading-relaxed text-ink-500 sm:text-base">
                   {lesson.lesson.description}
                 </p>
-              )}
+              ) : null}
             </div>
-            <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+            <div className="flex shrink-0 flex-row items-stretch gap-2 sm:flex-col sm:items-end">
               <TutorSheet
                 courseId={courseId}
                 lessonId={lesson.lesson.id}
@@ -273,18 +286,19 @@ export default async function LearnPage({
               />
               <LessonCompleteButton
                 lessonId={lesson.lesson.id}
-                completed={lesson.progress?.completed ?? false}
+                completed={isCompleted}
               />
             </div>
           </div>
 
-          {lesson.lesson.content && (
+          {/* Lesson content */}
+          {lesson.lesson.content ? (
             <article className="mt-6">
-              <div className="max-w-none whitespace-pre-wrap text-base leading-7 text-on-surface">
+              <div className="prose prose-sm max-w-none whitespace-pre-wrap rounded-2xl border border-outline-variant bg-surface-0 p-5 text-base leading-7 text-ink-900 sm:p-6">
                 {lesson.lesson.content}
               </div>
             </article>
-          )}
+          ) : null}
 
           {/* Lesson Materials / Resources */}
           <LessonResources materials={materials} className="mt-8" />
@@ -300,52 +314,42 @@ export default async function LearnPage({
             currentUserRole={user.role}
           />
 
-          <div className="mt-8 flex items-center justify-between gap-3 border-t border-outline-variant pt-6 pb-2">
+          {/* Prev / Next nav */}
+          <div
+            className={cn(
+              "mt-8 flex flex-col-reverse items-stretch gap-2 border-t border-outline-variant pt-6 sm:flex-row sm:items-center sm:justify-between",
+            )}
+          >
             {lesson.prevLessonId ? (
               <Link
                 href={lessonHref(lesson.prevLessonId)}
-                className="inline-flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-sm font-medium text-on-surface-variant transition-colors hover:border-primary/40 hover:text-primary"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-outline-variant bg-surface-0 px-4 text-sm font-semibold text-ink-900 transition-colors hover:bg-surface-1 sm:justify-start"
               >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                {t("student.learn.previous")}
+                <ArrowRightIcon
+                  size={14}
+                  className="rotate-180 text-ink-500"
+                />
+                <span>{t("student.learn.previous")}</span>
               </Link>
             ) : (
-              <span />
+              <span aria-hidden />
             )}
 
-            {lesson.nextLessonId ? (
-              <Link
-                href={lessonHref(lesson.nextLessonId)}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
-              >
-                {t("student.learn.nextLesson")}
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+            <div className="flex items-center justify-end">
+              {lesson.nextLessonId ? (
+                <Link
+                  href={lessonHref(lesson.nextLessonId)}
+                  className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary/90"
                 >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </Link>
-            ) : isLastLesson && course.progress.percent < 100 ? (
-              <span className="text-sm font-medium text-secondary">
-                {t("student.learn.courseEnd")}
-              </span>
-            ) : null}
+                  {t("student.learn.nextLesson")}
+                  <ArrowRightIcon size={14} />
+                </Link>
+              ) : isLastLesson && course.progress.percent < 100 ? (
+                <span className="text-sm font-medium text-ink-500">
+                  {t("student.learn.courseEnd")}
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
       </main>

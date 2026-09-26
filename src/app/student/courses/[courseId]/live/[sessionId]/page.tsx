@@ -65,7 +65,7 @@ export default async function StudentLiveLobbyPage({ params }: PageProps) {
   const t = await getTranslator();
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
+    <main id="main-content" className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
       <StudentLiveLobby
         locale={t.locale}
         session={{

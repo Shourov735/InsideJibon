@@ -25,35 +25,35 @@ export default async function CheckoutPage({
   const { status, user } = await resolveCurrentUser();
   if (status === "not-synced") {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-2xl px-4 py-10">
         <p className="text-on-surface">Account syncing…</p>
       </main>
     );
   }
   if (!user) {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-2xl px-4 py-10">
         <p className="text-on-surface">Please sign in to continue.</p>
       </main>
     );
   }
   if (user.role !== "student") {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-2xl px-4 py-10">
         <p className="text-on-surface">Only students can pay.</p>
       </main>
     );
   }
   if (scopeKind !== "course" && scopeKind !== "bundle") {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-2xl px-4 py-10">
         <p className="text-on-surface">Invalid scope.</p>
       </main>
     );
   }
   if (!isUuid(scopeId)) {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-2xl px-4 py-10">
         <p className="text-on-surface">Invalid identifier.</p>
       </main>
     );
@@ -71,7 +71,7 @@ export default async function CheckoutPage({
 
   if (!scope) {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <main id="main-content" className="mx-auto w-full max-w-2xl px-4 py-10">
         <CourseAccessFallback scopeKind={scopeKind} scopeId={scopeId} />
       </main>
     );
@@ -87,7 +87,7 @@ export default async function CheckoutPage({
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+    <main id="main-content" className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold tracking-tight text-on-surface">
         {t("payment.title")}
       </h1>

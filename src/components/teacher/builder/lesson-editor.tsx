@@ -131,7 +131,7 @@ export function LessonEditor({
           <div className="flex items-center gap-2 text-xs font-medium text-secondary">
             <span>{moduleTitle}</span>
             <svg
-              className="h-3.5 w-3.5 text-outline"
+        className="h-3.5 w-3.5 text-outline"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -158,7 +158,7 @@ export function LessonEditor({
             className="inline-flex items-center gap-1.5 rounded-lg border border-error/30 bg-error-container/20 px-3 py-1.5 text-xs font-medium text-error transition-colors hover:bg-error-container/40 disabled:opacity-50"
           >
             <svg
-              className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

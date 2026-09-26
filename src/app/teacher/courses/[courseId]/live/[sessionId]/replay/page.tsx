@@ -10,6 +10,9 @@ import { classSessions, courses } from "@/db/schema";
 import { getTranslator } from "@/i18n/server";
 import { authorizeReplayViewer, getReplayChat } from "@/services/classes";
 import { ReplayPage } from "@/components/shared/live/replay-page";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { VideoIcon } from "@/components/shared/ui/icons";
 
 interface PageProps {
   params: Promise<{ courseId: string; sessionId: string }>;
@@ -79,43 +82,47 @@ export default async function TeacherReplayPage({ params }: PageProps) {
   const t = await getTranslator();
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 space-y-4">
-      <header className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wider text-secondary">
-          {row.course.title}
-        </p>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-on-surface">
-          {row.session.title}
-        </h1>
-        <p className="text-xs text-secondary">Host replay</p>
-      </header>
-      <ReplayPage
-        locale={t.locale}
-        sessionId={sessionId}
-        courseId={courseId}
-        courseTitle={row.course.title}
-        sessionTitle={row.session.title}
-        sessionDescription={row.session.description}
-        scheduledAt={row.session.scheduledAt?.toISOString() ?? null}
-        endedAt={row.session.endedAt?.toISOString() ?? null}
-        embedUrl={
-          row.session.youtubeReplayVideoId
-            ? `https://www.youtube-nocookie.com/embed/${row.session.youtubeReplayVideoId}`
-            : row.session.youtubeLiveVideoId
-              ? `https://www.youtube-nocookie.com/embed/${row.session.youtubeLiveVideoId}`
-              : null
+    <Container className="py-6 sm:py-8" size="xl">
+      <PageHeader
+        size="compact"
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <VideoIcon size={14} />
+            {row.course.title}
+          </span>
         }
-        replayStatus={row.session.replayStatus}
-        chat={chat.map((m) => ({
-          id: m.id,
-          userId: m.userId,
-          body: m.body,
-          createdAt: m.createdAt.toISOString(),
-        }))}
-        reactions={[]}
-        startedAt={startedAt}
-        lastEventAt={lastEventAt}
+        title={row.session.title}
+        description="Host replay"
       />
-    </main>
+      <div className="mt-6">
+        <ReplayPage
+          locale={t.locale}
+          sessionId={sessionId}
+          courseId={courseId}
+          courseTitle={row.course.title}
+          sessionTitle={row.session.title}
+          sessionDescription={row.session.description}
+          scheduledAt={row.session.scheduledAt?.toISOString() ?? null}
+          endedAt={row.session.endedAt?.toISOString() ?? null}
+          embedUrl={
+            row.session.youtubeReplayVideoId
+              ? `https://www.youtube-nocookie.com/embed/${row.session.youtubeReplayVideoId}`
+              : row.session.youtubeLiveVideoId
+                ? `https://www.youtube-nocookie.com/embed/${row.session.youtubeLiveVideoId}`
+                : null
+          }
+          replayStatus={row.session.replayStatus}
+          chat={chat.map((m) => ({
+            id: m.id,
+            userId: m.userId,
+            body: m.body,
+            createdAt: m.createdAt.toISOString(),
+          }))}
+          reactions={[]}
+          startedAt={startedAt}
+          lastEventAt={lastEventAt}
+        />
+      </div>
+    </Container>
   );
 }

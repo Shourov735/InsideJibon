@@ -189,7 +189,7 @@ export function CommandPalette({ staticItems, roleActions }: CommandPaletteProps
     >
       <div className="flex items-center gap-2 border-b border-outline-variant px-4 py-3">
         <svg
-          className="h-4 w-4 text-secondary"
+        className="h-4 w-4 text-secondary"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

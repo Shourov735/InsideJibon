@@ -121,7 +121,7 @@ export function CourseForm({
         <div className="rounded-lg border border-error/30 bg-error-container/40 p-4 text-sm text-on-error-container">
           <div className="flex items-center gap-2 font-semibold">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-error"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -283,7 +283,7 @@ export function CourseForm({
           {isSubmitting ? (
             <>
               <svg
-                className="h-4 w-4 animate-spin text-current"
+        className="h-4 w-4 animate-spin text-current"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"

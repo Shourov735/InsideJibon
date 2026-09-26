@@ -167,7 +167,7 @@ export function TutorSheet(props: TutorSheetProps) {
         className="inline-flex items-center gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 shadow-xs transition-colors hover:border-emerald-400 hover:bg-emerald-100"
       >
         <svg
-          className="h-4 w-4"
+        className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -223,7 +223,7 @@ export function TutorSheet(props: TutorSheetProps) {
                 aria-label="Close"
               >
                 <svg
-                  className="h-4 w-4"
+        className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -354,7 +354,7 @@ function CitationChip({
           className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800 transition-colors hover:border-emerald-400 hover:bg-emerald-100"
         >
           <svg
-            className="h-3 w-3"
+        className="h-3 w-3"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

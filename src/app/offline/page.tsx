@@ -12,7 +12,7 @@ import { useTranslations } from "@/i18n/client";
 export default function OfflinePage() {
   const { t } = useTranslations();
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
+    <main id="main-content" className="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
       <h1 className="text-3xl font-semibold text-on-surface">
         {t("pwa.offline.title")}
       </h1>

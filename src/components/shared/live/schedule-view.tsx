@@ -1,9 +1,18 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import Link from "next/link";
 
 import { useTranslations } from "@/i18n/client";
 import { cn } from "@/lib/utils";
+
+import { Button } from "@/components/shared/ui/button";
+import {
+  ArrowRightIcon,
+  CalendarIcon,
+  ClockIcon,
+  TrophyIcon,
+} from "@/components/shared/ui/icons";
 
 export interface ScheduleCell {
   sessionId: string;
@@ -118,97 +127,122 @@ export function ScheduleView(props: ScheduleViewProps) {
   const basePath =
     props.viewerRole === "teacher" ? "/teacher/courses" : "/student/courses";
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayIso = today.toISOString();
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-display text-lg font-semibold">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-ink-900">
+          <CalendarIcon size={18} className="text-primary" />
           {t("schedule.weekOf", { date: headerDateLabel })}
         </h2>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={copyIcalLink}
-            className="rounded-lg border border-outline-variant bg-surface-container px-3 py-1.5 text-xs font-semibold hover:bg-surface-container-high"
           >
             {copyState === "ical" ? t("schedule.icalDownloaded") : t("schedule.exportIcal")}
-          </button>
-          <a
-            href="/api/live/ical"
-            download
-            onClick={(e) => {
-              e.preventDefault();
-              downloadIcal();
-            }}
-            className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-on-primary hover:bg-primary-container hover:text-on-primary-container"
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={downloadIcal}
           >
             {t("schedule.exportIcal")}
-          </a>
+          </Button>
         </div>
       </div>
 
       {props.cells.length === 0 ? (
-        <p className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 text-center text-sm text-on-surface-variant">
+        <div className="rounded-3xl border border-dashed border-outline-variant bg-surface-0 p-8 text-center text-sm text-ink-500">
           {t("schedule.empty")}
-        </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
-          {bucketed.map((bucket) => (
-            <div
-              key={bucket.iso}
-              className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-3"
-            >
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-secondary">
-                {t(`schedule.${bucket.weekdayKey}`)}
-              </p>
-              <p className="text-xs text-on-surface-variant">{bucket.label}</p>
-              <ul className="mt-2 space-y-2">
-                {bucket.cells.length === 0 ? (
-                  <li className="text-[10px] text-on-surface-variant">—</li>
-                ) : (
-                  bucket.cells.map((cell) => {
-                    const isUpcoming = cell.status === "upcoming";
-                    const isReplay =
-                      cell.replayStatus === "available" || !!cell.youtubeReplayVideoId;
-                    const href = isUpcoming
-                      ? `${basePath}/${cell.courseId}/live/${cell.sessionId}`
-                      : isReplay
-                        ? `${basePath}/${cell.courseId}/live/${cell.sessionId}/replay`
-                        : `${basePath}/${cell.courseId}/live/${cell.sessionId}`;
-                    return (
-                      <li
-                        key={cell.sessionId}
-                        className={cn(
-                          "rounded-lg border px-2 py-1.5 text-xs",
-                          isReplay
-                            ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                            : isUpcoming
-                              ? "border-primary/30 bg-primary-container/40 text-on-surface"
-                              : "border-outline-variant bg-surface-container text-on-surface-variant"
-                        )}
-                      >
-                        <a href={href} className="block">
-                          <p className="text-[10px] font-bold uppercase tracking-wide opacity-80">
-                            {cell.courseTitle}
-                          </p>
-                          <p className="text-xs font-semibold leading-snug">
-                            {cell.title}
-                          </p>
-                          <p className="text-[10px] opacity-70">
-                            {timeFmt.format(new Date(cell.scheduledAt))}
-                            {cell.durationMinutes
-                              ? ` · ${cell.durationMinutes} min`
-                              : ""}
-                          </p>
-                        </a>
-                      </li>
-                    );
-                  })
+          {bucketed.map((bucket) => {
+            const isToday = bucket.iso.slice(0, 10) === todayIso.slice(0, 10);
+            return (
+              <div
+                key={bucket.iso}
+                className={cn(
+                  "flex flex-col gap-2 rounded-2xl border p-3 transition-colors",
+                  isToday
+                    ? "border-primary bg-primary-container/15"
+                    : "border-outline-variant bg-surface-0",
                 )}
-              </ul>
-            </div>
-          ))}
+              >
+                <div>
+                  <p
+                    className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider",
+                      isToday ? "text-primary" : "text-ink-500",
+                    )}
+                  >
+                    {t(`schedule.${bucket.weekdayKey}`)}
+                  </p>
+                  <p className="text-xs font-semibold text-ink-900">{bucket.label}</p>
+                </div>
+                <ul className="space-y-2">
+                  {bucket.cells.length === 0 ? (
+                    <li className="text-[10px] italic text-ink-500">—</li>
+                  ) : (
+                    bucket.cells.map((cell) => {
+                      const isUpcoming = cell.status === "upcoming";
+                      const isReplay =
+                        cell.replayStatus === "available" || !!cell.youtubeReplayVideoId;
+                      const href = isUpcoming
+                        ? `${basePath}/${cell.courseId}/live/${cell.sessionId}`
+                        : isReplay
+                          ? `${basePath}/${cell.courseId}/live/${cell.sessionId}/replay`
+                          : `${basePath}/${cell.courseId}/live/${cell.sessionId}`;
+                      return (
+                        <li key={cell.sessionId}>
+                          <Link
+                            href={href}
+                            className={cn(
+                              "block rounded-xl border p-2.5 text-xs transition-colors",
+                              isReplay
+                                ? "border-emerald-200 bg-emerald-50/70 hover:border-emerald-300"
+                                : isUpcoming
+                                  ? "border-primary/30 bg-primary-container/30 hover:border-primary/60"
+                                  : "border-outline-variant bg-surface-1 hover:bg-surface-2",
+                            )}
+                          >
+                            <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide opacity-90">
+                              {isReplay ? (
+                                <TrophyIcon size={10} />
+                              ) : isUpcoming ? (
+                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                              ) : null}
+                              <span className="line-clamp-1">{cell.courseTitle}</span>
+                            </p>
+                            <p className="mt-0.5 line-clamp-2 font-semibold leading-snug text-ink-900">
+                              {cell.title}
+                            </p>
+                            <p className="mt-1 inline-flex items-center gap-1 text-[10px] text-ink-700">
+                              <ClockIcon size={10} />
+                              {timeFmt.format(new Date(cell.scheduledAt))}
+                              {cell.durationMinutes
+                                ? ` · ${cell.durationMinutes} min`
+                                : ""}
+                            </p>
+                          </Link>
+                        </li>
+                      );
+                    })
+                  )}
+                </ul>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
+
+// kept for downstream consumers
+export { ArrowRightIcon };

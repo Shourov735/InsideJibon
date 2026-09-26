@@ -20,13 +20,18 @@ import { and, desc, eq, isNotNull, or } from "drizzle-orm";
 import { extractYouTubeVideoId } from "@/lib/video/youtube";
 import { CoursePreviewVideo } from "@/components/public/course-preview-video";
 
-// R0 §8: course detail edge-cache. The per-user `resolveCurrentUser()`
-// call inside the page component still runs on every request — Next.js
-// handles this by suspending the per-user subtree and serving the rest
-// from the route cache. We tag the page with `course:<slug>` so a
-// `revalidateTag('course:<slug>')` call from the publish/update flow
-// purges the entry. Stale-while-revalidate window is the default Next.js
-// behavior on Cloudflare.
+import { Container } from "@/components/shared/ui/container";
+import { Badge } from "@/components/shared/ui/badge";
+import { Stat } from "@/components/shared/ui/stat";
+import {
+  ArrowRightIcon,
+  BookIcon,
+  CalendarIcon,
+  ChevronRightIcon,
+  PlayIcon,
+  TrophyIcon,
+} from "@/components/shared/ui/icons";
+
 export const revalidate = 120;
 
 interface PublicCourseDetailPageProps {
@@ -116,7 +121,6 @@ export default async function PublicCourseDetailPage({
   const t = await getTranslator();
   const { user } = await resolveCurrentUser();
   const canEnroll = user?.role === "student";
-  // Enrollment is a request flow — the button reflects the request state.
   const enrollmentStatus = canEnroll
     ? ((await getStudentEnrollment(user.id, course.id))?.status ?? "none")
     : "none";
@@ -153,7 +157,6 @@ export default async function PublicCourseDetailPage({
       }).format(new Date(course.publishedAt))
     : null;
 
-  // Resolve preview video for the course
   let previewVideoId: string | null = null;
   try {
     const db = getDb();
@@ -186,6 +189,64 @@ export default async function PublicCourseDetailPage({
     previewVideoId = extractYouTubeVideoId(course.thumbnailUrl);
   }
 
+  const primaryCta = (() => {
+    if (isPaidCourse && enrollmentStatus === "active") {
+      return (
+        <Link
+          href={`/student/courses/${course.id}/learn`}
+          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
+        >
+          {t("marketing.courseDetail.continueLearning")}
+          <ArrowRightIcon size={16} />
+        </Link>
+      );
+    }
+
+    if (isPaidCourse) {
+      if (cheapestBundle) {
+        return (
+          <Link
+            href={`/checkout/bundle/${cheapestBundle.id}`}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
+          >
+            {t("payment.detail.cta.bundle", { price: formattedBundlePrice ?? "" })}
+            <ArrowRightIcon size={16} />
+          </Link>
+        );
+      }
+      if (canEnroll) {
+        return (
+          <Link
+            href={`/checkout/course/${course.id}`}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
+          >
+            {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
+            <ArrowRightIcon size={16} />
+          </Link>
+        );
+      }
+      return (
+        <Link
+          href={`/sign-in?redirect_url=${encodeURIComponent(`/courses/${course.slug}`)}`}
+          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-on-primary hover:bg-primary/90 sm:w-auto"
+        >
+          {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
+          <ArrowRightIcon size={16} />
+        </Link>
+      );
+    }
+
+    return (
+      <EnrollButton
+        courseId={course.id}
+        courseSlug={course.slug}
+        courseTitle={course.title}
+        canEnroll={canEnroll}
+        enrollmentStatus={enrollmentStatus}
+      />
+    );
+  })();
+
   return (
     <div>
       <JsonLd data={buildCourseJsonLd(course, t.locale as "en" | "bn")} />
@@ -196,258 +257,244 @@ export default async function PublicCourseDetailPage({
           { name: course.title, url: `/courses/${course.slug}` },
         ])}
       />
-      <section className="bg-surface-container-lowest border-b border-outline-variant">
-        <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
-            <Link href="/" className="hover:text-primary hover:underline">
+
+      {/* Hero / preview */}
+      <section className="border-b border-outline-variant bg-surface-0">
+        <Container className="py-8 sm:py-12" size="xl">
+          {/* Breadcrumb */}
+          <nav className="mb-5 flex items-center gap-1.5 text-xs font-medium text-ink-500">
+            <Link href="/" className="hover:text-ink-900">
               {t("marketing.home")}
             </Link>
-            <svg
-              className="h-3 w-3 text-outline"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-            <Link href="/courses" className="hover:text-primary hover:underline">
+            <ChevronRightIcon size={12} />
+            <Link href="/courses" className="hover:text-ink-900">
               {t("marketing.header.courses")}
             </Link>
-            <svg
-              className="h-3 w-3 text-outline"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-            <span className="truncate text-on-surface">{course.title}</span>
+            <ChevronRightIcon size={12} />
+            <span className="truncate text-ink-900">{course.title}</span>
           </nav>
 
-          <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start">
-            {(previewVideoId || course.thumbnailUrl) && (
-              <div className="aspect-[16/10] w-full shrink-0 overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-high lg:aspect-auto lg:w-96">
-                <CoursePreviewVideo
-                  youtubeVideoId={previewVideoId}
-                  thumbnailUrl={course.thumbnailUrl}
-                  title={course.title}
-                  badgeLabel={t("learning.player.previewNotice")}
-                  className="h-full w-full"
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+            {/* Main column */}
+            <div className="space-y-5 lg:col-span-8">
+              {/* Preview video */}
+              {previewVideoId || course.thumbnailUrl ? (
+                <div className="overflow-hidden rounded-3xl border border-outline-variant bg-surface-1">
+                  <div className="relative aspect-video w-full">
+                    <CoursePreviewVideo
+                      youtubeVideoId={previewVideoId}
+                      thumbnailUrl={course.thumbnailUrl}
+                      title={course.title}
+                      badgeLabel={t("learning.player.previewNotice")}
+                      className="h-full w-full"
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Title + meta */}
+              <div className="space-y-3">
+                <Badge tone="primary" size="sm">
+                  {course.category ? t(`course.category.${course.category}` as Parameters<typeof t>[0]) : "Course"}
+                </Badge>
+                <h1 className="font-display text-2xl font-bold leading-tight tracking-tight text-ink-900 sm:text-3xl lg:text-4xl">
+                  {course.title}
+                </h1>
+                {course.description ? (
+                  <p className="max-w-3xl text-sm leading-relaxed text-ink-500 sm:text-base">
+                    {course.description}
+                  </p>
+                ) : (
+                  <p className="max-w-3xl text-sm leading-relaxed text-ink-500 sm:text-base">
+                    {t("marketing.courseDetail.fallbackDescription")}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <div className="flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={course.teacher.imageUrl || "/jibon.jpg"}
+                      alt={course.teacher.name || "Tanvir Hasan Jibon"}
+                      className="h-9 w-9 rounded-full border border-outline-variant object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      width={36}
+                      height={36}
+                    />
+                    <div className="leading-tight">
+                      <p className="text-sm font-semibold text-ink-900">
+                        {course.teacher.name || "Tanvir Hasan Jibon"}
+                      </p>
+                      <p className="text-xs text-ink-500">Lead Educator</p>
+                    </div>
+                  </div>
+                  {formattedPublished ? (
+                    <span className="inline-flex items-center gap-1.5 text-xs text-ink-500">
+                      <CalendarIcon size={14} />
+                      {t("common.publishedShort", { date: formattedPublished })}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Stat grid */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <Stat
+                  label={t("marketing.courseDetail.modules")}
+                  value={course.moduleCount}
+                  icon={<BookIcon size={18} />}
+                />
+                <Stat
+                  label={t("marketing.courseDetail.lessons")}
+                  value={totalLessons}
+                  icon={<PlayIcon size={18} />}
+                />
+                <Stat
+                  label={t("marketing.courseDetail.freePreviews")}
+                  value={freeLessons}
+                  icon={<TrophyIcon size={18} />}
+                  tone="success"
+                  className="col-span-2 sm:col-span-1"
                 />
               </div>
-            )}
+            </div>
 
-            <div className="flex-1 space-y-3">
-              <p className="font-mono text-xs font-semibold text-secondary">
-                /{course.slug}
-              </p>
-              <h1 className="text-2xl font-bold leading-tight tracking-tight text-on-surface sm:text-3xl">
-                {course.title}
-              </h1>
-              <p className="max-w-2xl text-sm leading-relaxed text-on-surface-variant sm:text-base">
-                {course.description || t("marketing.courseDetail.fallbackDescription")}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <div className="flex items-center gap-2">
-                  <img
-                    src={course.teacher.imageUrl || "/jibon.jpg"}
-                    alt={course.teacher.name || "Tanvir Hasan Jibon"}
-                    className="h-9 w-9 rounded-full border border-outline-variant object-cover"
-                    loading="lazy"
-                    decoding="async"
-                    width={36}
-                    height={36}
-                  />
-                  <div className="leading-tight">
-                    <p className="text-sm font-medium text-on-surface">
-                      {course.teacher.name || "Tanvir Hasan Jibon"}
-                    </p>
-                    <p className="text-xs text-secondary">
-                      {t("marketing.courseDetail.leadEducator", { subject: "Physics, Chemistry, Biology & Math" })}
-                    </p>
+            {/* Sidebar — sticky CTA */}
+            <aside className="lg:col-span-4">
+              <div className="sticky top-20 space-y-3 rounded-3xl border border-outline-variant bg-surface-0 p-5 shadow-[0_4px_14px_-6px_rgba(0,0,0,0.08)]">
+                {isPaidCourse ? (
+                  <div className="space-y-1">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">
+                      {cheapestBundle ? "Bundle price" : "Course price"}
+                    </div>
+                    <div className="font-display text-3xl font-bold text-ink-900">
+                      ৳{cheapestBundle ? formattedBundlePrice : formattedCoursePrice}
+                    </div>
+                    {cheapestBundle ? (
+                      <Badge tone="warning" size="xs">
+                        {t("payment.detail.bundleAvailable")}
+                      </Badge>
+                    ) : null}
                   </div>
-                </div>
-
-                {formattedPublished && (
-                  <span className="text-xs text-secondary">
-                    {t("common.publishedShort", { date: formattedPublished })}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                {t("marketing.courseDetail.modules")}
-              </span>
-              <p className="mt-1 text-2xl font-bold text-primary">
-                {course.moduleCount}
-              </p>
-            </div>
-            <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                {t("marketing.courseDetail.lessons")}
-              </span>
-              <p className="mt-1 text-2xl font-bold text-primary">{totalLessons}</p>
-            </div>
-            <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                {t("marketing.courseDetail.freePreviews")}
-              </span>
-              <p className="mt-1 text-2xl font-bold text-emerald-700">{freeLessons}</p>
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            {!isPaidCourse && (
-              <EnrollButton
-                courseId={course.id}
-                courseSlug={course.slug}
-                courseTitle={course.title}
-                canEnroll={canEnroll}
-                enrollmentStatus={enrollmentStatus}
-              />
-            )}
-
-            {isPaidCourse && enrollmentStatus !== "active" && (
-              <>
-                {cheapestBundle ? (
-                  <Link
-                    href={`/checkout/bundle/${cheapestBundle.id}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
-                  >
-                    {t("payment.detail.cta.bundle", { price: formattedBundlePrice ?? "" })}
-                  </Link>
-                ) : canEnroll ? (
-                  <Link
-                    href={`/checkout/course/${course.id}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
-                  >
-                    {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
-                  </Link>
                 ) : (
-                  <Link
-                    href={`/sign-in?redirect_url=${encodeURIComponent(`/courses/${course.slug}`)}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
-                  >
-                    {t("payment.detail.cta.buy", { price: formattedCoursePrice ?? "" })}
-                  </Link>
+                  <div className="space-y-1">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">
+                      Enrollment
+                    </div>
+                    <div className="font-display text-xl font-bold text-ink-900">
+                      Free
+                    </div>
+                  </div>
                 )}
 
-                {canEnroll && (
-                  <Link
-                    href={`/courses/${course.slug}#fallback`}
-                    className="text-xs font-semibold text-secondary hover:text-primary hover:underline"
-                  >
-                    {t("payment.actions.requestAccess")}
-                  </Link>
-                )}
+                {primaryCta}
 
-                {cheapestBundle && (
-                  <span className="rounded border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-900">
-                    {t("payment.detail.bundleAvailable")}
-                  </span>
-                )}
-              </>
-            )}
+                {enrollmentStatus === "pending" ? (
+                  <div className="rounded-2xl bg-[color:var(--color-warning)]/10 px-3 py-2 text-xs font-medium text-[color:var(--color-warning)]">
+                    {t("marketing.courseDetail.enrollmentPending") ?? "Enrollment request pending review."}
+                  </div>
+                ) : null}
 
-            {isPaidCourse && enrollmentStatus === "active" && (
-              <Link
-                href={`/student/courses/${course.id}/learn`}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
-              >
-                {t("marketing.courseDetail.continueLearning")}
-              </Link>
-            )}
-
-            {enrollmentStatus === "active" && !isPaidCourse && (
-              <span className="rounded border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                {t("marketing.courseDetail.enrolled")}
-              </span>
-            )}
+                <div className="space-y-2 border-t border-outline-variant pt-3 text-xs text-ink-500">
+                  <div className="flex items-center gap-2">
+                    <PlayIcon size={14} />
+                    {totalLessons} {t("marketing.courseDetail.lessons")}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <BookIcon size={14} />
+                    {course.moduleCount} {t("marketing.courseDetail.modules")}
+                  </div>
+                  {cheapestBundle && canEnroll ? (
+                    <div className="flex items-center gap-2">
+                      <TrophyIcon size={14} />
+                      Save with a bundle
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </aside>
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-        <h2 className="text-xl font-bold tracking-tight text-on-surface">
-          {t("marketing.courseDetail.curriculum")}
-        </h2>
-        <p className="mt-1 text-sm text-secondary">
-          {t("marketing.courseDetail.curriculumSubtitle")}
-        </p>
-
-        {course.modules.length === 0 ? (
-          <div className="mt-6 rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center">
-            <p className="text-sm text-secondary">
-              {t("marketing.courseDetail.curriculumPreparing")}
+      {/* Curriculum */}
+      <section className="bg-surface-1">
+        <Container className="py-10 sm:py-14" size="xl">
+          <div className="mb-6 max-w-2xl sm:mb-8">
+            <h2 className="font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
+              {t("marketing.courseDetail.curriculum")}
+            </h2>
+            <p className="mt-1 text-sm text-ink-500 sm:text-base">
+              {t("marketing.courseDetail.curriculumSubtitle")}
             </p>
           </div>
-        ) : (
-          <div className="mt-6 space-y-4">
-            {course.modules.map((mod) => (
-              <div
-                key={mod.id}
-                className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs space-y-3"
-              >
-                <div className="flex items-center justify-between border-b border-outline-variant pb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded bg-primary-container px-2 py-0.5 text-xs font-bold text-on-primary-container">
-                        {t("common.moduleLabel")} {mod.position}
-                      </span>
-                      <h3 className="text-sm font-bold text-on-surface">
-                        {mod.title}
-                      </h3>
-                    </div>
-                    {mod.description && (
-                      <p className="mt-1 text-xs text-secondary">
-                        {mod.description}
-                      </p>
-                    )}
-                  </div>
-                  <span className="font-mono text-xs text-secondary">
-                    {t.tn("common.lessonCountLower", mod.lessons.length)}
-                  </span>
-                </div>
 
-                <div className="space-y-1.5 pl-2">
-                  {mod.lessons.length === 0 ? (
-                    <p className="text-xs text-outline italic">
-                      {t("marketing.courseDetail.lessonsPreparing")}
-                    </p>
-                  ) : (
-                    mod.lessons.map((lesson) => (
-                      <div
-                        key={lesson.id}
-                        className="flex items-center justify-between rounded-lg bg-surface-container-low px-3 py-2 text-xs"
-                      >
-                        <div className="flex min-w-0 items-center gap-2">
-                          <span className="font-mono text-[11px] text-secondary">
-                            {mod.position}.{lesson.position}
-                          </span>
-                          <span className="truncate font-medium text-on-surface">
-                            {lesson.title}
-                          </span>
-                          {lesson.isFree && (
-                            <span className="shrink-0 rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700">
-                              {t("materials.freePreview")}
-                            </span>
-                          )}
-                        </div>
+          {course.modules.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-outline-variant bg-surface-0 p-10 text-center">
+              <p className="text-sm text-ink-500">
+                {t("marketing.courseDetail.curriculumPreparing")}
+              </p>
+            </div>
+          ) : (
+            <ol className="space-y-3">
+              {course.modules.map((mod) => (
+                <li
+                  key={mod.id}
+                  className="overflow-hidden rounded-2xl border border-outline-variant bg-surface-0"
+                >
+                  <div className="flex flex-col gap-2 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-primary-container px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-on-primary-container">
+                          Module {mod.position}
+                        </span>
+                        <h3 className="truncate text-sm font-semibold text-ink-900 sm:text-base">
+                          {mod.title}
+                        </h3>
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                      {mod.description ? (
+                        <p className="mt-1 text-xs text-ink-500">{mod.description}</p>
+                      ) : null}
+                    </div>
+                    <span className="shrink-0 text-xs font-medium text-ink-500">
+                      {t.tn("common.lessonCountLower", mod.lessons.length)}
+                    </span>
+                  </div>
+                  <ul className="divide-y divide-outline-variant">
+                    {mod.lessons.length === 0 ? (
+                      <li className="px-4 py-3 text-xs italic text-ink-500 sm:px-5">
+                        {t("marketing.courseDetail.lessonsPreparing")}
+                      </li>
+                    ) : (
+                      mod.lessons.map((lesson) => (
+                        <li
+                          key={lesson.id}
+                          className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs sm:px-5"
+                        >
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="font-mono text-[11px] text-ink-500">
+                              {mod.position}.{lesson.position}
+                            </span>
+                            <PlayIcon size={12} className="text-ink-500" />
+                            <span className="truncate font-medium text-ink-900">
+                              {lesson.title}
+                            </span>
+                            {lesson.isFree ? (
+                              <Badge tone="success" size="xs">
+                                Free
+                              </Badge>
+                            ) : null}
+                          </div>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </li>
+              ))}
+            </ol>
+          )}
+        </Container>
       </section>
     </div>
   );

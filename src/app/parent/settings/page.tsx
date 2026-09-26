@@ -32,7 +32,7 @@ export default async function ParentSettingsPage() {
     });
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 space-y-6">
+    <main id="main-content" className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 space-y-6">
       <div>
         <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700">
           {t("nav.parent.settings")}

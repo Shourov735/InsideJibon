@@ -213,7 +213,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
           aria-label="Dismiss notification"
         >
           <svg
-            className="h-4 w-4"
+        className="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

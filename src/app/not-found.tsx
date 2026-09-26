@@ -14,7 +14,7 @@ export default async function NotFound() {
   const t = await getTranslator();
 
   return (
-    <main className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-16 text-center">
+    <main id="main-content" className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-16 text-center">
       <div className="bento-card flex max-w-md flex-col items-center p-8 sm:p-10">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <span className="font-mono text-2xl font-bold">404</span>

@@ -7,8 +7,8 @@ import {
 } from "@/services/exams";
 import { getTeacherCourseById } from "@/services/courses";
 import { getTranslator } from "@/i18n/server";
-import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamDetailView } from "@/components/teacher/exams/exam-detail-view";
+import { Container } from "@/components/shared/ui/container";
 
 interface ExamDetailPageProps {
   params: Promise<{ examId: string }>;
@@ -41,16 +41,12 @@ export default async function ExamDetailPage({ params }: ExamDetailPageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      <TeacherNav user={teacher} activeSection="exams" />
-
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 space-y-6">
-        <ExamDetailView
-          exam={exam}
-          course={course}
-          publishCheck={publishCheck}
-        />
-      </main>
-    </div>
+    <Container className="py-6 sm:py-8" size="lg">
+      <ExamDetailView
+        exam={exam}
+        course={course}
+        publishCheck={publishCheck}
+      />
+    </Container>
   );
 }

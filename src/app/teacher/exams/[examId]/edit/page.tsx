@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherExamById } from "@/services/exams";
 import { getTeacherCourseById } from "@/services/courses";
-import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamForm } from "@/components/teacher/exams/exam-form";
 import { getTranslator } from "@/i18n/server";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { ChevronRightIcon, TrophyIcon } from "@/components/shared/ui/icons";
 
 interface ExamEditPageProps {
   params: Promise<{ examId: string }>;
@@ -37,66 +39,38 @@ export default async function ExamEditPage({ params }: ExamEditPageProps) {
   const course = await getTeacherCourseById(teacher.id, exam.courseId);
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      <TeacherNav user={teacher} activeSection="exams" />
+    <Container className="py-6 sm:py-8" size="lg">
+      <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-1.5 text-xs text-ink-500">
+        <Link href="/teacher/exams" className="hover:text-ink-900 transition-colors">
+          {t("teacher.examForm.breadcrumb.exams")}
+        </Link>
+        <ChevronRightIcon size={12} />
+        <Link
+          href={`/teacher/exams/${exam.id}`}
+          className="max-w-[160px] truncate hover:text-ink-900 transition-colors"
+        >
+          {exam.title}
+        </Link>
+        <ChevronRightIcon size={12} />
+        <span className="font-medium text-ink-700">
+          {t("teacher.examForm.breadcrumb.settings")}
+        </span>
+      </nav>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 space-y-6">
-        {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-xs font-medium text-secondary">
-          <Link href="/teacher/exams" className="hover:text-primary transition-colors">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <TrophyIcon size={14} />
             {t("teacher.examForm.breadcrumb.exams")}
-          </Link>
-          <svg
-            className="h-3 w-3 text-outline"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-          </svg>
-          <Link
-            href={`/teacher/exams/${exam.id}`}
-            className="hover:text-primary transition-colors truncate max-w-xs"
-          >
-            {exam.title}
-          </Link>
-          <svg
-            className="h-3 w-3 text-outline"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-          </svg>
-          <span className="text-on-surface font-semibold">
-            {t("teacher.examForm.breadcrumb.settings")}
           </span>
-        </div>
+        }
+        title={t("teacher.examForm.titleEditSettings")}
+        description={t("teacher.examForm.settingsDesc")}
+      />
 
-        {/* Card Container */}
-        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 sm:p-8 shadow-xs">
-          <div className="border-b border-outline-variant pb-5">
-            <div className="flex items-center gap-2">
-              <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                {t("teacher.examForm.breadcrumb.settings")}
-              </span>
-              <span className="text-xs text-secondary">
-                • {t("teacher.examForm.metadataBadge")}
-              </span>
-            </div>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface">
-              {t("teacher.examForm.titleEditSettings")}
-            </h1>
-            <p className="mt-1 text-sm text-on-surface-variant">
-              {t("teacher.examForm.settingsDesc")}
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <ExamForm mode="edit" exam={exam} associatedCourse={course} />
-          </div>
-        </div>
-      </main>
-    </div>
+      <div className="mt-6 rounded-3xl border border-outline-variant bg-surface-0 p-5 sm:p-8">
+        <ExamForm mode="edit" exam={exam} associatedCourse={course} />
+      </div>
+    </Container>
   );
 }

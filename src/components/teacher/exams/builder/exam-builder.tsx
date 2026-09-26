@@ -263,7 +263,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             className="flex items-center gap-1 rounded-lg border border-outline-variant bg-surface-container-low px-2 sm:px-3 py-1.5 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors shrink-0"
           >
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -303,7 +303,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             <div className="hidden items-center gap-1.5 text-xs font-medium md:flex">
               <span className="flex items-center gap-1.5 text-secondary">
                 <svg
-                  className="h-3.5 w-3.5 animate-spin text-primary"
+        className="h-3.5 w-3.5 animate-spin text-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -330,7 +330,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             <div className="hidden items-center gap-1 text-xs font-medium md:flex">
               <span className="flex items-center gap-1 text-emerald-700">
                 <svg
-                  className="h-3.5 w-3.5 text-emerald-600"
+        className="h-3.5 w-3.5 text-emerald-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -351,7 +351,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             <div className="hidden items-center gap-1 text-xs font-medium md:flex">
               <span className="flex items-center gap-1 text-error">
                 <svg
-                  className="h-3.5 w-3.5 text-error"
+        className="h-3.5 w-3.5 text-error"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -380,7 +380,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             className="inline-flex items-center gap-1 rounded-lg border border-outline-variant bg-surface-container-low px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
           >
             <svg
-              className="h-4 w-4 text-secondary"
+        className="h-4 w-4 text-secondary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -412,7 +412,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             }`}
           >
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -437,7 +437,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
         <div className="bg-amber-100 border-b border-amber-300 px-4 py-2.5 text-xs text-amber-950 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <svg
-              className="h-4 w-4 text-amber-800 shrink-0"
+        className="h-4 w-4 text-amber-800 shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -518,7 +518,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                     className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container hover:text-on-primary-container transition-colors cursor-pointer"
                   >
                     <svg
-                      className="h-4 w-4"
+        className="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -546,7 +546,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                     className="rounded-xl border border-outline-variant bg-surface-container-lowest p-2 text-secondary hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
                   >
                     <svg
-                      className="h-4 w-4"
+        className="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -667,7 +667,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
           {errorMessage ? (
             <div className="m-4 mb-0 flex items-start gap-3 rounded-xl border border-error-container bg-error-container/40 p-4 text-xs text-on-error-container">
               <svg
-                className="h-4 w-4 shrink-0 text-error mt-0.5"
+        className="h-4 w-4 shrink-0 text-error mt-0.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -710,7 +710,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
             <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-container-high text-secondary">
                 <svg
-                  className="h-8 w-8"
+        className="h-8 w-8"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -737,7 +737,7 @@ export function ExamBuilder({ exam, courseTitle }: ExamBuilderProps) {
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-on-primary shadow-xs hover:bg-primary-container transition-colors cursor-pointer"
                   >
                     <svg
-                      className="h-4 w-4"
+        className="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

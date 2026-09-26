@@ -12,12 +12,23 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: "/continue",
   },
   images: {
-    // Clerk profile photos, YouTube oEmbed thumbnails, and R2 CDN public assets
+    // Clerk profile photos, YouTube oEmbed thumbnails, R2 CDN public assets,
+    // Cloudinary (legacy instructor avatars + R5 course covers uploaded before
+    // the R2 migration), and Dhaka University (legacy course thumbnails in
+    // R0 imports — `ssl.du.ac.bd`). Keep this list aligned with `img-src` in
+    // the CSP below so allowed hosts agree.
     remotePatterns: [
       { protocol: "https", hostname: "img.clerk.com" },
       { protocol: "https", hostname: "cdn.insidejibon.com.bd" },
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "img.youtube.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "ssl.du.ac.bd" },
+      { protocol: "https", hostname: "du.ac.bd" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "lh4.googleusercontent.com" },
+      { protocol: "https", hostname: "lh5.googleusercontent.com" },
+      { protocol: "https", hostname: "lh6.googleusercontent.com" },
     ],
   },
   async headers() {
@@ -76,7 +87,14 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube.com https://www.youtube.com/iframe_api https://s.ytimg.com",
+              // `'unsafe-eval'` is needed in development because React's
+              // error-overlay and Clerk's hosted UI use eval() to reconstruct
+              // stack traces and lazy-mount components. We scope it to dev
+              // only so production remains strict. The presence of `'unsafe-eval'`
+              // also forces Clerk UI to mount within the 10s timeout instead
+              // of failing silently (Clerk logs `[Clerk UI] Component renderer
+              // did not mount within 10s` when it can't get eval()).
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.youtube.com https://www.youtube.com/iframe_api https://s.ytimg.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",

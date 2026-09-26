@@ -3,10 +3,13 @@ import Link from "next/link";
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherExams } from "@/services/exams";
 import { getTeacherCourses } from "@/services/courses";
-import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ExamDirectory } from "@/components/teacher/exams/exam-directory";
 import { getTranslator } from "@/i18n/server";
 import type { ExamStatus } from "@/services/exams/exams";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { Button } from "@/components/shared/ui/button";
+import { PlusIcon, TrophyIcon } from "@/components/shared/ui/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -34,46 +37,28 @@ export default async function TeacherExamsPage({ searchParams }: PageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      <TeacherNav user={teacher} activeSection="exams" />
-
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
-                {t("teacher.exams.badge")}
-              </span>
-            </div>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-              {t("teacher.exams.title")}
-            </h1>
-            <p className="mt-1 text-sm text-on-surface-variant max-w-2xl">
-              {t("teacher.exams.subtitle")}
-            </p>
-          </div>
-
-          <Link
-            href="/teacher/exams/new"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container hover:text-on-primary-container shrink-0"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>{t("teacher.exams.create")}</span>
+    <Container className="py-6 sm:py-8" size="xl">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <TrophyIcon size={14} />
+            {t("teacher.exams.badge")}
+          </span>
+        }
+        title={t("teacher.exams.title")}
+        description={t("teacher.exams.subtitle")}
+        actions={
+          <Link href="/teacher/exams/new">
+            <Button variant="primary" size="md" leadingIcon={<PlusIcon size={14} />}>
+              {t("teacher.exams.create")}
+            </Button>
           </Link>
-        </div>
+        }
+      />
 
-        {/* Directory Dashboard */}
+      <div className="mt-6">
         <ExamDirectory exams={examsList} courses={coursesList} />
-      </main>
-    </div>
+      </div>
+    </Container>
   );
 }

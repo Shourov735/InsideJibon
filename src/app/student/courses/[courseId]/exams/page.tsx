@@ -40,14 +40,14 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
   const completedExams = examsList.filter((e) => e.attemptsUsed > 0).length;
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <main id="main-content" className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
         <Link href="/student" className="hover:text-primary transition-colors">
           {t("nav.student.dashboard")}
         </Link>
         <svg
-          className="h-3 w-3 text-outline"
+        className="h-3 w-3 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -62,7 +62,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
           {t("nav.student.courses")}
         </Link>
         <svg
-          className="h-3 w-3 text-outline"
+        className="h-3 w-3 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -77,7 +77,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
           {course.title}
         </Link>
         <svg
-          className="h-3 w-3 text-outline"
+        className="h-3 w-3 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -108,7 +108,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
           href={`/student/courses/${courseId}/learn`}
           className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-xs font-semibold text-on-surface transition-colors hover:bg-surface-container hover:text-primary shrink-0"
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           <span>{t("student.exams.returnToLessons")}</span>
@@ -145,7 +145,7 @@ export default async function CourseExamsPage({ params }: ExamsListPageProps) {
           <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center shadow-xs space-y-3">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
               <svg
-                className="h-7 w-7"
+        className="h-7 w-7"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

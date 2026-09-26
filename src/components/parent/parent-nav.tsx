@@ -1,29 +1,29 @@
-import { Suspense } from "react";
 import type { CurrentUser } from "@/lib/auth";
+import { getTranslator } from "@/i18n/server";
 import { ParentNavClient } from "./parent-nav-client";
 
 interface ParentNavProps {
   user: CurrentUser;
-  activeSection?: "dashboard" | "settings";
+  activeSection?: "dashboard" | "settings" | "invite";
 }
 
-/**
- * R7 — Parent top navigation. Currently a simple shell; the bell
- * comes from a generic in-app bell we re-use from the student layout
- * (or omit, since parents consume digest email rather than in-app
- * toasts).
- */
 export async function ParentNav({
   user,
   activeSection = "dashboard",
 }: ParentNavProps) {
+  const t = await getTranslator();
   return (
-    <Suspense
-      fallback={
-        <span className="h-16 w-full border-b border-outline-variant bg-surface" />
-      }
-    >
-      <ParentNavClient user={user} activeSection={activeSection} />
-    </Suspense>
+    <ParentNavClient
+      user={user}
+      activeSection={activeSection}
+      labels={{
+        dashboard: t("nav.dashboard"),
+        children: t("nav.parent.children"),
+        settings: t("nav.parent.settings"),
+        invite: t("parent.invite.title"),
+        menu: t("nav.menu"),
+        more: t("nav.more"),
+      }}
+    />
   );
 }

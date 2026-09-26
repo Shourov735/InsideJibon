@@ -116,7 +116,7 @@ export function StudentAssignmentWorkspace({
           className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-3.5 py-2 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors shrink-0"
         >
           <svg
-            className="h-4 w-4"
+        className="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -138,7 +138,7 @@ export function StudentAssignmentWorkspace({
           className="flex items-start gap-3 rounded-xl border border-error/30 bg-error-container/40 p-4 text-xs font-medium text-on-error-container"
         >
           <svg
-            className="h-4 w-4 text-error shrink-0 mt-0.5"
+        className="h-4 w-4 text-error shrink-0 mt-0.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -160,7 +160,7 @@ export function StudentAssignmentWorkspace({
           <div className="flex items-center justify-between border-b border-emerald-200 pb-3">
             <div className="flex items-center gap-2 text-emerald-900">
               <svg
-                className="h-5 w-5 text-emerald-700"
+        className="h-5 w-5 text-emerald-700"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -217,7 +217,7 @@ export function StudentAssignmentWorkspace({
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-on-primary shrink-0">
               <svg
-                className="h-5 w-5"
+        className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -253,7 +253,7 @@ export function StudentAssignmentWorkspace({
       {isClosed && !isSubmitted && !isGraded ? (
         <div className="rounded-2xl border border-slate-300 bg-slate-100 p-4 text-xs font-medium text-slate-800 flex items-center gap-2.5">
           <svg
-            className="h-4 w-4 text-slate-600 shrink-0"
+        className="h-4 w-4 text-slate-600 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

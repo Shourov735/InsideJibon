@@ -116,7 +116,7 @@ export function ExamForm({
       {error && (
         <div className="flex items-start gap-3 rounded-xl border border-error-container bg-error-container/40 p-4 text-sm text-on-error-container">
           <svg
-            className="h-5 w-5 shrink-0 text-error"
+        className="h-5 w-5 shrink-0 text-error"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -336,7 +336,7 @@ export function ExamForm({
           {submitting ? (
             <>
               <svg
-                className="h-4 w-4 animate-spin"
+        className="h-4 w-4 animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
               >

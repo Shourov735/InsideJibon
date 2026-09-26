@@ -26,7 +26,7 @@ export function CommandTrigger({ className }: CommandTriggerProps) {
       type="button"
       onClick={open}
       className={
-        "inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-xs text-secondary hover:bg-surface-container hover:text-on-surface transition-colors " +
+        "inline-flex h-9 items-center gap-2 rounded-full border border-outline-variant bg-surface-0 px-3 text-xs text-ink-700 transition-colors hover:bg-surface-1 focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2 " +
         (className ?? "")
       }
       aria-label={t("command.title")}
@@ -41,7 +41,7 @@ export function CommandTrigger({ className }: CommandTriggerProps) {
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
       </svg>
       <span className="hidden sm:inline">{t("command.placeholder").split("…")[0]}</span>
-      <kbd className="hidden sm:inline rounded border border-outline-variant bg-surface-container-low px-1 font-mono text-[10px]">
+      <kbd className="hidden sm:inline rounded border border-outline-variant bg-surface-1 px-1 font-mono text-[10px]">
         ⌘K
       </kbd>
     </button>

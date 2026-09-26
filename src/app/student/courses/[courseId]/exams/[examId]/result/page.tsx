@@ -51,14 +51,14 @@ export default async function ResultPage({
   if (!result) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 space-y-6">
+    <main id="main-content" className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 space-y-6">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs font-medium text-secondary">
         <Link href="/student" className="hover:text-primary transition-colors">
           {t("nav.student.dashboard")}
         </Link>
         <svg
-          className="h-3 w-3 text-outline"
+        className="h-3 w-3 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -73,7 +73,7 @@ export default async function ResultPage({
           {t("nav.student.courses")}
         </Link>
         <svg
-          className="h-3 w-3 text-outline"
+        className="h-3 w-3 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -88,7 +88,7 @@ export default async function ResultPage({
           {t("student.exams.breadcrumb")}
         </Link>
         <svg
-          className="h-3 w-3 text-outline"
+        className="h-3 w-3 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -103,7 +103,7 @@ export default async function ResultPage({
           {result.examTitle}
         </Link>
         <svg
-          className="h-3 w-3 text-outline"
+        className="h-3 w-3 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

@@ -224,7 +224,7 @@ export function ExamTaker({
             <div className="flex items-center gap-3 border-b border-outline-variant pb-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <svg
-                  className="h-5 w-5"
+        className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -294,7 +294,7 @@ export function ExamTaker({
               {unansweredCount > 0 ? (
                 <div className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50/80 p-3 text-amber-900">
                   <svg
-                    className="h-4 w-4 shrink-0 text-amber-700 mt-0.5"
+        className="h-4 w-4 shrink-0 text-amber-700 mt-0.5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -336,7 +336,7 @@ export function ExamTaker({
                 {isSubmitting ? (
                   <>
                     <svg
-                      className="h-3.5 w-3.5 animate-spin"
+        className="h-3.5 w-3.5 animate-spin"
                       fill="none"
                       viewBox="0 0 24 24"
                     >

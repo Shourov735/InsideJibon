@@ -4,6 +4,9 @@ import { requireTeacher } from "@/lib/permissions";
 import { getTranslator } from "@/i18n/server";
 import { getRoutineForUser } from "@/services/classes";
 import { ScheduleView } from "@/components/shared/live/schedule-view";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { CalendarIcon } from "@/components/shared/ui/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -24,40 +27,43 @@ export default async function TeacherSchedulePage() {
   const cells = await getRoutineForUser(user.id, "teacher", weekStart);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-      <header className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wider text-secondary">
-          {t("schedule.nav")}
-        </p>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-on-surface">
-          {t("schedule.weekOf", {
-            date: new Intl.DateTimeFormat(t.locale === "bn" ? "bn-BD" : "en-US", {
-              month: "short",
-              day: "numeric",
-            }).formatRange(weekStart, weekEnd),
-          })}
-        </h1>
-        <p className="text-sm text-secondary">{t("schedule.hostBadge")}</p>
-      </header>
-      <ScheduleView
-        locale={t.locale}
-        weekStartIso={weekStart.toISOString()}
-        weekEndIso={weekEnd.toISOString()}
-        viewerRole="teacher"
-        cells={cells.map((c) => ({
-          sessionId: c.sessionId,
-          courseId: c.courseId,
-          courseTitle: c.courseTitle,
-          title: c.title,
-          scheduledAt: c.scheduledAt.toISOString(),
-          durationMinutes: c.durationMinutes,
-          status: c.status,
-          youtubeLiveVideoId: c.youtubeLiveVideoId,
-          youtubeReplayVideoId: c.youtubeReplayVideoId,
-          replayStatus: c.replayStatus,
-        }))}
+    <Container className="py-6 sm:py-8" size="xl">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <CalendarIcon size={14} />
+            {t("schedule.nav")}
+          </span>
+        }
+        title={t("schedule.weekOf", {
+          date: new Intl.DateTimeFormat(t.locale === "bn" ? "bn-BD" : "en-US", {
+            month: "short",
+            day: "numeric",
+          }).formatRange(weekStart, weekEnd),
+        })}
+        description={t("schedule.hostBadge")}
       />
-    </main>
+      <div className="mt-6">
+        <ScheduleView
+          locale={t.locale}
+          weekStartIso={weekStart.toISOString()}
+          weekEndIso={weekEnd.toISOString()}
+          viewerRole="teacher"
+          cells={cells.map((c) => ({
+            sessionId: c.sessionId,
+            courseId: c.courseId,
+            courseTitle: c.courseTitle,
+            title: c.title,
+            scheduledAt: c.scheduledAt.toISOString(),
+            durationMinutes: c.durationMinutes,
+            status: c.status,
+            youtubeLiveVideoId: c.youtubeLiveVideoId,
+            youtubeReplayVideoId: c.youtubeReplayVideoId,
+            replayStatus: c.replayStatus,
+          }))}
+        />
+      </div>
+    </Container>
   );
 }
 

@@ -14,6 +14,11 @@ import { EmptyState } from "@/components/shared/feedback";
 import { ParentOverviewClient } from "@/components/parent/parent-overview-client";
 import type { DashboardChild, DashboardUpcoming } from "@/components/parent/parent-overview-client";
 
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { Button } from "@/components/shared/ui/button";
+import { ArrowRightIcon, UsersIcon } from "@/components/shared/ui/icons";
+
 export const dynamic = "force-dynamic";
 
 export default async function ParentDashboardPage({
@@ -27,51 +32,36 @@ export default async function ParentDashboardPage({
 
   if (linked.length === 0) {
     return (
-      <main className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
-        <div className="mb-8">
-          <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse" />
-            {t("parent.dashboard.title")}
-          </span>
-          <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-            {t("parent.dashboard.welcome", {
-              name:
-                user.name?.split(" ")[0] ||
-                t("parent.dashboard.guestFallback"),
-            })}
-          </h1>
-          <p className="mt-1 text-sm text-secondary">
-            {t("parent.dashboard.introEmpty")}
-          </p>
-        </div>
-        <EmptyState
-          icon={
-            <svg
-              className="h-6 w-6 text-rose-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-3.13a4 4 0 100-8 4 4 0 000 8zm6 0a4 4 0 100-8 4 4 0 000 8z"
-              />
-            </svg>
+      <Container className="py-8 sm:py-12" size="md">
+        <PageHeader
+          eyebrow={
+            <span className="inline-flex items-center gap-1.5 text-rose-700">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-600" />
+              {t("parent.dashboard.title")}
+            </span>
           }
-          title={t("parent.dashboard.empty.title")}
-          description={t("parent.dashboard.empty.description")}
-          action={
-            <Link
-              href="/parent/invite"
-              className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-rose-700 transition-colors"
-            >
-              {t("parent.dashboard.empty.cta")} →
-            </Link>
-          }
+          title={t("parent.dashboard.welcome", {
+            name:
+              user.name?.split(" ")[0] ||
+              t("parent.dashboard.guestFallback"),
+          })}
+          description={t("parent.dashboard.introEmpty")}
         />
-      </main>
+        <div className="mt-8">
+          <EmptyState
+            icon={<UsersIcon size={20} className="text-rose-600" />}
+            title={t("parent.dashboard.empty.title")}
+            description={t("parent.dashboard.empty.description")}
+            action={
+              <Link href="/parent/invite">
+                <Button variant="primary" size="md" trailingIcon={<ArrowRightIcon size={14} />}>
+                  {t("parent.dashboard.empty.cta")}
+                </Button>
+              </Link>
+            }
+          />
+        </div>
+      </Container>
     );
   }
 
@@ -112,26 +102,26 @@ export default async function ParentDashboardPage({
   }));
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 space-y-6">
-      <div>
-        <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse" />
-          {t("parent.dashboard.title")}
-        </span>
-        <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-          {t("parent.dashboard.welcome", {
-            name: user.name?.split(" ")[0] || user.email.split("@")[0],
-          })}
-        </h1>
-        <p className="mt-1 text-sm text-secondary">
-          {t("parent.dashboard.intro")}
-        </p>
-      </div>
-
-      <ParentOverviewClient
-        childList={childList}
-        activeChildId={activeChildId}
+    <Container className="py-6 sm:py-8" size="xl">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-rose-700">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-600" />
+            {t("parent.dashboard.title")}
+          </span>
+        }
+        title={t("parent.dashboard.welcome", {
+          name: user.name?.split(" ")[0] || user.email.split("@")[0],
+        })}
+        description={t("parent.dashboard.intro")}
       />
-    </main>
+
+      <div className="mt-6">
+        <ParentOverviewClient
+          childList={childList}
+          activeChildId={activeChildId}
+        />
+      </div>
+    </Container>
   );
 }

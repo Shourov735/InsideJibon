@@ -66,7 +66,7 @@ export function SearchFilterBar({
       {/* Search Input */}
       <div className="relative flex-1 min-w-0">
         <svg
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline"
+        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -104,8 +104,9 @@ export function SearchFilterBar({
       {/* Clear Button */}
       {hasFilters && (
         <button
+          type="button"
           onClick={clearAll}
-          className="shrink-0 rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-xs font-medium text-secondary transition-colors hover:bg-surface-container hover:text-on-surface"
+          className="inline-flex h-9 shrink-0 items-center rounded-lg border border-outline-variant bg-surface-0 px-3 text-xs font-medium text-ink-500 transition-colors hover:bg-surface-1 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2"
         >
           {t("common.clearFilters")}
         </button>

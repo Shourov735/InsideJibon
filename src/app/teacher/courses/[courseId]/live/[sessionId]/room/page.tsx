@@ -10,6 +10,9 @@ import { classSessions, courses } from "@/db/schema";
 import { getTranslator } from "@/i18n/server";
 import { signClassroomTicket, encodeTicket } from "@/lib/live-ticket";
 import { ClassroomRoom } from "@/components/shared/live/classroom-room";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { VideoIcon } from "@/components/shared/ui/icons";
 
 interface PageProps {
   params: Promise<{ courseId: string; sessionId: string }>;
@@ -76,32 +79,36 @@ export default async function TeacherLiveRoomPage({ params }: PageProps) {
   const t = await getTranslator();
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 space-y-4">
-      <header className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-wider text-secondary">
-          {row.course.title}
-        </p>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-on-surface">
-          {row.session.title}
-        </h1>
-        <p className="text-xs text-secondary">{t("live.room.hostBadge")}</p>
-      </header>
-      <ClassroomRoom
-        locale={t.locale}
-        sessionId={sessionId}
-        courseId={courseId}
-        courseTitle={row.course.title}
-        teacherName={user.name ?? "Teacher"}
-        ticket={ticket.sig}
-        encodedTicket={encoded}
-        initialYoutubeLiveVideoId={row.session.youtubeLiveVideoId}
-        initialYoutubeReplayVideoId={row.session.youtubeReplayVideoId}
-        initialReplayStatus={row.session.replayStatus}
-        viewerRole="teacher"
-        viewerId={user.id}
-        viewerName={user.name ?? "Teacher"}
-        teacherControls
+    <Container className="py-6 sm:py-8" size="xl">
+      <PageHeader
+        size="compact"
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <VideoIcon size={14} />
+            {row.course.title}
+          </span>
+        }
+        title={row.session.title}
+        description={t("live.room.hostBadge")}
       />
-    </main>
+      <div className="mt-6">
+        <ClassroomRoom
+          locale={t.locale}
+          sessionId={sessionId}
+          courseId={courseId}
+          courseTitle={row.course.title}
+          teacherName={user.name ?? "Teacher"}
+          ticket={ticket.sig}
+          encodedTicket={encoded}
+          initialYoutubeLiveVideoId={row.session.youtubeLiveVideoId}
+          initialYoutubeReplayVideoId={row.session.youtubeReplayVideoId}
+          initialReplayStatus={row.session.replayStatus}
+          viewerRole="teacher"
+          viewerId={user.id}
+          viewerName={user.name ?? "Teacher"}
+          teacherControls
+        />
+      </div>
+    </Container>
   );
 }

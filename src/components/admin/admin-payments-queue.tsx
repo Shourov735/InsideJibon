@@ -140,6 +140,7 @@ function FilterBar({
         name="search"
         defaultValue={activeSearch}
         placeholder="TrxID…"
+        aria-label="Search by transaction ID"
         className="rounded-md border border-outline-variant bg-surface px-3 py-1.5 text-xs"
       />
       <div className="flex flex-wrap items-center gap-1">

@@ -204,7 +204,7 @@ export function AssignmentSubmissionForm({
               </svg>
             ) : (
               <svg
-                className="h-6 w-6"
+        className="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -246,7 +246,7 @@ export function AssignmentSubmissionForm({
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-on-primary shadow-xs hover:bg-primary-container hover:text-on-primary-container disabled:opacity-50 transition-colors"
           >
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -278,7 +278,7 @@ export function AssignmentSubmissionForm({
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
                 <svg
-                  className="h-5 w-5"
+        className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -329,7 +329,7 @@ export function AssignmentSubmissionForm({
                 {isSubmitting ? (
                   <>
                     <svg
-                      className="h-4 w-4 animate-spin"
+        className="h-4 w-4 animate-spin"
                       fill="none"
                       viewBox="0 0 24 24"
                     >

@@ -33,11 +33,10 @@ export function FileTypeIcon({
     case "pdf":
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-error/20 bg-error-container text-error ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-error/20 bg-error-container text-error ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -60,11 +59,10 @@ export function FileTypeIcon({
     case "doc":
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-secondary-container bg-secondary-container text-on-secondary-container ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-secondary-container bg-secondary-container text-on-secondary-container ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -82,11 +80,10 @@ export function FileTypeIcon({
     case "ppt":
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-amber-200 bg-amber-100 text-amber-800 ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-amber-200 bg-amber-100 text-amber-800 ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -104,11 +101,10 @@ export function FileTypeIcon({
     case "xls":
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-emerald-200 bg-emerald-100 text-emerald-800 ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-emerald-200 bg-emerald-100 text-emerald-800 ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -126,11 +122,10 @@ export function FileTypeIcon({
     case "image":
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-purple-200 bg-purple-100 text-purple-800 ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-purple-200 bg-purple-100 text-purple-800 ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -148,11 +143,10 @@ export function FileTypeIcon({
     case "archive":
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-slate-300 bg-slate-200 text-slate-800 ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-slate-300 bg-slate-200 text-slate-800 ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -170,11 +164,10 @@ export function FileTypeIcon({
     case "text":
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-outline-variant bg-surface-container-high text-on-surface-variant ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-outline-variant bg-surface-container-high text-on-surface-variant ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -192,11 +185,10 @@ export function FileTypeIcon({
     default:
       return (
         <div
-          aria-hidden="true"
-          className={`flex shrink-0 items-center justify-center border border-outline-variant bg-surface-container text-secondary ${sizeClasses} ${className}`}
+        className={`flex shrink-0 items-center justify-center border border-outline-variant bg-surface-container text-secondary ${sizeClasses} ${className}`}
         >
           <svg
-            className={iconSizes}
+        className={iconSizes}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

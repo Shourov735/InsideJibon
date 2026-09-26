@@ -13,6 +13,15 @@ import { isUuid } from "@/services/qna/threads";
 import { getDb } from "@/db";
 import { courses, users } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { Tabs } from "@/components/shared/ui/tabs";
+import { Badge } from "@/components/shared/ui/badge";
+import { ResponsiveTable } from "@/components/shared/ui/responsive-table";
+import { EmptyState } from "@/components/shared/feedback/empty-state";
+import { Stat } from "@/components/shared/ui/stat";
+import { TrophyIcon } from "@/components/shared/ui/icons";
+import { cn } from "@/lib/utils";
 
 /**
  * R4 Leaderboard — top 20 students by XP earned this week. Two scopes:
@@ -68,6 +77,9 @@ export default async function LeaderboardPage({
         user={user}
         weekStart={weekStart}
         t={t}
+        courseTitle={courseTitle}
+        courseId={courseId}
+        isLeague
       />
     );
   }
@@ -89,53 +101,38 @@ export default async function LeaderboardPage({
 
   const weekIso = board.weekStart;
 
-  return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
-      <header className="mb-8">
-        <p className="font-mono text-xs font-semibold uppercase tracking-wide text-secondary">
-          {t("leaderboard.weeklyWeek", { date: weekIso })}
-        </p>
-        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-on-surface">
-          {t("leaderboard.title")}
-        </h1>
-        <p className="mt-2 text-sm text-secondary">
-          {courseId
-            ? courseTitle ?? t("leaderboard.subtitle.course")
-            : t("leaderboard.subtitle.global")}
-        </p>
-      </header>
+  const viewTabs = [
+    { value: "global", label: t("leaderboard.view.global"), href: "/leaderboard" },
+    { value: "league", label: t("leaderboard.view.league"), href: "/leaderboard?view=league" },
+  ];
 
-      <nav
-        aria-label="Leaderboard view"
-        className="mb-6 inline-flex rounded-full border border-outline-variant bg-surface-container-lowest p-1 text-sm"
-      >
-        <ViewTab
-          href="/leaderboard"
-          active={!isLeague}
-          label={t("leaderboard.view.global")}
-        />
-        <ViewTab
-          href="/leaderboard?view=league"
-          active={isLeague}
-          label={t("leaderboard.view.league")}
-        />
-        {courseId ? (
-          <ViewTab
-            href={`/leaderboard?courseId=${courseId}`}
-            active={true}
-            label={courseTitle ?? t("leaderboard.scope.course")}
-          />
-        ) : null}
-      </nav>
+  return (
+    <Container className="py-6 sm:py-8" size="md">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <TrophyIcon size={14} />
+            {t("leaderboard.weeklyWeek", { date: weekIso })}
+          </span>
+        }
+        title={t("leaderboard.title")}
+        description={
+          courseId
+            ? courseTitle ?? t("leaderboard.subtitle.course")
+            : t("leaderboard.subtitle.global")
+        }
+        tabs={
+          <Tabs items={viewTabs} value={isLeague ? "league" : "global"} />
+        }
+      />
 
       {board.entries.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-10 text-center">
-          <p className="text-base font-semibold text-on-surface">
-            {t("leaderboard.empty.title")}
-          </p>
-          <p className="mt-1 text-sm text-secondary">
-            {t("leaderboard.empty.description")}
-          </p>
+        <div className="mt-6">
+          <EmptyState
+            icon={<TrophyIcon size={20} />}
+            title={t("leaderboard.empty.title")}
+            description={t("leaderboard.empty.description")}
+          />
         </div>
       ) : (
         <LeaderboardList
@@ -153,20 +150,20 @@ export default async function LeaderboardPage({
       )}
 
       {rank && rank.rank > 20 ? (
-        <p className="mt-6 text-center text-sm font-medium text-secondary">
+        <p className="mt-6 text-center text-sm font-medium text-ink-500">
           {t("leaderboard.yourRank", { rank: rank.rank, total: rank.total })}{" "}
-          <span className="text-on-surface-variant">
+          <span className="text-ink-700">
             ({t("leaderboard.yourXp", { xp: rank.xp })})
           </span>
         </p>
       ) : null}
 
-      <p className="mt-4 text-center text-xs text-outline">
+      <p className="mt-4 text-center text-xs text-ink-500">
         {t("leaderboard.lastUpdated", {
           when: new Date(board.computedAt).toLocaleString(),
         })}
       </p>
-    </main>
+    </Container>
   );
 }
 
@@ -174,10 +171,16 @@ async function LeagueTab({
   user,
   weekStart,
   t,
+  courseTitle,
+  courseId,
+  isLeague,
 }: {
   user: { id: string };
   weekStart: Date;
   t: Awaited<ReturnType<typeof getTranslator>>;
+  courseTitle: string | null;
+  courseId: string | null;
+  isLeague: boolean;
 }) {
   const [self, cohort] = await Promise.all([
     getCurrentLeague(user.id, weekStart),
@@ -198,117 +201,134 @@ async function LeagueTab({
     }
   }
 
-  return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
-      <header className="mb-8">
-        <p className="font-mono text-xs font-semibold uppercase tracking-wide text-secondary">
-          {t("leaderboard.weeklyWeek", { date: weekStart.toISOString().slice(0, 10) })}
-        </p>
-        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-on-surface">
-          {t("leaderboard.league.title")}
-        </h1>
-        <p className="mt-2 text-sm text-secondary">
-          {t("leaderboard.league.subtitle", {
-            league: self?.league ? t(`gamification.league.${self.league}`) : "—",
-            rank: self?.rank ?? "—",
-            total: cohort.cohort.length,
-          })}
-        </p>
-      </header>
+  const viewTabs = [
+    { value: "global", label: t("leaderboard.view.global"), href: "/leaderboard" },
+    { value: "league", label: t("leaderboard.view.league"), href: "/leaderboard?view=league" },
+  ];
 
-      <nav
-        aria-label="Leaderboard view"
-        className="mb-6 inline-flex rounded-full border border-outline-variant bg-surface-container-lowest p-1 text-sm"
-      >
-        <ViewTab href="/leaderboard" label={t("leaderboard.view.global")} active={false} />
-        <ViewTab href="/leaderboard?view=league" label={t("leaderboard.view.league")} active />
-      </nav>
+  return (
+    <Container className="py-6 sm:py-8" size="md">
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <TrophyIcon size={14} />
+            {t("leaderboard.weeklyWeek", {
+              date: weekStart.toISOString().slice(0, 10),
+            })}
+          </span>
+        }
+        title={t("leaderboard.league.title")}
+        description={t("leaderboard.league.subtitle", {
+          league: self?.league ? t(`gamification.league.${self.league}`) : "—",
+          rank: self?.rank ?? "—",
+          total: cohort.cohort.length,
+        })}
+        tabs={<Tabs items={viewTabs} value={isLeague ? "league" : "global"} />}
+      />
+
+      {self?.league ? (
+        <div className="mt-6">
+          <Stat
+            label={t("leaderboard.league.movement")}
+            value={
+              self.promoted
+                ? "↑ Promoted"
+                : self.relegated
+                  ? "↓ Relegated"
+                  : t("leaderboard.league.settled")
+            }
+            icon={<TrophyIcon size={18} />}
+            tone={self.promoted ? "success" : self.relegated ? "warning" : "neutral"}
+          />
+        </div>
+      ) : null}
 
       {cohort.cohort.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-10 text-center">
-          <p className="text-base font-semibold text-on-surface">
-            {t("leaderboard.empty.title")}
-          </p>
-          <p className="mt-1 text-sm text-secondary">
-            {t("leaderboard.league.emptyHint")}
-          </p>
+        <div className="mt-6">
+          <EmptyState
+            icon={<TrophyIcon size={20} />}
+            title={t("leaderboard.empty.title")}
+            description={t("leaderboard.league.emptyHint")}
+          />
         </div>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-outline-variant text-left text-xs font-medium uppercase tracking-wide text-secondary">
-              <th className="py-2 pl-2">{t("leaderboard.row.rank")}</th>
-              <th className="py-2">{t("leaderboard.row.student")}</th>
-              <th className="py-2 pr-2 text-right">{t("leaderboard.row.xp")}</th>
-              <th className="py-2 pr-2 text-right">{t("leaderboard.league.movement")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cohort.cohort.map((entry) => {
-              const meta = nameById.get(entry.userId);
-              const isMe = entry.userId === user.id;
-              return (
-                <tr
-                  key={entry.userId}
-                  className={
-                    isMe
-                      ? "border-b border-outline-variant bg-primary-container/30"
-                      : "border-b border-outline-variant"
-                  }
-                >
-                  <td className="py-3 pl-2 font-mono font-bold text-on-surface">
-                    #{entry.rank}
-                  </td>
-                  <td className="py-3">
+        <div className="mt-6">
+          <ResponsiveTable
+            columns={[
+              {
+                header: t("leaderboard.row.rank"),
+                mobileLabel: t("leaderboard.row.rank"),
+                cell: (e) => (
+                  <span className="font-mono font-bold text-ink-900">#{e.rank}</span>
+                ),
+              },
+              {
+                header: t("leaderboard.row.student"),
+                mobileLabel: t("leaderboard.row.student"),
+                mobilePrimary: true,
+                cell: (e) => {
+                  const isMe = e.userId === user.id;
+                  return (
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                        {(meta?.name ?? "U").charAt(0).toUpperCase()}
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-primary">
+                        {e.displayName.charAt(0).toUpperCase()}
                       </span>
-                      <span className="text-on-surface">{meta?.name ?? "Anonymous"}</span>
+                      <span className="text-ink-900">{e.displayName}</span>
                       {isMe ? (
-                        <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-on-primary">
-                          You
-                        </span>
+                        <Badge tone="primary" size="xs">You</Badge>
                       ) : null}
                     </div>
-                  </td>
-                  <td className="py-3 pr-2 text-right font-mono font-semibold text-on-surface">
-                    {(entry.xp ?? 0).toLocaleString()}
-                  </td>
-                  <td className="py-3 pr-2 text-right font-mono text-xs text-secondary">
-                    {isMe && self?.promoted ? "↑ promoted" : isMe && self?.relegated ? "↓ relegated" : "—"}
-                  </td>
-                </tr>
-              );
+                  );
+                },
+              },
+              {
+                header: t("leaderboard.row.xp"),
+                mobileLabel: t("leaderboard.row.xp"),
+                className: "text-right",
+                mobileClassName: "text-right",
+                cell: (e) => (
+                  <span className="font-mono font-semibold text-ink-900">
+                    {(e.xp ?? 0).toLocaleString()}
+                  </span>
+                ),
+              },
+            ]}
+            rows={cohort.cohort.map((entry) => {
+              const meta = nameById.get(entry.userId);
+              return {
+                ...entry,
+                displayName: meta?.name ?? "Anonymous",
+              };
             })}
-          </tbody>
-        </table>
+            rowKey={(r) => r.userId}
+            mobileLeading={(r) => (
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">
+                  {r.displayName.charAt(0).toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink-900">
+                    {r.displayName}
+                  </p>
+                  <p className="text-xs text-ink-500">#{r.rank} this week</p>
+                </div>
+              </div>
+            )}
+            mobileTrailing={(r) => (
+              <Badge tone="warning" size="sm">
+                {(r.xp ?? 0).toLocaleString()} XP
+              </Badge>
+            )}
+          />
+        </div>
       )}
-    </main>
-  );
-}
 
-function ViewTab({
-  href,
-  active,
-  label,
-}: {
-  href: string;
-  active: boolean;
-  label: string;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={
-        active
-          ? "rounded-full bg-primary px-4 py-1.5 text-on-primary shadow-xs"
-          : "rounded-full px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high"
-      }
-    >
-      {label}
-    </Link>
+      {courseId && courseTitle ? (
+        <p className="mt-4 text-center text-xs text-ink-500">
+          {courseTitle}
+        </p>
+      ) : null}
+    </Container>
   );
 }
 
@@ -338,7 +358,7 @@ function LeaderboardList({
   const rest = entries.slice(3);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Podium */}
       <section
         aria-label="Top 3"
@@ -355,31 +375,32 @@ function LeaderboardList({
                 : podiumLabels.third;
           const tone =
             podiumIdx === 0
-              ? "border-amber-300 bg-amber-50"
+              ? "border-amber-300 bg-gradient-to-b from-amber-50 to-surface-0"
               : podiumIdx === 1
-                ? "border-slate-300 bg-slate-50"
-                : "border-orange-300 bg-orange-50";
+                ? "border-slate-300 bg-gradient-to-b from-slate-50 to-surface-0"
+                : "border-orange-300 bg-gradient-to-b from-orange-50 to-surface-0";
           return (
             <article
               key={e.userId}
-              className={`flex flex-col items-center gap-2 rounded-2xl border-2 ${tone} p-5 text-center`}
+              className={cn(
+                "flex flex-col items-center gap-2 rounded-3xl border-2 p-5 text-center",
+                tone,
+              )}
             >
-              <span className="font-mono text-xs font-bold uppercase tracking-wide text-secondary">
+              <span className="text-micro font-bold uppercase tracking-wide text-ink-500">
                 #{e.rank} · {podiumLabel}
               </span>
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-on-primary">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary font-display text-lg font-bold text-on-primary">
                 {(e.userName ?? "U").charAt(0).toUpperCase()}
               </span>
-              <p className="text-sm font-semibold text-on-surface">
+              <p className="text-sm font-semibold text-ink-900">
                 {e.userName ?? "Anonymous"}
               </p>
-              <p className="font-mono text-xs text-secondary">
+              <p className="text-xs text-ink-500">
                 {e.xp.toLocaleString()} {xpLabel}
               </p>
               {e.userId === currentUserId ? (
-                <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-on-primary">
-                  You
-                </span>
+                <Badge tone="primary" size="xs">You</Badge>
               ) : null}
             </article>
           );
@@ -389,44 +410,67 @@ function LeaderboardList({
       {/* Rest of top 20 */}
       {rest.length > 0 ? (
         <section aria-label={rankLabel}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-outline-variant text-left text-xs font-medium uppercase tracking-wide text-secondary">
-                <th className="py-2 pl-2">{rankLabel}</th>
-                <th className="py-2">{studentLabel}</th>
-                <th className="py-2 pr-2 text-right">{xpLabel}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rest.map((e) => (
-                <tr
-                  key={e.userId}
-                  className={
-                    e.userId === currentUserId
-                      ? "border-b border-outline-variant bg-primary-container/30"
-                      : "border-b border-outline-variant"
-                  }
-                >
-                  <td className="py-3 pl-2 font-mono font-bold text-on-surface">
-                    #{e.rank}
-                  </td>
-                  <td className="py-3">
+          <ResponsiveTable
+            columns={[
+              {
+                header: rankLabel,
+                mobileLabel: rankLabel,
+                cell: (e) => (
+                  <span className="font-mono font-bold text-ink-900">#{e.rank}</span>
+                ),
+              },
+              {
+                header: studentLabel,
+                mobileLabel: studentLabel,
+                mobilePrimary: true,
+                cell: (e) => {
+                  const isMe = e.userId === currentUserId;
+                  return (
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                        {(e.userName ?? "U").charAt(0).toUpperCase()}
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-xs font-bold text-primary">
+                        {e.displayName.charAt(0).toUpperCase()}
                       </span>
-                      <span className="text-on-surface">
-                        {e.userName ?? "Anonymous"}
-                      </span>
+                      <span className="text-ink-900">{e.displayName}</span>
+                      {isMe ? (
+                        <Badge tone="primary" size="xs">You</Badge>
+                      ) : null}
                     </div>
-                  </td>
-                  <td className="py-3 pr-2 text-right font-mono font-semibold text-on-surface">
+                  );
+                },
+              },
+              {
+                header: xpLabel,
+                mobileLabel: xpLabel,
+                className: "text-right",
+                mobileClassName: "text-right",
+                cell: (e) => (
+                  <span className="font-mono font-semibold text-ink-900">
                     {e.xp.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </span>
+                ),
+              },
+            ]}
+            rows={rest.map((e) => ({ ...e, displayName: e.userName ?? "Anonymous" }))}
+            rowKey={(r) => r.userId}
+            mobileLeading={(r) => (
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">
+                  {r.displayName.charAt(0).toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink-900">
+                    {r.displayName}
+                  </p>
+                  <p className="text-xs text-ink-500">#{r.rank} this week</p>
+                </div>
+              </div>
+            )}
+            mobileTrailing={(r) => (
+              <Badge tone="warning" size="sm">
+                {r.xp.toLocaleString()} XP
+              </Badge>
+            )}
+          />
         </section>
       ) : null}
     </div>

@@ -36,7 +36,7 @@ export default async function ExamBuilderPage({ params }: ExamBuilderPageProps) 
     <div className="h-screen bg-surface flex flex-col overflow-hidden">
       <TeacherNav user={teacher} activeSection="exams" />
 
-      <main className="flex-1 overflow-hidden">
+      <main id="main-content" className="flex-1 overflow-hidden">
         <ExamBuilder exam={exam} courseTitle={course?.title} />
       </main>
     </div>

@@ -226,7 +226,7 @@ export function AssignmentSubmissionsTable({
                       {sub.fileCount > 0 ? (
                         <span className="inline-flex items-center gap-1">
                           <svg
-                            className="h-3.5 w-3.5 text-secondary"
+        className="h-3.5 w-3.5 text-secondary"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"

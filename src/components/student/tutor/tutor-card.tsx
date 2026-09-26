@@ -33,7 +33,7 @@ export async function TutorDashboardCard({
           </p>
         </div>
         <svg
-          className="h-7 w-7 shrink-0 text-emerald-700"
+        className="h-7 w-7 shrink-0 text-emerald-700"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -53,7 +53,7 @@ export async function TutorDashboardCard({
       >
         {t("tutor.dashboardCard.cta")}
         <svg
-          className="h-3 w-3"
+        className="h-3 w-3"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

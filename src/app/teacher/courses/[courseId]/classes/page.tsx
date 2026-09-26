@@ -3,9 +3,11 @@ import Link from "next/link";
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherCourseById } from "@/services/courses";
 import { getTeacherSessionsForCourse } from "@/services/classes";
-import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { ClassSessionDirectory } from "@/components/teacher/classes/class-session-directory";
 import { getTranslator } from "@/i18n/server";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { ChevronRightIcon, CalendarIcon } from "@/components/shared/ui/icons";
 
 interface CourseClassesPageProps {
   params: Promise<{ courseId: string }>;
@@ -25,7 +27,7 @@ export default async function CourseClassesPage({ params }: CourseClassesPagePro
   const { courseId } = await params;
   const teacher = await requireTeacher();
   const t = await getTranslator();
-  
+
   const course = await getTeacherCourseById(teacher.id, courseId);
   if (!course) {
     notFound();
@@ -34,42 +36,41 @@ export default async function CourseClassesPage({ params }: CourseClassesPagePro
   const sessions = await getTeacherSessionsForCourse(teacher.id, course.id);
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      <TeacherNav user={teacher} activeSection="courses" />
+    <Container className="py-6 sm:py-8" size="xl">
+      <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-1.5 text-xs text-ink-500">
+        <Link
+          href="/teacher/courses"
+          className="hover:text-ink-900 transition-colors"
+        >
+          {t("teacher.courseForm.breadcrumb.courses")}
+        </Link>
+        <ChevronRightIcon size={12} />
+        <Link
+          href={`/teacher/courses/${course.id}`}
+          className="max-w-[160px] truncate hover:text-ink-900 transition-colors"
+        >
+          {course.title}
+        </Link>
+        <ChevronRightIcon size={12} />
+        <span className="font-medium text-ink-700">
+          {t("student.classes.classesTab")}
+        </span>
+      </nav>
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-medium text-secondary">
-              <Link
-                href="/teacher/courses"
-                className="hover:text-on-surface hover:underline"
-              >
-                {t("teacher.courseForm.breadcrumb.courses")}
-              </Link>
-              <svg className="h-3 w-3 text-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-              <Link
-                href={`/teacher/courses/${course.id}`}
-                className="hover:text-on-surface hover:underline truncate max-w-[200px]"
-              >
-                {course.title}
-              </Link>
-              <svg className="h-3 w-3 text-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-              <span className="text-on-surface">{t("student.classes.classesTab")}</span>
-            </div>
-            
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-on-surface">
-              {t("teacher.classes.title")}
-            </h1>
-          </div>
-        </div>
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <CalendarIcon size={14} />
+            {t("teacher.classes.title")}
+          </span>
+        }
+        title={t("teacher.classes.title")}
+        description={course.title}
+      />
 
+      <div className="mt-6">
         <ClassSessionDirectory sessions={sessions} courseId={course.id} />
-      </main>
-    </div>
+      </div>
+    </Container>
   );
 }

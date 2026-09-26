@@ -46,7 +46,7 @@ export async function CourseCard({ course }: CourseCardProps) {
         <div className="mt-4 flex items-center gap-4 text-xs font-medium text-secondary">
           <div className="flex items-center gap-1.5">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
@@ -60,7 +60,7 @@ export async function CourseCard({ course }: CourseCardProps) {
 
           <div className="flex items-center gap-1.5">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
@@ -84,7 +84,7 @@ export async function CourseCard({ course }: CourseCardProps) {
           className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-2xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
             className="h-3.5 w-3.5"
             fill="none"
             viewBox="0 0 24 24"
@@ -109,7 +109,7 @@ export async function CourseCard({ course }: CourseCardProps) {
           title={t("teacher.courseCard.editSettings")}
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"

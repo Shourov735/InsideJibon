@@ -6,6 +6,19 @@ import { StudentAssignmentCard } from "./student-assignment-card";
 import type { StudentAssignmentSummary } from "@/services/assignments";
 import { useTranslations } from "@/i18n/client";
 
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { Stat } from "@/components/shared/ui/stat";
+import { Tabs } from "@/components/shared/ui/tabs";
+import { EmptyState } from "@/components/shared/feedback/empty-state";
+import { Button } from "@/components/shared/ui/button";
+import { Input } from "@/components/shared/ui/field";
+import {
+  ArrowRightIcon,
+  ClipboardIcon,
+  SearchIcon,
+} from "@/components/shared/ui/icons";
+import { cn } from "@/lib/utils";
+
 interface StudentAssignmentListProps {
   assignments: StudentAssignmentSummary[];
   courseId: string;
@@ -57,186 +70,126 @@ export function StudentAssignmentList({
     });
   }, [assignments, activeTab, searchQuery]);
 
+  const tabs = [
+    { value: "all", label: t("teacher.assignments.tabs.all"), count: stats.total },
+    { value: "pending", label: t("student.assignments.stat.pending"), count: stats.pending },
+    { value: "submitted", label: t("student.assignments.stat.submitted"), count: stats.submitted },
+    { value: "graded", label: t("student.assignments.stat.graded"), count: stats.graded },
+  ];
+
+  const hasFilters = activeTab !== "all" || searchQuery.trim() !== "";
+
   return (
     <div className="space-y-6">
-      {/* Header & Return to lessons breadcrumb */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-medium text-secondary">
-            <Link
-              href={`/student/courses/${courseId}`}
-              className="hover:text-primary transition-colors truncate max-w-xs"
-            >
-              {courseTitle}
-            </Link>
-            <span className="text-outline">/</span>
-            <span className="text-on-surface">{t("student.assignments.breadcrumb")}</span>
-          </div>
-
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-            {t("student.assignments.title", { course: courseTitle })}
-          </h1>
-          <p className="mt-1 text-xs text-secondary max-w-xl">
-            {t("student.assignments.subtitle")}
-          </p>
-        </div>
-
-        <Link
-          href={`/student/courses/${courseId}`}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-3.5 py-2 text-xs font-semibold text-secondary hover:bg-surface-container hover:text-on-surface transition-colors shrink-0"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span>{t("student.assignments.returnToLessons")}</span>
-        </Link>
-      </div>
-
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("student.assignments.stat.total")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-primary">{stats.total}</p>
-        </div>
-
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("student.assignments.stat.pending")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-amber-700">{stats.pending}</p>
-        </div>
-
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("student.assignments.stat.submitted")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-primary">{stats.submitted}</p>
-        </div>
-
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            {t("student.assignments.stat.graded")}
-          </span>
-          <p className="mt-2 text-3xl font-bold text-emerald-700">{stats.graded}</p>
-        </div>
-      </div>
-
-      {/* Filter Tabs & Search */}
-      <div className="flex flex-col gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-2xs sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab("all")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-              activeTab === "all"
-                ? "bg-primary text-on-primary shadow-xs"
-                : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
-            }`}
+      <PageHeader
+        eyebrow={
+          <Link
+            href={`/student/courses/${courseId}`}
+            className="inline-flex items-center gap-1 text-xs font-medium text-ink-500 hover:text-ink-900"
           >
-            {t("teacher.assignments.tabs.all")} ({stats.total})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("pending")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-              activeTab === "pending"
-                ? "bg-primary text-on-primary shadow-xs"
-                : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
-            }`}
+            {courseTitle}
+            <ArrowRightIcon size={12} />
+          </Link>
+        }
+        title={t("student.assignments.title", { course: courseTitle })}
+        description={t("student.assignments.subtitle")}
+        actions={
+          <Link
+            href={`/student/courses/${courseId}`}
+            className="hidden sm:inline-flex"
           >
-            {t("student.assignments.stat.pending")} ({stats.pending})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("submitted")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-              activeTab === "submitted"
-                ? "bg-primary text-on-primary shadow-xs"
-                : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
-            }`}
-          >
-            {t("student.assignments.stat.submitted")} ({stats.submitted})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("graded")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-              activeTab === "graded"
-                ? "bg-primary text-on-primary shadow-xs"
-                : "text-secondary hover:bg-surface-container-low hover:text-on-surface"
-            }`}
-          >
-            {t("student.assignments.stat.graded")} ({stats.graded})
-          </button>
-        </div>
+            <Button variant="outline" size="md">
+              {t("student.assignments.returnToLessons")}
+            </Button>
+          </Link>
+        }
+      />
 
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t("teacher.assignments.searchPlaceholder")}
-          className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface outline-none focus:border-primary w-full sm:w-64"
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <Stat
+          label={t("student.assignments.stat.total")}
+          value={stats.total}
+          tone="primary"
+        />
+        <Stat
+          label={t("student.assignments.stat.pending")}
+          value={stats.pending}
+          tone="warning"
+        />
+        <Stat
+          label={t("student.assignments.stat.submitted")}
+          value={stats.submitted}
+          tone="primary"
+        />
+        <Stat
+          label={t("student.assignments.stat.graded")}
+          value={stats.graded}
+          tone="success"
         />
       </div>
 
-      {/* Cards Grid */}
-      {assignments.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center shadow-xs space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <svg
-              className="h-7 w-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="1.75"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-base font-bold text-on-surface">
-            {t("student.assignments.emptyTitle")}
-          </h3>
-          <p className="mx-auto max-w-md text-xs text-secondary">
-            {t("student.assignments.emptyDesc")}
-          </p>
-          <div className="pt-2">
-            <Link
-              href={`/student/courses/${courseId}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-on-primary shadow-xs hover:bg-primary-container"
-            >
-              <span>{t("student.assignments.returnToLessons")}</span>
-            </Link>
-          </div>
+      <div className="flex flex-col gap-3 rounded-2xl border border-outline-variant bg-surface-0 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4">
+        <Tabs
+          items={tabs}
+          value={activeTab}
+          onChange={(v) => setActiveTab(v as typeof activeTab)}
+          className="w-fit"
+        />
+        <div className="relative w-full sm:w-72">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-500">
+            <SearchIcon size={14} />
+          </span>
+          <Input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("teacher.assignments.searchPlaceholder")}
+            className="pl-9"
+          />
         </div>
+      </div>
+
+      {assignments.length === 0 ? (
+        <EmptyState
+          icon={<ClipboardIcon size={20} />}
+          title={t("student.assignments.emptyTitle")}
+          description={t("student.assignments.emptyDesc")}
+          action={
+            <Link href={`/student/courses/${courseId}`}>
+              <Button variant="primary" size="md">
+                {t("student.assignments.returnToLessons")}
+              </Button>
+            </Link>
+          }
+        />
       ) : filteredAssignments.length === 0 ? (
-        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-10 text-center shadow-xs space-y-2">
-          <p className="text-sm font-semibold text-on-surface">
+        <div
+          className={cn(
+            "rounded-3xl border border-outline-variant bg-surface-0 p-8 text-center",
+          )}
+        >
+          <p className="text-sm font-semibold text-ink-900">
             {t("teacher.assignments.noMatches")}
           </p>
-          <p className="text-xs text-secondary">
+          <p className="mt-1 text-xs text-ink-500">
             {t("teacher.assignments.noMatchesHint")}
           </p>
-          <div className="pt-2">
-            <button
-              type="button"
+          {hasFilters ? (
+            <Button
+              variant="outline"
+              size="md"
+              className="mt-4"
               onClick={() => {
                 setActiveTab("all");
                 setSearchQuery("");
               }}
-              className="rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container"
             >
               {t("teacher.assignments.resetFilters")}
-            </button>
-          </div>
+            </Button>
+          ) : null}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filteredAssignments.map((item) => (
             <StudentAssignmentCard
               key={item.assignment.id}

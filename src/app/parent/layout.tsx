@@ -15,7 +15,7 @@ export default async function ParentLayout({
   return (
     <div data-role="parent" className="flex min-h-dvh flex-col bg-surface">
       <ParentNav user={user} />
-      <div className="flex-1">{children}</div>
+      <div className="flex-1 pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
       <CommandProvider role="parent" />
     </div>
   );

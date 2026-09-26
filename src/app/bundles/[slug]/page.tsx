@@ -23,7 +23,7 @@ export default async function BundleLandingPage({
   const itemCount = result.items.length;
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6 lg:px-8 space-y-6">
+    <main id="main-content" className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6 lg:px-8 space-y-6">
       <header className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-2xs">
         <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
           {result.bundle.title}

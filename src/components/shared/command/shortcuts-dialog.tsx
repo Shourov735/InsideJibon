@@ -74,7 +74,7 @@ export function ShortcutsDialog() {
             className="rounded-md p-1 text-secondary hover:bg-surface-container hover:text-on-surface"
           >
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

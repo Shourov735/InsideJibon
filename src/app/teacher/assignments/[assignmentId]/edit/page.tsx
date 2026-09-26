@@ -3,9 +3,11 @@ import { notFound, redirect } from "next/navigation";
 import { requireTeacher } from "@/lib/permissions";
 import { getTeacherAssignmentById } from "@/services/assignments";
 import { getTeacherCourses, getTeacherCourseWithCurriculum } from "@/services/courses";
-import { TeacherNav } from "@/components/teacher/teacher-nav";
 import { AssignmentForm } from "@/components/teacher/assignments";
 import { getTranslator } from "@/i18n/server";
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { ChevronRightIcon, ClipboardIcon } from "@/components/shared/ui/icons";
 
 interface EditAssignmentPageProps {
   params: Promise<{ assignmentId: string }>;
@@ -43,54 +45,46 @@ export default async function EditAssignmentPage({ params }: EditAssignmentPageP
   }
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      <TeacherNav user={teacher} activeSection="assignments" />
+    <Container className="py-6 sm:py-8" size="lg">
+      <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-1.5 text-xs text-ink-500">
+        <Link
+          href="/teacher/assignments"
+          className="hover:text-ink-900 transition-colors"
+        >
+          {t("teacher.assignmentForm.breadcrumb.assignments")}
+        </Link>
+        <ChevronRightIcon size={12} />
+        <Link
+          href={`/teacher/assignments/${assignment.id}`}
+          className="max-w-[160px] truncate hover:text-ink-900 transition-colors"
+        >
+          {assignment.title}
+        </Link>
+        <ChevronRightIcon size={12} />
+        <span className="font-medium text-ink-700">
+          {t("teacher.assignmentForm.breadcrumb.settings")}
+        </span>
+      </nav>
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-        {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-xs font-medium text-secondary">
-          <Link
-            href="/teacher/assignments"
-            className="hover:text-primary transition-colors"
-          >
-            {t("teacher.assignmentForm.breadcrumb.assignments")}
-          </Link>
-          <span className="text-outline">/</span>
-          <Link
-            href={`/teacher/assignments/${assignment.id}`}
-            className="hover:text-primary transition-colors truncate max-w-xs"
-          >
-            {assignment.title}
-          </Link>
-          <span className="text-outline">/</span>
-          <span className="text-on-surface font-semibold">
-            {t("teacher.assignmentForm.breadcrumb.settings")}
+      <PageHeader
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <ClipboardIcon size={14} />
+            {t("teacher.assignmentForm.badge")}
           </span>
-        </div>
+        }
+        title={t("teacher.assignmentForm.titleEdit")}
+        description={t("teacher.assignmentForm.subtitleEdit")}
+      />
 
-        {/* Page Title */}
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
-              {t("teacher.assignmentForm.badge")}
-            </span>
-          </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-            {t("teacher.assignmentForm.titleEdit")}
-          </h1>
-          <p className="mt-1 text-sm text-on-surface-variant">
-            {t("teacher.assignmentForm.subtitleEdit")}
-          </p>
-        </div>
-
-        {/* Edit Form */}
+      <div className="mt-6">
         <AssignmentForm
           initialData={assignment}
           courses={coursesList}
           preselectedCourseId={assignment.courseId}
           courseLessons={courseLessons}
         />
-      </main>
-    </div>
+      </div>
+    </Container>
   );
 }

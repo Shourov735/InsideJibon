@@ -54,7 +54,7 @@ export function ExamStartButton({
         {isSubmitting ? (
           <>
             <svg
-              className="h-4 w-4 animate-spin"
+        className="h-4 w-4 animate-spin"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -78,7 +78,7 @@ export function ExamStartButton({
           <>
             <span>{label ?? t("student.exam.startExam")}</span>
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

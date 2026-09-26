@@ -200,7 +200,7 @@ export function AssignmentDetailView({
             className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors"
           >
             <svg
-              className="h-4 w-4 text-secondary"
+        className="h-4 w-4 text-secondary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -222,7 +222,7 @@ export function AssignmentDetailView({
                 className="inline-flex items-center gap-1.5 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors"
               >
                 <svg
-                  className="h-4 w-4 text-secondary"
+        className="h-4 w-4 text-secondary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -244,7 +244,7 @@ export function AssignmentDetailView({
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-on-primary shadow-xs hover:bg-primary-container transition-colors disabled:opacity-50"
               >
                 <svg
-                  className="h-4 w-4"
+        className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -302,7 +302,7 @@ export function AssignmentDetailView({
           className="flex items-start gap-3 rounded-xl border border-error/30 bg-error-container/40 p-4 text-xs font-medium text-on-error-container"
         >
           <svg
-            className="h-4 w-4 text-error shrink-0 mt-0.5"
+        className="h-4 w-4 text-error shrink-0 mt-0.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -324,7 +324,7 @@ export function AssignmentDetailView({
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-container text-secondary shrink-0">
               <svg
-                className="h-4 w-4"
+        className="h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -355,7 +355,7 @@ export function AssignmentDetailView({
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 shrink-0">
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -378,7 +378,7 @@ export function AssignmentDetailView({
         <div className="rounded-2xl border border-slate-300 bg-slate-100 p-4 flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-200 text-slate-700 shrink-0">
             <svg
-              className="h-4 w-4"
+        className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

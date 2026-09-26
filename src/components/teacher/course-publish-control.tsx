@@ -27,7 +27,7 @@ export function CoursePublishControl({ course }: { course: CourseWithCurriculum 
         }`}
       >
         <svg
-          className="h-4 w-4"
+        className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

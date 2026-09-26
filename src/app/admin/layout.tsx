@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const admin = await requireAdmin();
+  const user = await requireAdmin();
   return (
-    <div data-role="admin" className="flex min-h-screen flex-col bg-surface">
-      <AdminNav user={admin} />
-      {children}
+    <div data-role="admin" className="flex min-h-dvh flex-col bg-surface">
+      <AdminNav user={user} />
+      <div className="flex-1 pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
       <CommandProvider role="admin" />
     </div>
   );

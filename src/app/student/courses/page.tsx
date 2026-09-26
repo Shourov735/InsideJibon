@@ -8,6 +8,19 @@ import { getTranslator } from "@/i18n/server";
 import { SearchFilterBar } from "@/components/shared/search-filter-bar";
 import { getWhatsAppEnrollmentUrl } from "@/lib/whatsapp";
 
+import { Container } from "@/components/shared/ui/container";
+import { PageHeader } from "@/components/shared/ui/page-header";
+import { Tabs } from "@/components/shared/ui/tabs";
+import { Badge } from "@/components/shared/ui/badge";
+import { EmptyState } from "@/components/shared/feedback";
+import {
+  ArrowRightIcon,
+  BookIcon,
+  ClipboardIcon,
+  TrophyIcon,
+  VideoIcon,
+} from "@/components/shared/ui/icons";
+
 export const dynamic = "force-dynamic";
 
 interface StudentCoursesPageProps {
@@ -30,17 +43,11 @@ export default async function StudentCoursesPage({ searchParams }: StudentCourse
   const notStartedCourses = allCourses.filter((c) => !c.completedAt && c.progress.percent === 0);
   const completedCourses = allCourses.filter((c) => Boolean(c.completedAt) || c.progress.percent === 100);
 
-  // Filter based on active tab
   let filteredList = allCourses;
-  if (activeTab === "in-progress") {
-    filteredList = inProgressCourses;
-  } else if (activeTab === "not-started") {
-    filteredList = notStartedCourses;
-  } else if (activeTab === "completed") {
-    filteredList = completedCourses;
-  }
+  if (activeTab === "in-progress") filteredList = inProgressCourses;
+  else if (activeTab === "not-started") filteredList = notStartedCourses;
+  else if (activeTab === "completed") filteredList = completedCourses;
 
-  // Filter based on search query
   const displayedCourses = q
     ? filteredList.filter(
         (c) =>
@@ -61,94 +68,49 @@ export default async function StudentCoursesPage({ searchParams }: StudentCourse
   const isFiltered = Boolean(q);
 
   const tabs = [
-    { id: "all", label: t("student.courses.tabs.all"), count: allCourses.length },
-    { id: "in-progress", label: t("student.courses.tabs.inProgress"), count: inProgressCourses.length },
-    { id: "not-started", label: t("student.courses.tabs.notStarted"), count: notStartedCourses.length },
-    { id: "completed", label: t("student.courses.tabs.completed"), count: completedCourses.length },
-    { id: "pending", label: t("student.courses.tabs.pending"), count: pendingEnrollments.length },
+    { value: "all", label: t("student.courses.tabs.all"), href: "/student/courses", count: allCourses.length },
+    { value: "in-progress", label: t("student.courses.tabs.inProgress"), href: "/student/courses?tab=in-progress", count: inProgressCourses.length },
+    { value: "not-started", label: t("student.courses.tabs.notStarted"), href: "/student/courses?tab=not-started", count: notStartedCourses.length },
+    { value: "completed", label: t("student.courses.tabs.completed"), href: "/student/courses?tab=completed", count: completedCourses.length },
+    { value: "pending", label: t("student.courses.tabs.pending"), href: "/student/courses?tab=pending", count: pendingEnrollments.length },
   ];
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl">
-            {t("student.courses.title")}
-          </h1>
-          <p className="text-sm text-secondary mt-1">
-            {t("student.courses.subtitle")}
-          </p>
-        </div>
+    <Container className="py-6 sm:py-8" size="xl">
+      <PageHeader
+        title={t("student.courses.title")}
+        description={t("student.courses.subtitle")}
+        actions={
+          <Link
+            href="/courses"
+            className="inline-flex h-11 items-center gap-2 rounded-2xl bg-primary px-4 text-sm font-semibold text-on-primary hover:bg-primary/90"
+          >
+            <BookIcon size={14} />
+            {t("student.courses.emptyCta")}
+            <ArrowRightIcon size={14} />
+          </Link>
+        }
+        tabs={<Tabs items={tabs} value={activeTab} className="w-fit" />}
+      />
 
-        <Link
-          href="/courses"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs sm:text-sm font-semibold text-on-primary shadow-xs hover:bg-primary-container hover:text-on-primary-container transition-colors w-full sm:w-auto"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          <span>{t("student.courses.emptyCta")}</span>
-        </Link>
-      </div>
-
-      {/* Tabs bar */}
-      <div className="border-b border-outline-variant overflow-x-auto">
-        <nav className="-mb-px flex gap-4 min-w-max" aria-label="Course Status Tabs">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const href = tab.id === "all" ? "/student/courses" : `/student/courses?tab=${tab.id}`;
-            return (
-              <Link
-                key={tab.id}
-                href={href}
-                className={`whitespace-nowrap border-b-2 py-3.5 px-2 text-xs sm:text-sm font-medium transition-colors flex items-center gap-2 ${
-                  isActive
-                    ? "border-primary text-primary font-bold"
-                    : "border-transparent text-secondary hover:border-outline hover:text-on-surface"
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                    isActive
-                      ? "bg-primary-container text-on-primary-container"
-                      : "bg-surface-container-high text-secondary"
-                  }`}
-                >
-                  {tab.count}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Search Filter Bar */}
-      {(allCourses.length > 0 || pendingEnrollments.length > 0) && (
-        <div>
+      {(allCourses.length > 0 || pendingEnrollments.length > 0) ? (
+        <div className="mt-6">
           <SearchFilterBar searchPlaceholder={t("student.courses.search.placeholder")} />
         </div>
-      )}
+      ) : null}
 
       {/* Content for Pending Tab */}
       {activeTab === "pending" ? (
         displayedPending.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center space-y-3">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-high text-secondary">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.75">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-base font-bold text-on-surface">
-              {isFiltered ? t("common.noResultsFound") : t("student.courses.emptyPendingTitle")}
-            </h2>
-            <p className="text-xs text-secondary max-w-sm mx-auto">
-              {isFiltered ? t("common.noResultsFoundDesc") : t("student.courses.emptyPendingDesc")}
-            </p>
+          <div className="mt-6">
+            <EmptyState
+              icon={<ClipboardIcon size={20} />}
+              title={isFiltered ? t("common.noResultsFound") : t("student.courses.emptyPendingTitle")}
+              description={isFiltered ? t("common.noResultsFoundDesc") : t("student.courses.emptyPendingDesc")}
+            />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
             {displayedPending.map((req) => {
               const whatsAppUrl = getWhatsAppEnrollmentUrl(req.courseTitle, t.locale as "en" | "bn");
               const formattedDate = new Intl.DateTimeFormat(t.locale === "bn" ? "bn-BD" : "en-US", {
@@ -159,57 +121,51 @@ export default async function StudentCoursesPage({ searchParams }: StudentCourse
               return (
                 <div
                   key={req.id}
-                  className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-2xs flex flex-col justify-between gap-4"
+                  className="flex flex-col justify-between gap-4 rounded-3xl border border-outline-variant bg-surface-0 p-5"
                 >
                   <div className="flex items-start gap-4">
                     {req.courseThumbnailUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={req.courseThumbnailUrl}
                         alt={req.courseTitle}
-                        className="h-16 w-24 rounded-xl object-cover border border-outline-variant shrink-0"
+                        className="h-16 w-24 shrink-0 rounded-xl border border-outline-variant object-cover"
                       />
                     ) : (
-                      <div className="flex h-16 w-24 items-center justify-center rounded-xl bg-primary-container/15 text-primary shrink-0 border border-outline-variant">
-                        <svg className="h-8 w-8 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
+                      <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded-xl border border-outline-variant bg-primary-container/15 text-primary">
+                        <BookIcon size={28} />
                       </div>
                     )}
-
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
-                          {t("student.courses.card.statusPending")}
-                        </span>
-                      </div>
-                      <h3 className="font-display text-base font-bold text-on-surface line-clamp-1 mt-1">
-                        <Link href={`/courses/${req.courseSlug}`} className="hover:text-primary transition-colors">
+                      <Badge tone="warning" size="xs">
+                        {t("student.courses.card.statusPending")}
+                      </Badge>
+                      <h3 className="mt-1 line-clamp-1 font-display text-base font-semibold text-ink-900">
+                        <Link href={`/courses/${req.courseSlug}`} className="hover:text-primary">
                           {req.courseTitle}
                         </Link>
                       </h3>
-                      <p className="text-xs text-secondary mt-0.5">
+                      <p className="mt-0.5 text-xs text-ink-500">
                         {req.teacherName ?? "InsideJibon"} · {t("student.dashboard.pendingRequestedAt", { date: formattedDate })}
                       </p>
                     </div>
                   </div>
 
-                  <div className="border-t border-outline-variant pt-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center justify-between gap-3 border-t border-outline-variant pt-3">
                     <Link
                       href={`/courses/${req.courseSlug}`}
-                      className="text-xs font-semibold text-secondary hover:text-primary hover:underline"
+                      className="text-xs font-semibold text-ink-500 hover:text-primary"
                     >
-                      Course Syllabus →
+                      Course Syllabus
+                      <ArrowRightIcon size={12} className="ml-1 inline-block" />
                     </Link>
-
                     <a
                       href={whatsAppUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white px-3.5 py-1.5 text-xs font-bold shadow-2xs transition-colors"
+                      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-3 text-xs font-semibold text-white hover:bg-[#20bd5a]"
                     >
-                      <svg className="h-3.5 w-3.5 fill-current shrink-0" viewBox="0 0 24 24">
-                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.976.58 1.992.921 3.149.921l.002-.001c3.182 0 5.768-2.587 5.769-5.766.001-3.182-2.585-5.769-5.771-5.769zm3.364 8.163c-.14.394-.809.761-1.121.808-.288.043-.665.076-1.921-.444-1.608-.665-2.651-2.296-2.73-2.402-.079-.106-.649-.864-.649-1.648 0-.784.408-1.171.554-1.332.146-.161.32-.201.427-.201.107 0 .213.001.306.006.098.005.23-.037.36.275.14.336.478 1.166.52 1.252.043.086.071.188.014.302-.057.114-.086.185-.171.285-.086.1-.18.223-.257.3-.086.086-.176.18-.076.352.1.171.444.733.953 1.186.656.585 1.209.766 1.381.852.172.086.272.072.373-.044.101-.116.434-.505.549-.678.115-.173.23-.144.388-.086.158.058 1.002.472 1.174.558.172.086.287.129.33.201.043.072.043.418-.097.812zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.176L2 22l4.957-1.399C8.423 21.493 10.153 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" />
-                      </svg>
+                      <VideoIcon size={12} />
                       <span>{t("student.dashboard.chatOnWhatsApp")}</span>
                     </a>
                   </div>
@@ -219,61 +175,47 @@ export default async function StudentCoursesPage({ searchParams }: StudentCourse
           </div>
         )
       ) : displayedCourses.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-12 text-center space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-high text-primary">
-            <svg
-              className="h-7 w-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-              />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-on-surface">
-              {isFiltered
+        <div className="mt-6">
+          <EmptyState
+            icon={<BookIcon size={20} />}
+            title={
+              isFiltered
                 ? t("common.noResultsFound")
                 : activeTab === "in-progress"
                   ? t("student.courses.emptyInProgressTitle")
                   : activeTab === "completed"
                     ? t("student.courses.emptyCompletedTitle")
-                    : t("student.courses.emptyTitle")}
-            </h2>
-            <p className="mt-1 text-xs sm:text-sm text-secondary max-w-md mx-auto">
-              {isFiltered
+                    : t("student.courses.emptyTitle")
+            }
+            description={
+              isFiltered
                 ? t("common.noResultsFoundDesc")
                 : activeTab === "in-progress"
                   ? t("student.courses.emptyInProgressDesc")
                   : activeTab === "completed"
                     ? t("student.courses.emptyCompletedDesc")
-                    : t("student.courses.emptyDesc")}
-            </p>
-          </div>
-
-          {!isFiltered && (
-            <div>
-              <Link
-                href="/courses"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs sm:text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container"
-              >
-                {t("student.courses.emptyCta")} →
-              </Link>
-            </div>
-          )}
+                    : t("student.courses.emptyDesc")
+            }
+            action={
+              !isFiltered ? (
+                <Link
+                  href="/courses"
+                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-on-primary hover:bg-primary/90"
+                >
+                  {t("student.courses.emptyCta")}
+                  <ArrowRightIcon size={14} />
+                </Link>
+              ) : undefined
+            }
+          />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {displayedCourses.map((course) => (
             <StudentCourseCard key={course.courseId} course={course} />
           ))}
         </div>
       )}
-    </main>
+    </Container>
   );
 }

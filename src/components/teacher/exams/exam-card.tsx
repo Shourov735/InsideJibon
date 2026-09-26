@@ -27,7 +27,7 @@ export function ExamCard({ exam, courseTitle }: ExamCardProps) {
             {courseTitle ? (
               <span className="inline-flex items-center gap-1 text-xs font-semibold text-secondary truncate max-w-full">
                 <svg
-                  className="h-3.5 w-3.5 shrink-0 text-primary/70"
+        className="h-3.5 w-3.5 shrink-0 text-primary/70"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -70,7 +70,7 @@ export function ExamCard({ exam, courseTitle }: ExamCardProps) {
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs font-medium text-secondary">
           <div className="flex items-center gap-1.5 rounded-md bg-surface-container-low px-2 py-1">
             <svg
-              className="h-3.5 w-3.5 text-primary"
+        className="h-3.5 w-3.5 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -88,7 +88,7 @@ export function ExamCard({ exam, courseTitle }: ExamCardProps) {
           {exam.durationMinutes ? (
             <div className="flex items-center gap-1.5 rounded-md bg-surface-container-low px-2 py-1">
               <svg
-                className="h-3.5 w-3.5 text-secondary"
+        className="h-3.5 w-3.5 text-secondary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -107,7 +107,7 @@ export function ExamCard({ exam, courseTitle }: ExamCardProps) {
           ) : (
             <div className="flex items-center gap-1.5 rounded-md bg-surface-container-low px-2 py-1 text-outline">
               <svg
-                className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -136,7 +136,7 @@ export function ExamCard({ exam, courseTitle }: ExamCardProps) {
           className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-on-primary shadow-2xs transition-colors hover:bg-primary-container hover:text-on-primary-container"
         >
           <svg
-            className="h-3.5 w-3.5"
+        className="h-3.5 w-3.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -168,7 +168,7 @@ export function ExamCard({ exam, courseTitle }: ExamCardProps) {
           title={t("teacher.examCard.editSettings")}
         >
           <svg
-            className="h-4 w-4"
+        className="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
