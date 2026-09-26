@@ -45,7 +45,7 @@ export default async function AccountPendingPage() {
       </p>
       <div className="mt-6 flex items-center gap-3">
         <Link
-          href="/account-pending"
+          href="/continue"
           className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-container hover:text-on-primary-container"
         >
           {t("accountPending.retry")}
