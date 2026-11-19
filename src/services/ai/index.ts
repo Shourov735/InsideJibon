@@ -15,3 +15,4 @@ export * from "./budget-guard";
 export * from "./safety";
 export * from "./tutor";
 export * from "./quiz-generator";
+export * from "./gemini";

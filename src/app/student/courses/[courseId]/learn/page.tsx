@@ -38,7 +38,7 @@ import {
 
 interface LearnPageProps {
   params: Promise<{ courseId: string }>;
-  searchParams: Promise<{ lesson?: string }>;
+  searchParams: Promise<{ lesson?: string; tutor?: string }>;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -59,7 +59,8 @@ export default async function LearnPage({
   searchParams,
 }: LearnPageProps) {
   const { courseId } = await params;
-  const { lesson: lessonParam } = await searchParams;
+  const { lesson: lessonParam, tutor: tutorParam } = await searchParams;
+
 
   const user = await requireStudent();
   const t = await getTranslator();
@@ -283,7 +284,9 @@ export default async function LearnPage({
                 lessonId={lesson.lesson.id}
                 initialHistory={tutorMessages}
                 initialBudget={tutorBudget}
+                initialOpen={tutorParam === "1"}
               />
+
               <LessonCompleteButton
                 lessonId={lesson.lesson.id}
                 completed={isCompleted}

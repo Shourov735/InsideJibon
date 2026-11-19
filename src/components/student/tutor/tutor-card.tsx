@@ -19,9 +19,12 @@ export async function TutorDashboardCard({
   lessonId,
 }: TutorDashboardCardProps) {
   const t = await getTranslator();
-  if (!courseId || !lessonId) return null;
-  const href = `/student/courses/${courseId}/learn?lesson=${lessonId}&tutor=1`;
+  if (!courseId) return null;
+  const href = lessonId
+    ? `/student/courses/${courseId}/learn?lesson=${lessonId}&tutor=1`
+    : `/student/courses/${courseId}/learn?tutor=1`;
   return (
+
     <section className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div>

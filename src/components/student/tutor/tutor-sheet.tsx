@@ -9,17 +9,14 @@ import {
 } from "@/app/student/actions/tutor-actions";
 
 /**
- * R8 §4.1 — Tutor side sheet.
+ * R8 — AI Tutor side sheet.
  *
- * A bottom-anchored panel that opens from the "Ask the tutor" button on
- * the lesson page. The chat list shows prior questions for this lesson
- * (loaded server-side and passed in `initialHistory`); the input box
- * calls `askTutorAction` server-side. Citations render as YouTube
- * embed links with `?start=<sec>` so the student can jump to the
- * exact moment in the lesson video.
- *
- * Daily budget is read on mount and after each ask; the UI shows
- * "{n} of 20 questions left today" per R8 §4.1.
+ * Enhanced with:
+ * - Google Gemini 3.8 Flash intelligence
+ * - Multimodal handwritten notebook / diagram photo upload
+ * - Adaptive Reteaching ("Explain another way" / "অন্যভাবে বোঝান")
+ * - Quick prompt chips
+ * - Auto-open via ?tutor=1 or initialOpen prop
  */
 
 export type TutorHistoryMessage = {
@@ -29,6 +26,7 @@ export type TutorHistoryMessage = {
   citations: TutorCitationView[];
   lang: string;
   createdAt: string;
+  imageUrl?: string | null;
 };
 
 export type TutorCitationView = {
@@ -48,13 +46,14 @@ interface TutorSheetProps {
   initialQuestion?: string;
   initialHistory: TutorHistoryMessage[];
   initialBudget: { remaining: number; resetSec: number };
+  initialOpen?: boolean;
 }
 
 type LocalMessage = TutorHistoryMessage & { pending?: boolean };
 
 export function TutorSheet(props: TutorSheetProps) {
   const { t, tn, locale } = useTranslations();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(props.initialOpen ?? false);
   const [messages, setMessages] = useState<LocalMessage[]>(
     props.initialHistory.map((m) => ({ ...m, pending: false }))
   );
@@ -63,10 +62,31 @@ export function TutorSheet(props: TutorSheetProps) {
   const [thinking, setThinking] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Multimodal image state
+  const [attachedImage, setAttachedImage] = useState<{
+    data: string; // Base64 without data prefix
+    mimeType: string;
+    previewUrl: string;
+  } | null>(null);
+
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const nextIdRef = useRef(1);
 
-  // Refresh budget on mount (server-rendered initial may be stale).
+  // Check URL query parameters for ?tutor=1 on client mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("tutor") === "1") {
+        queueMicrotask(() => setOpen(true));
+      }
+    }
+  }, []);
+
+
+  // Refresh budget on mount
   useEffect(() => {
     let cancelled = false;
     readTutorBudgetAction()
@@ -79,15 +99,13 @@ export function TutorSheet(props: TutorSheetProps) {
     };
   }, []);
 
-  // Auto-scroll to bottom when new messages arrive.
+  // Auto-scroll to bottom when messages or thinking changes
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, thinking]);
 
-  // Reset draft when the active lesson changes. We defer the setState to a
-  // microtask so we don't run state-update logic synchronously inside the
-  // effect body (React 19 set-state-in-effect lint).
+  // Reset draft when active lesson changes
   useEffect(() => {
     const next = props.initialQuestion ?? "";
     queueMicrotask(() => setDraft(next));
@@ -96,30 +114,92 @@ export function TutorSheet(props: TutorSheetProps) {
   const exhausted = budget.remaining <= 0;
   const resetHours = Math.max(1, Math.ceil(budget.resetSec / 3600));
 
-  const submit = () => {
-    const text = draft.trim();
-    if (!text || thinking || isPending || exhausted) return;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setErrorBanner(
+        locale === "bn"
+          ? "দয়া করে JPG, PNG বা WebP ছবি নির্বাচন করুন।"
+          : "Please select a JPG, PNG, or WebP image."
+      );
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorBanner(
+        locale === "bn"
+          ? "ছবি ৫ মেগাবাইটের কম হতে হবে।"
+          : "Image must be under 5 MB."
+      );
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const commaIndex = result.indexOf(",");
+      const base64Data = commaIndex !== -1 ? result.slice(commaIndex + 1) : result;
+      setAttachedImage({
+        data: base64Data,
+        mimeType: file.type,
+        previewUrl: result,
+      });
+      setErrorBanner(null);
+    };
+    reader.readAsDataURL(file);
+    // Reset file input value so re-selecting the same file fires change
+    e.target.value = "";
+  };
+
+  const removeAttachedImage = () => {
+    setAttachedImage(null);
+  };
+
+  const submit = (
+    overridePrompt?: string,
+    mode: "standard" | "reteach" = "standard"
+  ) => {
+    const text = (overridePrompt ?? draft).trim();
+    if ((!text && !attachedImage) || thinking || isPending || exhausted) return;
+
+    const currentImage = attachedImage;
+    const displayText =
+      text ||
+      (locale === "bn"
+        ? "আমার খাতার এই অংশটি দেখে সমাধান বা ভুল বুঝিয়ে দিন।"
+        : "Please check this handwritten work and explain.");
+
+    const optimisticId = -(nextIdRef.current++);
     const optimistic: LocalMessage = {
-      id: Date.now(),
-      question: text,
+      id: optimisticId,
+      question: displayText,
       answer: "",
       citations: [],
       lang: locale,
-      createdAt: new Date().toISOString(),
+      createdAt: "",
       pending: true,
+      imageUrl: currentImage?.previewUrl ?? null,
     };
+
+
     setMessages((prev) => [...prev, optimistic]);
     setDraft("");
+    setAttachedImage(null);
     setThinking(true);
     setErrorBanner(null);
+
     startTransition(async () => {
       try {
         const result = await askTutorAction({
           courseId: props.courseId,
           lessonId: props.lessonId,
-          question: text,
+          question: displayText,
           lang: locale === "bn" ? "bn" : "en",
+          mode,
+          image: currentImage
+            ? { data: currentImage.data, mimeType: currentImage.mimeType }
+            : null,
         });
+
         if (result.ok) {
           setMessages((prev) =>
             prev.map((m) =>
@@ -138,9 +218,9 @@ export function TutorSheet(props: TutorSheetProps) {
             resetSec: result.budgetResetSec,
           });
         } else {
-          // Roll back optimistic message + surface the error.
           setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
-          setDraft(text);
+          setDraft(displayText);
+          if (currentImage) setAttachedImage(currentImage);
           setErrorBanner(messageForError(result.error, t));
           if (result.error.kind === "rate_limited" || result.error.kind === "budget") {
             setBudget((b) => ({ ...b, remaining: 0 }));
@@ -148,13 +228,53 @@ export function TutorSheet(props: TutorSheetProps) {
         }
       } catch {
         setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
-        setDraft(text);
+        setDraft(displayText);
+        if (currentImage) setAttachedImage(currentImage);
         setErrorBanner(t("system.serverError"));
       } finally {
         setThinking(false);
       }
     });
   };
+
+  const QUICK_CHIPS = [
+    {
+      id: "formulas",
+      label: t("tutor.chip.formulas"),
+      query:
+        locale === "bn"
+          ? "এই পাঠের মূল সূত্র ও গুরুত্বপূর্ণ নিয়মগুলো কী কী?"
+          : "What are the core formulas and rules of this lesson?",
+      mode: "standard" as const,
+    },
+    {
+      id: "reteach",
+      label: t("tutor.chip.reteach"),
+      query:
+        locale === "bn"
+          ? "সহজ কোনো বাস্তব উপমা দিয়ে পুরো ধারণাটি অন্যভাবে বুঝিয়ে দিন।"
+          : "Please explain this core concept in a different way using an intuitive real-world analogy.",
+      mode: "reteach" as const,
+    },
+    {
+      id: "example",
+      label: t("tutor.chip.example"),
+      query:
+        locale === "bn"
+          ? "একটি বাস্তব উদাহরণ দিয়ে ধাপে ধাপে সমাধান করে দেখান।"
+          : "Show a step-by-step worked example with clear reasoning.",
+      mode: "standard" as const,
+    },
+    {
+      id: "simplify",
+      label: t("tutor.chip.simplify"),
+      query:
+        locale === "bn"
+          ? "এই পাঠের মূল বিষয়টি একদম সহজ ভাষায় সংক্ষেপে বুঝিয়ে বলুন।"
+          : "Explain the main idea of this lesson as simply as possible.",
+      mode: "standard" as const,
+    },
+  ];
 
   return (
     <>
@@ -164,10 +284,10 @@ export function TutorSheet(props: TutorSheetProps) {
           setOpen(true);
           setTimeout(() => inputRef.current?.focus(), 80);
         }}
-        className="inline-flex items-center gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 shadow-xs transition-colors hover:border-emerald-400 hover:bg-emerald-100"
+        className="inline-flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 shadow-xs transition-colors hover:border-emerald-400 hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-600"
       >
         <svg
-        className="h-4 w-4"
+          className="h-4 w-4 shrink-0 text-emerald-700"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -194,23 +314,31 @@ export function TutorSheet(props: TutorSheetProps) {
             type="button"
             aria-label="Close tutor"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
           />
           <div
             className={cn(
-              "relative flex h-[92dvh] w-full flex-col bg-surface-container-lowest shadow-2xl",
-              "sm:h-full sm:max-w-md sm:border-l sm:border-outline-variant"
+              "relative flex h-[92dvh] w-full flex-col bg-surface-0 shadow-2xl",
+              "sm:h-full sm:max-w-lg sm:border-l sm:border-outline-variant"
             )}
           >
-            <header className="flex items-start justify-between border-b border-outline-variant px-5 py-4">
+            {/* Header */}
+            <header className="flex items-start justify-between border-b border-outline-variant bg-surface-0 px-5 py-4">
               <div>
-                <h2
-                  id="tutor-sheet-title"
-                  className="text-base font-bold text-on-surface"
-                >
-                  {t("tutor.title")}
-                </h2>
-                <p className="mt-1 text-xs text-secondary">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </span>
+                  <h2
+                    id="tutor-sheet-title"
+                    className="font-display text-base font-bold text-ink-900"
+                  >
+                    {t("tutor.title")}
+                  </h2>
+                </div>
+                <p className="mt-1 text-xs text-ink-500">
                   {exhausted
                     ? t("tutor.budget.exhausted")
                     : tn("tutor.budget.remaining", budget.remaining)}
@@ -219,53 +347,69 @@ export function TutorSheet(props: TutorSheetProps) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-2 text-secondary hover:bg-surface-container-low"
+                className="rounded-lg p-2 text-ink-400 hover:bg-surface-1 hover:text-ink-700"
                 aria-label="Close"
               >
-                <svg
-        className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </header>
 
+            {/* Error Banner */}
             {errorBanner && (
               <div
                 role="alert"
-                className="border-b border-rose-200 bg-rose-50 px-5 py-2 text-xs font-medium text-rose-800"
+                className="border-b border-rose-200 bg-rose-50 px-5 py-2.5 text-xs font-medium text-rose-800"
               >
                 {errorBanner}
               </div>
             )}
 
+            {/* Messages Scroll Area */}
             <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto px-5 py-4"
               aria-live="polite"
             >
               {messages.length === 0 && !thinking && (
-                <p className="text-sm text-secondary">{t("tutor.emptyHistory")}</p>
+                <div className="my-8 rounded-2xl border border-dashed border-outline-variant bg-surface-1/40 p-6 text-center">
+                  <p className="text-sm font-medium text-ink-700">
+                    {t("tutor.emptyHistory")}
+                  </p>
+                  <p className="mt-1 text-xs text-ink-400">
+                    {locale === "bn"
+                      ? "যেকোনো সমীকরণ, ধারণা বা খাতার ছবি দিয়ে প্রশ্ন করুন।"
+                      : "Ask any formula, concept question, or upload a photo of your notebook."}
+                  </p>
+                </div>
               )}
-              <ul className="flex flex-col gap-4">
+
+              <ul className="flex flex-col gap-5">
                 {messages.map((m) => (
                   <li key={m.id} className="flex flex-col gap-2">
-                    <div className="rounded-lg rounded-br-sm bg-primary/10 px-3 py-2 text-sm text-on-surface">
-                      {m.question}
+                    {/* User Question Bubble */}
+                    <div className="self-end rounded-2xl rounded-tr-xs bg-emerald-800 px-4 py-2.5 text-sm text-white shadow-xs max-w-[85%]">
+                      {m.imageUrl && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={m.imageUrl}
+                          alt="Student upload"
+                          className="mb-2 max-h-48 rounded-lg object-contain border border-emerald-700"
+                        />
+                      )}
+                      <p className="whitespace-pre-wrap">{m.question}</p>
                     </div>
+
+                    {/* Tutor Answer Bubble */}
                     {m.answer ? (
-                      <div className="rounded-lg rounded-bl-sm border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm leading-relaxed text-on-surface">
-                        <p>{m.answer}</p>
+                      <div className="self-start rounded-2xl rounded-tl-xs border border-outline-variant bg-surface-0 px-4 py-3 text-sm leading-relaxed text-ink-900 shadow-xs max-w-[95%]">
+                        <div className="prose prose-sm max-w-none text-ink-900 leading-relaxed space-y-2">
+                          {renderFormattedAnswer(m.answer)}
+                        </div>
+
                         {m.citations.length > 0 && (
-                          <ul className="mt-2 flex flex-wrap gap-1.5">
+                          <ul className="mt-3 flex flex-wrap gap-1.5 border-t border-outline-variant pt-2.5">
                             {m.citations.map((c) => (
                               <CitationChip key={c.n} citation={c} t={t} />
                             ))}
@@ -273,28 +417,118 @@ export function TutorSheet(props: TutorSheetProps) {
                         )}
                       </div>
                     ) : m.pending ? (
-                      <div className="rounded-lg rounded-bl-sm border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm italic text-secondary">
+                      <div className="self-start flex items-center gap-2 rounded-2xl rounded-tl-xs border border-outline-variant bg-surface-0 px-4 py-3 text-sm italic text-ink-500 shadow-xs">
+                        <svg className="h-4 w-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
                         {t("tutor.thinking")}
                       </div>
                     ) : null}
                   </li>
                 ))}
+
                 {thinking && messages[messages.length - 1]?.answer && (
-                  <li className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm italic text-secondary">
+                  <li className="self-start flex items-center gap-2 rounded-2xl rounded-tl-xs border border-outline-variant bg-surface-0 px-4 py-3 text-sm italic text-ink-500 shadow-xs">
+                    <svg className="h-4 w-4 animate-spin text-emerald-700" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
                     {t("tutor.thinking")}
                   </li>
                 )}
               </ul>
             </div>
 
+            {/* Quick Prompt Chips */}
+            <div className="border-t border-outline-variant/60 bg-surface-1/40 px-4 py-2">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                {QUICK_CHIPS.map((chip) => (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    onClick={() => submit(chip.query, chip.mode)}
+                    disabled={exhausted || thinking}
+                    className="shrink-0 rounded-lg border border-outline-variant bg-surface-0 px-2.5 py-1 text-xs font-medium text-ink-700 transition-colors hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-900 disabled:opacity-50"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Input Form & Image Upload */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 submit();
               }}
-              className="border-t border-outline-variant bg-surface-container-lowest px-3 py-3 sm:px-5"
+              className="border-t border-outline-variant bg-surface-0 p-3 sm:p-4"
             >
+              {/* Attached Image Preview */}
+              {attachedImage && (
+                <div className="mb-2.5 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={attachedImage.previewUrl}
+                    alt="Preview"
+                    className="h-12 w-12 rounded-lg object-cover border border-emerald-300"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-medium text-emerald-950">
+                      {locale === "bn" ? "খাতার ছবি যুক্ত হয়েছে" : "Photo attached"}
+                    </p>
+                    <p className="text-[10px] text-emerald-700">
+                      {locale === "bn"
+                        ? "প্রশ্ন লিখে বা সরাসরি জিজ্ঞাসা করুন চাপুন"
+                        : "Type a question or press Ask"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeAttachedImage}
+                    className="rounded-lg p-1.5 text-emerald-800 hover:bg-emerald-100"
+                    title={t("tutor.image.remove")}
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+
               <div className="flex items-end gap-2">
+                {/* Photo Upload Button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={exhausted || thinking}
+                  title={t("tutor.image.attach")}
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-outline-variant bg-surface-0 text-ink-600 transition-colors hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-50"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </button>
+
                 <textarea
                   ref={inputRef}
                   value={draft}
@@ -307,20 +541,28 @@ export function TutorSheet(props: TutorSheetProps) {
                   }}
                   rows={2}
                   maxLength={800}
-                  placeholder={t("tutor.placeholder")}
+                  placeholder={
+                    attachedImage
+                      ? locale === "bn"
+                        ? "এই ছবিতে আপনার কী প্রশ্ন রয়েছে? লিখুন..."
+                        : "Ask about this photo, or submit directly..."
+                      : t("tutor.placeholder")
+                  }
                   disabled={exhausted || thinking}
-                  className="min-h-[44px] max-h-32 flex-1 resize-none rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm leading-relaxed text-on-surface placeholder:text-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                  className="min-h-[44px] max-h-32 flex-1 resize-none rounded-xl border border-outline-variant bg-surface-0 px-3 py-2.5 text-sm leading-relaxed text-ink-900 placeholder:text-ink-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600 disabled:opacity-50"
                 />
+
                 <button
                   type="submit"
-                  disabled={exhausted || thinking || !draft.trim()}
-                  className="inline-flex h-11 items-center gap-1.5 rounded-md bg-primary px-4 text-sm font-semibold text-on-primary shadow-xs transition-colors hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={exhausted || thinking || (!draft.trim() && !attachedImage)}
+                  className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-4 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {t("tutor.ask")}
                 </button>
               </div>
+
               {exhausted && (
-                <p className="mt-2 text-[11px] font-medium text-secondary">
+                <p className="mt-2 text-[11px] font-medium text-ink-500">
                   {t("tutor.budget.resetAt", { hours: resetHours })}
                 </p>
               )}
@@ -344,6 +586,7 @@ function CitationChip({
   const label = end
     ? t("tutor.citation.chunk", { n: citation.n, start, end })
     : `${citation.n} · ${start}`;
+
   if (citation.url) {
     return (
       <li>
@@ -354,7 +597,7 @@ function CitationChip({
           className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800 transition-colors hover:border-emerald-400 hover:bg-emerald-100"
         >
           <svg
-        className="h-3 w-3"
+            className="h-3 w-3"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -378,7 +621,7 @@ function CitationChip({
     );
   }
   return (
-    <li className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface-container-low px-2 py-0.5 text-[11px] font-semibold text-secondary">
+    <li className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface-1 px-2 py-0.5 text-[11px] font-semibold text-ink-500">
       {label}
     </li>
   );
@@ -393,19 +636,32 @@ function formatTimestamp(sec: number | null): string {
 }
 
 function messageForError(
-  error:
-    | { kind: "forbidden"; message: string }
-    | { kind: "rate_limited"; remaining: 0; resetSec: number; reason: string }
-    | { kind: "budget"; message: string; resetSec: number }
-    | { kind: "unsafe"; message: string }
-    | { kind: "no_context"; message: string }
-    | { kind: "binding_missing"; message: string },
+  error: { kind: string; message?: string; reason?: string },
   t: ReturnType<typeof useTranslations>["t"]
 ): string {
+  if (error.kind === "key_missing") return t("tutor.keyMissing");
   if (error.kind === "budget") return t("tutor.budgetExhaustedBanner");
-  if (error.kind === "rate_limited") return error.reason;
-  if (error.kind === "no_context") return error.message;
-  if (error.kind === "unsafe") return error.message;
+  if (error.kind === "rate_limited") return error.reason || t("tutor.budget.exhausted");
+  if (error.kind === "no_context") return error.message || t("tutor.safety.fallback");
+  if (error.kind === "unsafe") return error.message || t("tutor.safety.fallback");
   if (error.kind === "forbidden") return t("system.forbidden");
-  return t("tutor.unavailable");
+  return error.message || t("tutor.unavailable");
+}
+
+
+function renderFormattedAnswer(text: string) {
+  const paragraphs = text.split(/\n\n+/);
+  return paragraphs.map((p, pIdx) => {
+    const lines = p.split("\n");
+    return (
+      <p key={pIdx} className="leading-relaxed">
+        {lines.map((line, lIdx) => (
+          <span key={lIdx}>
+            {lIdx > 0 && <br />}
+            {line}
+          </span>
+        ))}
+      </p>
+    );
+  });
 }

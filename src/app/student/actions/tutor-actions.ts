@@ -26,6 +26,14 @@ const askSchema = z.object({
   lessonId: z.string().uuid().optional().nullable(),
   question: z.string().min(1).max(800),
   lang: z.enum(["en", "bn"]).optional(),
+  mode: z.enum(["standard", "reteach"]).optional(),
+  image: z
+    .object({
+      data: z.string().min(1),
+      mimeType: z.string().min(1),
+    })
+    .optional()
+    .nullable(),
 });
 
 export type AskTutorResult =
@@ -44,7 +52,8 @@ export type AskTutorResult =
         | { kind: "budget"; message: string; resetSec: number }
         | { kind: "unsafe"; message: string }
         | { kind: "no_context"; message: string }
-        | { kind: "binding_missing"; message: string };
+        | { kind: "binding_missing"; message: string }
+        | { kind: "key_missing"; message: string };
     };
 
 export async function askTutorAction(
@@ -67,6 +76,8 @@ export async function askTutorAction(
     lessonId: parsed.data.lessonId ?? null,
     question: parsed.data.question,
     lang: parsed.data.lang ?? "en",
+    mode: parsed.data.mode ?? "standard",
+    image: parsed.data.image ?? null,
   });
   if (!result.ok) {
     return { ok: false, error: result.error };
@@ -79,6 +90,7 @@ export async function askTutorAction(
     budgetResetSec: result.data.budgetResetSec,
   };
 }
+
 
 const historySchema = z.object({
   courseId: z.string().uuid(),

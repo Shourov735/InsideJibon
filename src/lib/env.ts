@@ -40,7 +40,14 @@ const envSchema = z.object({
   // tickets. The DO verifies with the same secret via its env binding.
   // Operator action: `wrangler secret put CLASSROOM_TICKET_SECRET`.
   CLASSROOM_TICKET_SECRET: z.string().optional(),
+
+  // --- R8 AI Tutor (Google Gemini) ---
+  // Used for multimodal academic AI tutoring.
+  // Set in .env.local for dev, or via `wrangler secret put GEMINI_API_KEY` in production.
+  GEMINI_API_KEY: z.string().optional(),
+  AI_TUTOR_GEMINI_MODEL: z.string().optional(),
 });
+
 
 export type Env = z.infer<typeof envSchema>;
 
