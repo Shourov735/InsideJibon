@@ -15,6 +15,15 @@ import type { CourseCategory } from "@/db/schema";
 
 export type { CourseCategory };
 
+let _cachedPublishedCourses: {
+  data: PublicCourseSummary[];
+  expiresAt: number;
+} | null = null;
+
+export function clearPublishedCoursesCache(): void {
+  _cachedPublishedCourses = null;
+}
+
 /**
  * Public, read-only course queries. These are a separate concern from the
  * teacher-facing services and always start from `status = 'published'`.
@@ -54,6 +63,11 @@ export interface PublicCoursesFilter {
  * Supports optional search query and category filter.
  */
 export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise<PublicCourseSummary[]> {
+  const isDefaultQuery = !filter?.q && !filter?.category;
+  if (isDefaultQuery && _cachedPublishedCourses && Date.now() < _cachedPublishedCourses.expiresAt) {
+    return _cachedPublishedCourses.data;
+  }
+
   const db = getDb();
 
   const conditions = [eq(courses.status, "published")];
@@ -91,7 +105,7 @@ export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise
     .where(and(...conditions))
     .orderBy(desc(courses.publishedAt), desc(courses.updatedAt));
 
-  return rows.map((row) => ({
+  const results = rows.map((row) => ({
     id: row.id,
     slug: row.slug,
     title: row.title,
@@ -105,6 +119,15 @@ export async function getPublishedCourses(filter?: PublicCoursesFilter): Promise
     requiresPayment: row.requiresPayment,
     priceBdt: row.priceBdt,
   }));
+
+  if (isDefaultQuery) {
+    _cachedPublishedCourses = {
+      data: results,
+      expiresAt: Date.now() + 5 * 60 * 1000, // 5-minute TTL
+    };
+  }
+
+  return results;
 }
 
 /**

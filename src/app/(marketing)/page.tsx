@@ -13,7 +13,7 @@ import { EducatorSection } from "@/components/public/landing/educator-section";
 import { FeaturesSection } from "@/components/public/landing/features-section";
 import { CtaSection } from "@/components/public/landing/cta-section";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslator();

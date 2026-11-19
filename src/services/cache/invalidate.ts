@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { cacheInvalidations } from "@/db/schema/cache";
 import { purgeByTag, enqueuePurgeByTag } from "@/lib/cloudflare/cache";
+import { clearPublishedCoursesCache } from "@/services/courses/public";
 
 export interface InvalidateOptions {
   reason?: string;
@@ -57,10 +58,13 @@ export async function invalidateTags(
   for (const tag of cleanTags) {
     try {
       if (tag === "marketing:landing") {
+        clearPublishedCoursesCache();
         revalidatePath("/");
       } else if (tag === "catalog:list") {
+        clearPublishedCoursesCache();
         revalidatePath("/courses");
       } else if (tag.startsWith("course:")) {
+        clearPublishedCoursesCache();
         const slug = tag.slice("course:".length);
         if (slug) {
           revalidatePath(`/courses/${slug}`);
