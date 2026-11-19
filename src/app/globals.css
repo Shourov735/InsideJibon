@@ -144,3 +144,15 @@ body {
   }
 }
 
+/* Suppress any third-party Clerk watermark, badges, or development indicators */
+.cl-internal-b3fm6y,
+.cl-development-mode-badge,
+[data-clerk-badge],
+.cl-watermark,
+.cl-headerSubtitle,
+.cl-footerAction__signIn,
+.cl-footerAction__signUp {
+  display: none !important;
+}
+
+

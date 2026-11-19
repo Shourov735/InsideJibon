@@ -19,7 +19,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { UserButton, useAuth } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
+import { UserAccountMenu } from "@/components/shared/auth/user-account-menu";
 
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { useTranslations } from "@/i18n/client";
@@ -354,16 +355,18 @@ export function AppHeader({
 
             {trailing}
 
-            {/* User chip */}
-            {variant !== "marketing" && user ? (
-              <div className="hidden items-center gap-2 sm:flex">
-                <div className="hidden text-right lg:block">
-                  <div className="text-xs font-semibold text-ink-900 truncate max-w-[140px]">
-                    {user.name ?? user.email}
+            {/* User Account Menu */}
+            {!signedOut ? (
+              <div className="flex items-center gap-2">
+                {variant !== "marketing" && user ? (
+                  <div className="hidden text-right lg:block">
+                    <div className="text-xs font-semibold text-ink-900 truncate max-w-[140px]">
+                      {user.name ?? user.email}
+                    </div>
+                    <div className="text-[10px] uppercase tracking-wide text-ink-500">{roleBadge}</div>
                   </div>
-                  <div className="text-[10px] uppercase tracking-wide text-ink-500">{roleBadge}</div>
-                </div>
-                <UserButton />
+                ) : null}
+                <UserAccountMenu user={user} role={variant} roleBadge={roleBadge} />
               </div>
             ) : null}
 
@@ -529,13 +532,13 @@ export function AppHeader({
               <span className="text-sm font-medium text-ink-700">{t("theme.system")}</span>
               <ThemeToggle showLabels={false} />
             </div>
-            {user ? (
-              <div className="flex items-center gap-3 rounded-2xl bg-surface-1 px-3 py-2">
-                <UserButton />
+            {user || !signedOut ? (
+              <div className="flex items-center justify-between rounded-2xl bg-surface-1 px-3 py-2">
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold text-ink-900">{user.name ?? user.email}</div>
-                  <div className="truncate text-xs text-ink-500">{user.email}</div>
+                  <div className="truncate text-sm font-semibold text-ink-900">{user?.name ?? user?.email ?? "Account"}</div>
+                  {user?.email && <div className="truncate text-xs text-ink-500">{user.email}</div>}
                 </div>
+                <UserAccountMenu user={user} role={variant} roleBadge={roleBadge} />
               </div>
             ) : null}
           </div>

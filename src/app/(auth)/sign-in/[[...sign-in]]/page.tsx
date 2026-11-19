@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
-import { SignIn } from "@clerk/nextjs";
-
-import { BrandLogo } from "@/components/shared/brand-logo";
 import { getCurrentUser } from "@/lib/auth";
 import { dashboardPathForRole } from "@/lib/dashboard";
+import { CustomSignIn } from "@/components/auth/custom-sign-in";
 
 export const metadata = {
   title: "Sign In",
@@ -42,17 +40,10 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
     : "/sign-up";
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-surface px-4 py-10">
-      <div className="mb-6">
-        <BrandLogo href="/" size="md" variant="full" />
-      </div>
-      {/* Explicit routing props remove any path-inference ambiguity on
-          Workers deployments (a misinferred path crashes clerk-js). */}
-      <SignIn
-        routing="path"
-        path="/sign-in"
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-[#FAF8F5] px-4 py-10 dark:bg-[#0B0B0E]">
+      <CustomSignIn
+        continueUrl={continueUrl}
         signUpUrl={signUpUrl}
-        fallbackRedirectUrl={continueUrl}
       />
     </div>
   );

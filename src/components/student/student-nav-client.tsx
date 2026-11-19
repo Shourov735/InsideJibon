@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import { UserAccountMenu } from "@/components/shared/auth/user-account-menu";
 import { useEffect, useState } from "react";
 
 import { AppHeader, type AppHeaderNavItem } from "@/components/shared/ui/app-header";
@@ -142,4 +142,4 @@ export function StudentNavClient({
 }
 
 // Re-export for older import paths (not strictly required).
-export { UserButton };
+export { UserAccountMenu as UserButton };
