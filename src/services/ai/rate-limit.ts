@@ -110,22 +110,31 @@ export async function peekDailyCounter(
   userId: string,
   now: Date = new Date()
 ): Promise<TutorRateLimit> {
-  const db = getDb();
-  const usageDay = formatUsageDay(now);
-  const [row] = await db
-    .select({ questions: aiTutorUsage.questions })
-    .from(aiTutorUsage)
-    .where(
-      sql`${aiTutorUsage.userId} = ${userId} AND ${aiTutorUsage.usageDay} = ${usageDay}::date`
-    )
-    .limit(1);
-  const count = row?.questions ?? 0;
-  const remaining = Math.max(0, R8_DAILY_LIMIT - count);
-  return {
-    ok: remaining > 0,
-    remaining,
-    resetSec: secondsUntilUtcMidnight(now),
-  };
+  try {
+    const db = getDb();
+    const usageDay = formatUsageDay(now);
+    const [row] = await db
+      .select({ questions: aiTutorUsage.questions })
+      .from(aiTutorUsage)
+      .where(
+        sql`${aiTutorUsage.userId} = ${userId} AND ${aiTutorUsage.usageDay} = ${usageDay}::date`
+      )
+      .limit(1);
+    const count = row?.questions ?? 0;
+    const remaining = Math.max(0, R8_DAILY_LIMIT - count);
+    return {
+      ok: remaining > 0,
+      remaining,
+      resetSec: secondsUntilUtcMidnight(now),
+    };
+  } catch (error) {
+    console.error("[tutor] peekDailyCounter error:", error);
+    return {
+      ok: true,
+      remaining: R8_DAILY_LIMIT,
+      resetSec: secondsUntilUtcMidnight(now),
+    };
+  }
 }
 
 function formatUsageDay(d: Date): string {

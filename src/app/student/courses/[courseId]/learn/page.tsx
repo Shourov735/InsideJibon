@@ -109,34 +109,39 @@ export default async function LearnPage({
 
   const [materials, sessions, announcements, rawQaThreads, tutorHistory, tutorBudget, videoData] =
     await Promise.all([
-      getLessonMaterialsForStudent(user.id, activeLessonId),
-      getStudentSessionsForCourse(user.id, courseId),
-      getStudentAnnouncementsForCourse(user.id, courseId),
+      getLessonMaterialsForStudent(user.id, activeLessonId).catch(() => []),
+      getStudentSessionsForCourse(user.id, courseId).catch(() => []),
+      getStudentAnnouncementsForCourse(user.id, courseId).catch(() => []),
       listLessonQa({
         lessonId: activeLessonId,
         currentUserId: user.id,
         currentUserRole: user.role,
-      }),
+      }).catch(() => []),
       listTutorHistory({
         userId: user.id,
         courseId,
         lessonId: activeLessonId,
         limit: 10,
-      }),
-      readBudget(user.id),
+      }).catch(() => []),
+      readBudget(user.id).catch(() => ({ remaining: 20, resetSec: 86400 })),
       getLessonVideoForStudent(activeLessonId, user.id).catch(() => null),
     ]);
   // The DB column is `text` so drizzle widens `kind` to `string`; the schema
   // enum ('question' | 'answer' | 'comment' | 'comment_legacy') is enforced
   // by the migration CHECK constraint, so narrowing here is safe.
   const qaThreads = rawQaThreads as unknown as QaQuestionView[];
-  const tutorMessages: TutorHistoryMessage[] = tutorHistory.map((m) => ({
+  const tutorMessages: TutorHistoryMessage[] = (tutorHistory || []).map((m) => ({
     id: m.id,
     question: m.question,
     answer: m.answer,
     citations: m.citations,
     lang: m.lang,
-    createdAt: m.createdAt.toISOString(),
+    createdAt:
+      m.createdAt instanceof Date
+        ? m.createdAt.toISOString()
+        : typeof m.createdAt === "string"
+          ? m.createdAt
+          : new Date().toISOString(),
   }));
 
   const lessonHref = (lessonId: string) =>

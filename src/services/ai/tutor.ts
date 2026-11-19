@@ -447,35 +447,40 @@ export async function listTutorHistory(input: {
     createdAt: Date;
   }>
 > {
-  const db = getDb();
-  const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
-  const where = input.lessonId
-    ? and(
-        eq(aiTutorMessages.userId, input.userId),
-        eq(aiTutorMessages.courseId, input.courseId),
-        eq(aiTutorMessages.lessonId, input.lessonId)
-      )
-    : and(
-        eq(aiTutorMessages.userId, input.userId),
-        eq(aiTutorMessages.courseId, input.courseId)
-      );
-  const rows = await db
-    .select({
-      id: aiTutorMessages.id,
-      question: aiTutorMessages.question,
-      answer: aiTutorMessages.answer,
-      citations: aiTutorMessages.citations,
-      lang: aiTutorMessages.lang,
-      createdAt: aiTutorMessages.createdAt,
-    })
-    .from(aiTutorMessages)
-    .where(where)
-    .orderBy(desc(aiTutorMessages.createdAt))
-    .limit(limit);
-  return rows.map((r) => ({
-    ...r,
-    citations: (Array.isArray(r.citations) ? r.citations : []) as TutorCitation[],
-  }));
+  try {
+    const db = getDb();
+    const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
+    const where = input.lessonId
+      ? and(
+          eq(aiTutorMessages.userId, input.userId),
+          eq(aiTutorMessages.courseId, input.courseId),
+          eq(aiTutorMessages.lessonId, input.lessonId)
+        )
+      : and(
+          eq(aiTutorMessages.userId, input.userId),
+          eq(aiTutorMessages.courseId, input.courseId)
+        );
+    const rows = await db
+      .select({
+        id: aiTutorMessages.id,
+        question: aiTutorMessages.question,
+        answer: aiTutorMessages.answer,
+        citations: aiTutorMessages.citations,
+        lang: aiTutorMessages.lang,
+        createdAt: aiTutorMessages.createdAt,
+      })
+      .from(aiTutorMessages)
+      .where(where)
+      .orderBy(desc(aiTutorMessages.createdAt))
+      .limit(limit);
+    return rows.map((r) => ({
+      ...r,
+      citations: (Array.isArray(r.citations) ? r.citations : []) as TutorCitation[],
+    }));
+  } catch (error) {
+    console.error("[tutor] listTutorHistory failed:", error);
+    return [];
+  }
 }
 
 /**
@@ -485,11 +490,19 @@ export async function readBudget(userId: string): Promise<{
   remaining: number;
   resetSec: number;
 }> {
-  const counter = await peekDailyCounter(userId);
-  return {
-    remaining: counter.remaining,
-    resetSec: counter.resetSec,
-  };
+  try {
+    const counter = await peekDailyCounter(userId);
+    return {
+      remaining: counter.remaining,
+      resetSec: counter.resetSec,
+    };
+  } catch (error) {
+    console.error("[tutor] readBudget failed:", error);
+    return {
+      remaining: R8_DAILY_LIMIT,
+      resetSec: 86400,
+    };
+  }
 }
 
 /**

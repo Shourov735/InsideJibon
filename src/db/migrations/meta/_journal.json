@@ -162,6 +162,13 @@
       "when": 1790700000000,
       "tag": "0022_remaster_r9_pwa_proctoring",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1795080133674,
+      "tag": "0023_clean_mandarin",
+      "breakpoints": true
     }
   ]
 }
