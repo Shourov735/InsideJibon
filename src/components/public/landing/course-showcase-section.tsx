@@ -73,7 +73,7 @@ function getCourseThumbnail(
     case "mathematics":
       return "/images/courses/math-cover.jpg";
     default:
-      return thumbnailUrl || "/images/courses/physics-cover.jpg";
+      return "/images/courses/physics-cover.jpg";
   }
 }
 
