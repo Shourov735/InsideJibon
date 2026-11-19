@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hind_Siliguri, Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Hind_Siliguri, Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { LanguageProvider } from "@/i18n/client";
 import { getLocale } from "@/i18n/server";
@@ -18,27 +18,19 @@ export const viewport: Viewport = {
   ],
 };
 
-// R1 §3 — Hind Siliguri is the Bangla-first display + body font.
-// We keep Inter and Plus Jakarta Sans for any legacy utilities that
-// still bind to --font-jakarta / --font-inter.
+// Hind Siliguri is the Bangla-first display + body font.
+// Inter provides clean modern Latin numbers & symbols.
 const hind = Hind_Siliguri({
   variable: "--font-hind",
   subsets: ["latin", "bengali"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const jakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   display: "swap",
 });
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "600"],
   display: "swap",
 });
 
@@ -156,7 +148,7 @@ export default async function RootLayout({
         // the attribute before paint if the cookie is missing —
         // matching the cookie value on subsequent loads.
         suppressHydrationWarning
-        className={`${hind.variable} ${jakartaSans.variable} ${inter.variable} h-full antialiased`}
+        className={`${hind.variable} ${inter.variable} h-full antialiased`}
       >
         <head>
           <script
