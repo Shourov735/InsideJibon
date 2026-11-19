@@ -54,6 +54,29 @@ const DISCIPLINES = [
   },
 ];
 
+function getCourseThumbnail(
+  thumbnailUrl: string | null | undefined,
+  category: string | null | undefined
+): string {
+  if (thumbnailUrl && !thumbnailUrl.includes("ssl.du.ac.bd")) {
+    return thumbnailUrl;
+  }
+  switch (category) {
+    case "physics":
+      return "/images/courses/physics-cover.jpg";
+    case "chemistry":
+      return "/images/courses/chemistry-cover.jpg";
+    case "biology":
+      return "/images/courses/biology-cover.jpg";
+    case "ict":
+      return "/images/courses/ict-cover.jpg";
+    case "mathematics":
+      return "/images/courses/math-cover.jpg";
+    default:
+      return thumbnailUrl || "/images/courses/physics-cover.jpg";
+  }
+}
+
 export function CourseShowcaseSection({ courses, isBn }: CourseShowcaseSectionProps) {
   // Show up to 6 published courses
   const displayCourses = courses.slice(0, 6);
@@ -96,18 +119,20 @@ export function CourseShowcaseSection({ courses, isBn }: CourseShowcaseSectionPr
             {displayCourses.map((c) => {
               const isPaid = c.requiresPayment && c.priceBdt;
               const priceLabel = isPaid ? formatBDT(Number(c.priceBdt)) : (isBn ? "ফ্রি" : "Free");
+              const effectiveThumbnail = getCourseThumbnail(c.thumbnailUrl, c.category);
 
               return (
                 <Link
                   key={c.id}
                   href={`/courses/${c.slug}`}
+                  prefetch={false}
                   className="group flex flex-col overflow-hidden rounded-2xl border border-outline-variant bg-surface-0 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-academic"
                 >
                   {/* Thumbnail / Header Area */}
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface-2">
-                    {c.thumbnailUrl ? (
+                    {effectiveThumbnail ? (
                       <Image
-                        src={c.thumbnailUrl}
+                        src={effectiveThumbnail}
                         alt={c.title}
                         fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
@@ -189,6 +214,7 @@ export function CourseShowcaseSection({ courses, isBn }: CourseShowcaseSectionPr
                 <Link
                   key={d.slug}
                   href={`/courses?category=${d.slug}`}
+                  prefetch={false}
                   className="group relative flex flex-col overflow-hidden rounded-2xl border border-outline-variant bg-surface-1 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-academic"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2">

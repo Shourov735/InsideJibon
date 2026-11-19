@@ -45,15 +45,21 @@ export function PublicCourseCard({ course, enrollmentStatus, inBundle }: PublicC
       ? "warning"
       : "primary";
 
+  const effectiveThumbnail =
+    course.thumbnailUrl && !course.thumbnailUrl.includes("ssl.du.ac.bd")
+      ? course.thumbnailUrl
+      : `/images/courses/${course.category === "mathematics" ? "math" : (course.category || "physics")}-cover.jpg`;
+
   return (
     <Link
       href={`/courses/${course.slug}`}
+      prefetch={false}
       className="group flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant bg-surface-0 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-10px_rgba(0,0,0,0.12)] focus-visible:outline-2 focus-visible:outline-[color:var(--color-info)] focus-visible:outline-offset-2"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-surface-2">
-        {course.thumbnailUrl ? (
+        {effectiveThumbnail ? (
           <Image
-            src={course.thumbnailUrl}
+            src={effectiveThumbnail}
             alt={course.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
