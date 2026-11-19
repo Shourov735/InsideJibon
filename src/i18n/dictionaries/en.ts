@@ -74,7 +74,7 @@ export const en = {
 
   "nav.courses": "Courses",
   "nav.dashboard": "Dashboard",
-  "nav.getStarted": "Get Started",
+  "nav.getStarted": "Start learning",
   "nav.home": "Home",
   "nav.instructor": "Instructor",
   "nav.signIn": "Sign In",

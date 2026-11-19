@@ -9,6 +9,7 @@ import {
   BookIcon,
   CompassIcon,
   HomeIcon,
+  VideoIcon,
 } from "@/components/shared/ui/icons";
 
 type HeaderRole = "student" | "teacher" | "admin" | "parent" | null;
@@ -42,20 +43,32 @@ export function MarketingHeader({ role = null }: MarketingHeaderProps) {
     };
   }, [isSignedIn]);
 
-  const { t } = useTranslations();
+  const { locale } = useTranslations();
+  const isBn = locale === "bn";
   const navItems: AppHeaderNavItem[] = [
-    { label: t("nav.home"), href: "/", icon: <HomeIcon size={16} />, primaryNav: true },
     {
-      label: t("nav.courses"),
+      label: isBn ? "কোর্সসমূহ" : "Explore courses",
       href: "/courses",
       icon: <BookIcon size={16} />,
       primaryNav: true,
       matchPrefix: "/courses",
     },
     {
-      label: t("nav.instructor"),
+      label: isBn ? "লাইভ ক্লাস" : "Live classes",
+      href: "/#experience",
+      icon: <VideoIcon size={16} />,
+      primaryNav: true,
+    },
+    {
+      label: isBn ? "শিক্ষক পরিচিতি" : "For teachers",
       href: "/#instructor",
       icon: <CompassIcon size={16} />,
+      primaryNav: true,
+    },
+    {
+      label: isBn ? "পদ্ধতিগত কাঠামো" : "About",
+      href: "/#method",
+      icon: <HomeIcon size={16} />,
       primaryNav: true,
     },
   ];

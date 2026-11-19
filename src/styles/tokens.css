@@ -100,6 +100,7 @@
   --font-sans: var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-hind), 'Hind Siliguri', ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-hind), 'Hind Siliguri', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), 'Playfair Display', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   --text-display-1: 2.75rem;

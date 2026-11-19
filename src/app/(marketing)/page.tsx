@@ -6,11 +6,12 @@ import { JsonLd } from "@/components/shared/json-ld";
 import { getPublishedCourses } from "@/services/courses";
 
 import { HeroSection } from "@/components/public/landing/hero-section";
-import { PhilosophySection } from "@/components/public/landing/philosophy-section";
+import { ValuePillarsStrip } from "@/components/public/landing/value-pillars-strip";
+import { SubjectDiscoverySection } from "@/components/public/landing/subject-discovery-section";
 import { CourseShowcaseSection } from "@/components/public/landing/course-showcase-section";
+import { PlatformExperienceSection } from "@/components/public/landing/platform-experience-section";
 import { MethodSection } from "@/components/public/landing/method-section";
 import { EducatorSection } from "@/components/public/landing/educator-section";
-import { FeaturesSection } from "@/components/public/landing/features-section";
 import { CtaSection } from "@/components/public/landing/cta-section";
 
 export const revalidate = 3600;
@@ -18,8 +19,12 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslator();
   const isBn = t.locale === "bn";
-  const title = t("seo.home.title");
-  const description = t("seo.home.description");
+  const title = isBn
+    ? "ইনসাইডজীবন | উদ্দেশ্য নিয়ে শেখা, জীবনের জন্য এগিয়ে যাওয়া"
+    : "InsideJibon | Learn with Purpose. Grow for Life.";
+  const description = isBn
+    ? "পরিকল্পিত কোর্স, সরাসরি লাইভ ক্লাস, বোর্ড ও ভর্তি পরীক্ষার অনুশীলন — সব কিছু এক প্ল্যাটফর্মে, বাংলাদেশের শিক্ষার্থী ও শিক্ষকদের জন্য।"
+    : "Structured courses, live classes, practice exams and handwritten reviews — designed for Bangladeshi students and educators.";
 
   return {
     title: { absolute: title },
@@ -66,25 +71,28 @@ export default async function MarketingPage() {
     <main className="flex w-full flex-col min-h-screen">
       <JsonLd data={buildWebsiteJsonLd(t.locale as "en" | "bn")} />
 
-      {/* 01. Editorial Hero & Thesis */}
+      {/* 01. Editorial Hero & Purpose */}
       <HeroSection isBn={isBn} />
 
-      {/* 02. The Academic Philosophy */}
-      <PhilosophySection isBn={isBn} />
+      {/* 02. The 4 Value Pillars Floating Strip */}
+      <ValuePillarsStrip isBn={isBn} />
 
-      {/* 03. Core Published Courses & Discipline Pathways */}
+      {/* 03. Explore Subjects & Learning Paths */}
+      <SubjectDiscoverySection isBn={isBn} />
+
+      {/* 04. Published Courses Catalog */}
       <CourseShowcaseSection courses={publishedCourses} isBn={isBn} />
 
-      {/* 04. The 4-Stage Learning Architecture */}
+      {/* 05. Platform Architecture & Live Interactive Experience */}
+      <PlatformExperienceSection isBn={isBn} />
+
+      {/* 06. The 4-Stage Learning Architecture */}
       <MethodSection isBn={isBn} />
 
-      {/* 05. Lead Educator Monograph */}
+      {/* 07. Lead Educator Monograph */}
       <EducatorSection isBn={isBn} />
 
-      {/* 06. Engineering & Academic Capabilities */}
-      <FeaturesSection isBn={isBn} />
-
-      {/* 07. Concluding Editorial Call to Action */}
+      {/* 08. Concluding Call to Action */}
       <CtaSection isBn={isBn} />
     </main>
   );
