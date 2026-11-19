@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * AppHeader — universal authenticated top nav.
  *
@@ -13,8 +15,6 @@
  * The bottom-nav is opt-in via `bottomNav` so it can be disabled
  * on landing/auth pages.
  */
-
-"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";

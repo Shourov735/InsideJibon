@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/i18n/client";
 import type { Assignment, AssignmentSubmission } from "@/db/schema";
