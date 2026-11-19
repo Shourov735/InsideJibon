@@ -10,6 +10,8 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 body {
   background: var(--color-surface);
   color: var(--color-on-surface);

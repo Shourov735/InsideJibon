@@ -9,7 +9,7 @@ interface CtaSectionProps {
 
 export function CtaSection({ isBn }: CtaSectionProps) {
   return (
-    <section className="py-16 sm:py-24 bg-[#FAF8F5] dark:bg-[#0C0D10] border-t border-outline-variant/60">
+    <section className="py-16 sm:py-24 bg-[#FAF8F5] border-t border-outline-variant/60">
       <Container size="xl">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900 via-primary to-slate-900 px-6 py-16 sm:px-12 sm:py-20 text-center text-white shadow-xl">
           

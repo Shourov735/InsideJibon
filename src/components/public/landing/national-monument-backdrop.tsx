@@ -1,9 +1,9 @@
 /**
  * NationalMonumentBackdrop
  *
- * Vector illustration of the National Martyrs' Memorial (জাতীয় স্মৃতিসৌধ - Jatiyo Sriti Soudho)
- * at Savar, Dhaka, with layered lush foliage, misty horizon, and soaring birds.
- * Gives InsideJibon an authentic, proud Bangladeshi cultural aesthetic.
+ * Artistic vector illustration of the National Martyrs' Memorial (জাতীয় স্মৃতিসৌধ - Jatiyo Sriti Soudho)
+ * at Savar, Dhaka, with delicate tree canopies and soaring birds.
+ * Designed to blend seamlessly into the warm ivory (#FAF8F5) landing canvas.
  */
 
 import React from "react";
@@ -23,60 +23,50 @@ export function NationalMonumentBackdrop({ className = "" }: NationalMonumentBac
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="xMidYMax slice"
-        className="h-full w-full opacity-85 dark:opacity-35 transition-opacity duration-300"
+        className="h-full w-full"
       >
         <defs>
-          {/* Sky / Mist Gradient */}
-          <linearGradient id="monumentSkyMist" x1="50%" y1="0%" x2="50%" y2="100%">
-            <stop offset="0%" stopColor="var(--color-surface-0)" stopOpacity="0" />
-            <stop offset="60%" stopColor="var(--color-surface-1)" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="var(--color-surface-2)" stopOpacity="0.9" />
-          </linearGradient>
-
           {/* Monument Wall Shading Gradients */}
           <linearGradient id="pylonLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#cbd5e1" stopOpacity="0.65" />
+            <stop offset="0%" stopColor="#CBD5E1" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#E2E8F0" stopOpacity="0.95" />
           </linearGradient>
 
           <linearGradient id="pylonRight" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#64748b" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.25" />
+            <stop offset="0%" stopColor="#94A3B8" stopOpacity="0.75" />
+            <stop offset="100%" stopColor="#CBD5E1" stopOpacity="0.5" />
           </linearGradient>
 
           <linearGradient id="pylonCenter" x1="50%" y1="0%" x2="50%" y2="100%">
-            <stop offset="0%" stopColor="#e2e8f0" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.6" />
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+            <stop offset="100%" stopColor="#E2E8F0" stopOpacity="0.9" />
           </linearGradient>
 
-          {/* Foliage Gradients */}
+          {/* Gentle, airy pastel foliage gradients matching the reference image */}
           <linearGradient id="foliageFar" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#a7c4bc" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#688f82" stopOpacity="0.75" />
+            <stop offset="0%" stopColor="#D4E7DF" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#B3D3C6" stopOpacity="0.65" />
           </linearGradient>
 
           <linearGradient id="foliageMid" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#688f82" stopOpacity="0.65" />
-            <stop offset="100%" stopColor="#43685c" stopOpacity="0.85" />
+            <stop offset="0%" stopColor="#9EBEB2" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#7E9F94" stopOpacity="0.75" />
           </linearGradient>
 
           <linearGradient id="foliageNear" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#4b7264" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#2d4a3e" stopOpacity="0.95" />
+            <stop offset="0%" stopColor="#72978B" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#5B7E72" stopOpacity="0.85" />
           </linearGradient>
 
-          {/* Water reflection */}
-          <linearGradient id="waterReflect" x1="50%" y1="0%" x2="50%" y2="100%">
-            <stop offset="0%" stopColor="#64748b" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05" />
+          {/* Bottom blend into the warm ivory background */}
+          <linearGradient id="groundFade" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stopColor="#FAF8F5" stopOpacity="0" />
+            <stop offset="100%" stopColor="#FAF8F5" stopOpacity="1" />
           </linearGradient>
         </defs>
 
-        {/* Ambient Mist Backdrop */}
-        <rect width="1440" height="420" fill="url(#monumentSkyMist)" />
-
         {/* Soaring Birds (Gentle V-shaped flock across sky) */}
-        <g stroke="#64748b" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.65">
+        <g stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.75">
           {/* Bird 1 */}
           <path d="M 610 185 Q 618 178 626 186 Q 634 178 642 185" />
           {/* Bird 2 */}
@@ -104,36 +94,32 @@ export function NationalMonumentBackdrop({ className = "" }: NationalMonumentBac
         {/* The memorial has 7 pairs of triangular prism pylons converging at apex (720, 160) */}
         <g id="sriti-soudho" transform="translate(0, 0)">
           {/* Outermost Pair 7 (Widest, lowest) */}
-          <polygon points="720,285 580,365 720,365" fill="url(#pylonLeft)" opacity="0.6" />
-          <polygon points="720,285 860,365 720,365" fill="url(#pylonRight)" opacity="0.6" />
+          <polygon points="720,285 580,365 720,365" fill="url(#pylonLeft)" opacity="0.75" />
+          <polygon points="720,285 860,365 720,365" fill="url(#pylonRight)" opacity="0.65" />
 
           {/* Pair 6 */}
-          <polygon points="720,265 605,365 720,365" fill="url(#pylonLeft)" opacity="0.7" />
+          <polygon points="720,265 605,365 720,365" fill="url(#pylonLeft)" opacity="0.8" />
           <polygon points="720,265 835,365 720,365" fill="url(#pylonRight)" opacity="0.7" />
 
           {/* Pair 5 */}
-          <polygon points="720,245 630,365 720,365" fill="url(#pylonLeft)" opacity="0.75" />
+          <polygon points="720,245 630,365 720,365" fill="url(#pylonLeft)" opacity="0.85" />
           <polygon points="720,245 810,365 720,365" fill="url(#pylonRight)" opacity="0.75" />
 
           {/* Pair 4 */}
-          <polygon points="720,225 655,365 720,365" fill="url(#pylonLeft)" opacity="0.8" />
+          <polygon points="720,225 655,365 720,365" fill="url(#pylonLeft)" opacity="0.9" />
           <polygon points="720,225 785,365 720,365" fill="url(#pylonRight)" opacity="0.8" />
 
           {/* Pair 3 */}
-          <polygon points="720,205 675,365 720,365" fill="url(#pylonLeft)" opacity="0.85" />
+          <polygon points="720,205 675,365 720,365" fill="url(#pylonLeft)" opacity="0.92" />
           <polygon points="720,205 765,365 720,365" fill="url(#pylonRight)" opacity="0.85" />
 
           {/* Pair 2 */}
-          <polygon points="720,185 695,365 720,365" fill="url(#pylonLeft)" opacity="0.9" />
+          <polygon points="720,185 695,365 720,365" fill="url(#pylonLeft)" opacity="0.95" />
           <polygon points="720,185 745,365 720,365" fill="url(#pylonRight)" opacity="0.9" />
 
           {/* Center Tallest Spire 1 (Apex at 720, 160) */}
           <polygon points="720,158 708,365 720,365" fill="url(#pylonCenter)" />
           <polygon points="720,158 732,365 720,365" fill="url(#pylonRight)" />
-
-          {/* Memorial Reflection in Pool */}
-          <polygon points="720,365 712,410 720,410" fill="url(#waterReflect)" opacity="0.4" />
-          <polygon points="720,365 728,410 720,410" fill="url(#waterReflect)" opacity="0.4" />
         </g>
 
         {/* Mid-ground Layered Canopy Left */}
@@ -162,7 +148,7 @@ export function NationalMonumentBackdrop({ className = "" }: NationalMonumentBac
              C 230 350 280 355 310 380 
              L 310 420 L -10 420 Z"
           fill="url(#foliageNear)"
-          opacity="0.8"
+          opacity="0.85"
         />
 
         {/* Foreground Lush Trees and Shrubbery Right Edge */}
@@ -173,16 +159,16 @@ export function NationalMonumentBackdrop({ className = "" }: NationalMonumentBac
              C 1375 330 1425 330 1450 375 
              L 1450 420 L 1130 420 Z"
           fill="url(#foliageNear)"
-          opacity="0.8"
+          opacity="0.85"
         />
 
-        {/* Soft Ground Blend to match page background seamlessly */}
+        {/* Bottom smooth fade to merge directly into the next section */}
         <rect
           x="0"
-          y="385"
+          y="370"
           width="1440"
-          height="35"
-          fill="url(#monumentSkyMist)"
+          height="50"
+          fill="url(#groundFade)"
         />
       </svg>
     </div>
