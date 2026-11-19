@@ -1,11 +1,26 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/courses", "/courses/*"],
+        allow: [
+          "/",
+          "/courses",
+          "/courses/*",
+          "/bundles",
+          "/bundles/*",
+          "/legal",
+          "/legal/*",
+          "/_next/static/*",
+          "/images/*",
+          "/favicon.ico",
+          "/icon.png",
+          "/icon-*.png",
+          "/apple-touch-icon.png",
+        ],
         disallow: [
           "/student",
           "/student/*",
@@ -13,17 +28,28 @@ export default function robots(): MetadataRoute.Robots {
           "/teacher/*",
           "/admin",
           "/admin/*",
-          "/api/*",
+          "/parent",
+          "/parent/*",
+          "/account",
+          "/account/*",
+          "/checkout",
+          "/checkout/*",
+          "/leaderboard",
+          "/leaderboard/*",
+          "/access-denied",
+          "/unauthorized",
+          "/offline",
+          "/account-pending",
+          "/continue",
           "/sign-in",
           "/sign-in/*",
           "/sign-up",
           "/sign-up/*",
-          "/continue",
-          "/account-pending",
+          "/api/*",
         ],
       },
     ],
-    sitemap: "https://insidejibon.com/sitemap.xml",
-    host: "https://insidejibon.com",
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

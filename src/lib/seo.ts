@@ -89,22 +89,37 @@ export function buildWebsiteJsonLd(locale: "en" | "bn" = "bn") {
 }
 
 /**
+ * Resolves a reliable, absolute thumbnail URL for a course, avoiding broken legacy hosts.
+ */
+export function getEffectiveCourseThumbnailUrl(
+  thumbnailUrl: string | null | undefined,
+  category?: string | null
+): string {
+  if (thumbnailUrl && !thumbnailUrl.includes("ssl.du.ac.bd")) {
+    return thumbnailUrl.startsWith("http")
+      ? thumbnailUrl
+      : `${SITE_URL}${thumbnailUrl.startsWith("/") ? "" : "/"}${thumbnailUrl}`;
+  }
+  const catSlug = category === "mathematics" ? "math" : (category || "physics");
+  return `${SITE_URL}/images/courses/${catSlug}-cover.jpg`;
+}
+
+/**
  * Schema.org JSON-LD for an individual Course page.
  */
 export function buildCourseJsonLd(course: PublicCourseDetail, locale: "en" | "bn" = "bn") {
   const isBn = locale === "bn";
   const courseUrl = `${SITE_URL}/courses/${course.slug}`;
-  const imageUrl = course.thumbnailUrl
-    ? course.thumbnailUrl.startsWith("http")
-      ? course.thumbnailUrl
-      : `${SITE_URL}${course.thumbnailUrl}`
-    : DEFAULT_OG_IMAGE;
+  const imageUrl = getEffectiveCourseThumbnailUrl(course.thumbnailUrl, course.category);
 
   const teacherImageUrl = course.teacher.imageUrl
     ? course.teacher.imageUrl.startsWith("http")
       ? course.teacher.imageUrl
       : `${SITE_URL}${course.teacher.imageUrl}`
     : `${SITE_URL}/jibon.jpg`;
+
+  const isPaid = Boolean(course.requiresPayment && course.priceBdt);
+  const price = isPaid ? String(course.priceBdt) : "0";
 
   return {
     "@context": "https://schema.org",
@@ -134,13 +149,81 @@ export function buildCourseJsonLd(course: PublicCourseDetail, locale: "en" | "bn
       courseMode: "Online",
       courseWorkload: `${course.lessonCount} lessons`,
       inLanguage: ["bn", "en"],
+      offers: {
+        "@type": "Offer",
+        category: isPaid ? "Paid" : "Free",
+        price,
+        priceCurrency: "BDT",
+        availability: "https://schema.org/InStock",
+        url: courseUrl,
+      },
     },
     offers: {
       "@type": "Offer",
-      category: "Free",
-      price: "0",
+      category: isPaid ? "Paid" : "Free",
+      price,
       priceCurrency: "BDT",
       availability: "https://schema.org/InStock",
+      url: courseUrl,
+    },
+  };
+}
+
+/**
+ * Schema.org JSON-LD for an individual Course Bundle page.
+ */
+export function buildBundleJsonLd(
+  bundle: { title: string; slug: string; description: string | null; priceBdt: string | number },
+  locale: "en" | "bn" = "bn"
+) {
+  const isBn = locale === "bn";
+  const bundleUrl = `${SITE_URL}/bundles/${bundle.slug}`;
+  const description =
+    bundle.description ||
+    (isBn
+      ? `${bundle.title} — ইনসাইড জীবনে একাধিক কোর্সের সমন্বিত বান্ডেল প্যাকেজ।`
+      : `Get ${bundle.title} bundle on InsideJibon — structured academic course bundle.`);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": `${bundleUrl}#product`,
+    name: bundle.title,
+    description,
+    url: bundleUrl,
+    image: DEFAULT_OG_IMAGE,
+    offers: {
+      "@type": "Offer",
+      price: String(bundle.priceBdt),
+      priceCurrency: "BDT",
+      availability: "https://schema.org/InStock",
+      url: bundleUrl,
+    },
+  };
+}
+
+/**
+ * Schema.org JSON-LD for legal and policy documents.
+ */
+export function buildLegalJsonLd(
+  docKey: string,
+  title: string,
+  dateModified: string,
+  description: string
+) {
+  const docUrl = `${SITE_URL}/legal/${docKey}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${docUrl}#webpage`,
+    name: title,
+    url: docUrl,
+    description,
+    dateModified,
+    publisher: {
+      "@type": "EducationalOrganization",
+      name: SITE_NAME,
+      url: SITE_URL,
     },
   };
 }
@@ -156,7 +239,7 @@ export function buildBreadcrumbJsonLd(items: Array<{ name: string; url: string }
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: item.url.startsWith("http") ? item.url : `${SITE_URL}${item.url}`,
+      item: item.url.startsWith("http") ? item.url : `${SITE_URL}${item.url.startsWith("/") ? "" : "/"}${item.url}`,
     })),
   };
 }

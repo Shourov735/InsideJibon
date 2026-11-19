@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = t("seo.courses.description");
 
   return {
-    title: isBn ? "কোর্সসমূহ" : "Courses",
+    title: { absolute: title },
     description,
     alternates: buildAlternates("/courses"),
     openGraph: {

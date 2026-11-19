@@ -12,6 +12,7 @@ import {
   buildAlternates,
   buildBreadcrumbJsonLd,
   buildCourseJsonLd,
+  getEffectiveCourseThumbnailUrl,
 } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { getDb } from "@/db";
@@ -60,11 +61,7 @@ export async function generateMetadata({
       ? `${course.title} — ইনসাইড জীবনে পরিকল্পিত একাডেমিক ভিডিও পাঠ, অ্যাসাইনমেন্ট ও পরীক্ষা প্রস্তুতি।`
       : `Master ${course.title} with structured video lessons, assignments, and exam practice on InsideJibon.`);
 
-  const imageUrl = course.thumbnailUrl
-    ? course.thumbnailUrl.startsWith("http")
-      ? course.thumbnailUrl
-      : `https://insidejibon.com${course.thumbnailUrl}`
-    : "https://insidejibon.com/images/og-image.jpg";
+  const imageUrl = getEffectiveCourseThumbnailUrl(course.thumbnailUrl, course.category);
 
   return {
     title: course.title,
@@ -235,7 +232,7 @@ export default async function PublicCourseDetailPage({
                   <div className="relative aspect-video w-full">
                     <CoursePreviewVideo
                       youtubeVideoId={previewVideoId}
-                      thumbnailUrl={course.thumbnailUrl}
+                      thumbnailUrl={getEffectiveCourseThumbnailUrl(course.thumbnailUrl, course.category)}
                       title={course.title}
                       badgeLabel={t("learning.player.previewNotice")}
                       className="h-full w-full"

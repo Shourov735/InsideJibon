@@ -18,6 +18,16 @@ import { getLegalDoc, LEGAL_DOCS, LEGAL_LAST_UPDATED, type LegalDocKey } from "@
  * Unknown `doc` values return 404 so an attacker cannot enumerate.
  */
 
+import {
+  buildAlternates,
+  buildBreadcrumbJsonLd,
+  buildLegalJsonLd,
+  DEFAULT_OG_IMAGE,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
+import { JsonLd } from "@/components/shared/json-ld";
+
 const DOC_KEYS: LegalDocKey[] = ["terms", "privacy", "refund", "cookies"];
 
 function isDocKey(value: string): value is LegalDocKey {
@@ -38,6 +48,27 @@ function docTitleKey(doc: LegalDocKey) {
   }
 }
 
+function getDocDescription(doc: LegalDocKey, isBn: boolean): string {
+  switch (doc) {
+    case "terms":
+      return isBn
+        ? "ইনসাইড জীবন প্ল্যাটফর্ম ব্যবহারের নিয়মাবলী, শর্ত ও নীতিমালা সম্পর্কে বিস্তারিত জানুন।"
+        : "Read the Terms of Service governing the use of InsideJibon academic learning platform.";
+    case "privacy":
+      return isBn
+        ? "ইনসাইড জীবনে আপনার ব্যক্তিগত তথ্য কীভাবে সুরক্ষিত ও সংরক্ষিত রাখা হয় তার গোপনীয়তা নীতি।"
+        : "Learn how InsideJibon protects and handles your personal data and privacy.";
+    case "refund":
+      return isBn
+        ? "ইনসাইড জীবনের কোর্স ও সেবার ফি প্রদান এবং রিফান্ড সংক্রান্ত স্পষ্ট নীতিমালা।"
+        : "Understand InsideJibon's refund policy, payment terms, and course access conditions.";
+    case "cookies":
+      return isBn
+        ? "ইনসাইড জীবনে ব্রাউজিং অভিজ্ঞতা ও সেশন সুরক্ষায় ব্যবহৃত কুকি সংক্রান্ত তথ্য।"
+        : "Information about how cookies and session storage are used on InsideJibon.";
+  }
+}
+
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
@@ -50,13 +81,50 @@ export async function generateMetadata({
   params: Promise<{ doc: string }>;
 }): Promise<Metadata> {
   const { doc } = await params;
-  if (!isDocKey(doc)) return { title: "Not found" };
+  if (!isDocKey(doc)) return { title: "Not found", robots: { index: false, follow: false } };
   const locale = await getLocale();
+  const isBn = locale === "bn";
   const t = buildTranslator(locale);
+  const docTitle = `${t(docTitleKey(doc))} | InsideJibon`;
+  const description = getDocDescription(doc, isBn);
+  const docUrl = `${SITE_URL}/legal/${doc}`;
+
   return {
-    title: `${t(docTitleKey(doc))} — InsideJibon`,
-    description: t(docTitleKey(doc)),
-    robots: { index: true, follow: true },
+    title: { absolute: docTitle },
+    description,
+    alternates: buildAlternates(`/legal/${doc}`),
+    openGraph: {
+      title: docTitle,
+      description,
+      url: docUrl,
+      siteName: SITE_NAME,
+      locale: isBn ? "bn_BD" : "en_US",
+      alternateLocale: [isBn ? "en_US" : "bn_BD"],
+      type: "website",
+      images: [
+        {
+          url: DEFAULT_OG_IMAGE,
+          width: 1200,
+          height: 630,
+          alt: docTitle,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: docTitle,
+      description,
+      images: [DEFAULT_OG_IMAGE],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+      },
+    },
   };
 }
 
@@ -68,11 +136,30 @@ export default async function LegalDocPage({
   const { doc } = await params;
   if (!isDocKey(doc)) notFound();
   const locale = await getLocale();
+  const isBn = locale === "bn";
   const t = buildTranslator(locale);
   const content = getLegalDoc(doc, locale);
+  const docTitle = t(docTitleKey(doc));
+  const description = getDocDescription(doc, isBn);
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10 sm:py-14">
+      <JsonLd
+        data={buildLegalJsonLd(doc, docTitle, LEGAL_LAST_UPDATED[doc], description)}
+      />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: isBn ? "হোম" : "Home", url: "/" },
+          { name: docTitle, url: `/legal/${doc}` },
+        ])}
+      />
+      <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-xs font-medium text-on-surface-variant">
+        <Link href="/" className="hover:text-on-surface">
+          {isBn ? "হোম" : "Home"}
+        </Link>
+        <span aria-hidden="true">›</span>
+        <span className="truncate text-on-surface">{docTitle}</span>
+      </nav>
       <header className="mb-8">
         <p className="text-xs uppercase tracking-wider text-on-surface-variant">
           {t("legal.footerLink")}
