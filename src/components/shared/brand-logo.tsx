@@ -59,7 +59,7 @@ export function BrandLogo({
   className = "",
   badge,
   badgeClassName,
-  priority = true,
+  priority = false,
 }: BrandLogoProps) {
   const config = sizeConfig[size];
   const badgeClasses =
@@ -81,7 +81,8 @@ export function BrandLogo({
         width={config.markSize}
         height={config.markSize}
         className="h-full w-full object-contain brand-logo-light"
-        priority={priority}
+        loading="eager"
+        decoding="async"
       />
       <Image
         src="/images/logo-icon-dark.png"
@@ -89,7 +90,8 @@ export function BrandLogo({
         width={config.markSize}
         height={config.markSize}
         className="h-full w-full object-contain brand-logo-dark"
-        priority={priority}
+        loading="eager"
+        decoding="async"
       />
     </div>
   );
@@ -108,6 +110,8 @@ export function BrandLogo({
         height={config.fullHeight}
         className={cn(config.fullClass, "object-contain brand-logo-light")}
         priority={priority}
+        loading={priority ? undefined : "eager"}
+        decoding="async"
       />
       <Image
         src="/images/logo-dark.png"
@@ -115,7 +119,8 @@ export function BrandLogo({
         width={config.fullWidth}
         height={config.fullHeight}
         className={cn(config.fullClass, "object-contain brand-logo-dark")}
-        priority={priority}
+        loading="eager"
+        decoding="async"
       />
     </div>
   );
